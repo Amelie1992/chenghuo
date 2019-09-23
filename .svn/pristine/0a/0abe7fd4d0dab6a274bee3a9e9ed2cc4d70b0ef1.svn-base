@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>积分充值卡</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="../../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../css/AdminLTE.min.css">
+    <link rel="stylesheet" href="../../css/font-awesome.min.css">
+    <link rel="stylesheet" href="../../plugins/jqgrid/ui.jqgrid-bootstrap.css">
+    <link rel="stylesheet" href="../../css/bootstrap-table.min.css">
+    <link rel="stylesheet" href="../../plugins/bootstrap-validator/css/bootstrap-validator.min.css">
+    <link rel="stylesheet" href="../../plugins/ztree/css/metroStyle/metroStyle.css">
+    <link rel="stylesheet" href="../../css/main.css">
+    <link rel="stylesheet" href="../../plugins/treegrid/jquery.treegrid.css">
+
+</head>
+<body>
+<div id="rrapp" v-cloak class="content-wrapper wzl-content-wrapper">
+    <section class="content-header">
+        <h1>
+            积分充值卡 &nbsp;<small v-if="title!=''">{{title}}</small>
+        </h1>
+    </section>
+    <div v-show="showList">
+        <section class="content">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="box">
+                        <div class="box-header with-border">
+                            <div class="col-xs-2">
+                                <input type="text" class="form-control" v-model="queryParams.cardNumber" maxlength="20"
+                                       placeholder="充值码">
+                            </div>
+                            <div class="col-xs-2">
+                                <input type="text" class="form-control" v-model="queryParams.batchNumber" maxlength="20"
+                                       placeholder="批次号">
+                            </div>
+                            <div class="col-xs-2">
+                                <select class="form-control" data-width="auto" v-model="queryParams.activationState">
+                                    <option value="">激活状态</option>
+                                    <option value="1">已激活</option>
+                                    <option value="2">未激活</option>
+                                </select>
+                            </div>
+                            <div class="col-xs-2">
+                                <select class="form-control" data-width="auto" v-model="queryParams.writeOffStatus">
+                                    <option value="">核销状态</option>
+                                    <option value="1">已核销</option>
+                                    <option value="2">未核销</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-primary" @click="query">
+                                <i class="fa fa-search"></i>&nbsp;查询
+                            </button>
+                            <button v-if="hasPermission('integral:integralcard:save')" class="btn btn-success"
+                                    @click="add">
+                                <i class="fa fa-plus"></i>&nbsp;新增
+                            </button>
+                            <button v-if="hasPermission('integral:integralcard:update')" class="btn btn-warning"
+                                    @click="activate">
+                                <i class="fa fa-edit"></i>&nbsp;激活
+                            </button>
+                            <button class="btn btn-danger" @click="excel">&nbsp;导出</button>
+                            <!--<button v-if="hasPermission('integral:integralcard:update')" class="btn btn-warning" @click="update">-->
+                            <!--<i class="fa fa-trash-o"></i>&nbsp;修改-->
+                            <!--</button>-->
+                            <!--<button v-if="hasPermission('integral:integralcard:delete')" class="btn btn-danger" @click="del">-->
+                            <!--<i class="fa fa-trash-o"></i>&nbsp;删除-->
+                            <!--</button>-->
+                        </div>
+                        <div class="box-body">
+                            <table id="table"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!--新增页-->
+    <div v-show="batchList">
+        <section class="content">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="box">
+                        <form class="form-horizontal" id="batchForm">
+                            <div class="row">
+                                <div class="form-group">
+                                    <div class="col-sm-2 control-label">批次号</div>
+                                    <div class="col-sm-3">
+                                        <input type="text" name="batchNumber" class="form-control" disabled
+                                               v-model="integralCardBatch.batchNumber" placeholder="批次号自动生成"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group">
+                                    <div class="col-sm-2 control-label">积分面值</div>
+                                    <div class="col-sm-3">
+                                        <input type="text" name="integral" class="form-control"
+                                               v-model="integralCardBatch.integral" placeholder="积分面值"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group">
+                                    <div class="col-sm-2 control-label">开卡数</div>
+                                    <div class="col-sm-3">
+                                        <input type="text" name="number" class="form-control"
+                                               v-model="integralCardBatch.number" placeholder="开卡数"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group">
+                                    <div class="col-sm-2 control-label">备注</div>
+                                    <div class="col-sm-6">
+                                        <input type="text" name="remarks" class="form-control"
+                                               v-model="integralCardBatch.remarks" placeholder="备注"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group">
+                                    <div class="col-sm-2 control-label"></div>
+                                    <input type="button" class="btn btn-primary" @click="batchValidate" value="确定"/>
+                                    &nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload"
+                                                       value="返回"/>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<script src="../../libs/jquery.min.js"></script>
+<script src="../../plugins/layer/layer.js"></script>
+<script src="../../libs/bootstrap.min.js"></script>
+<script src="../../libs/vue.min.js"></script>
+<!--bootstrap-table-->
+<script src="../../plugins/bootstrap-table/bootstrap-table.min.js"></script>
+<script src="../../plugins/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
+<!--excel导出-->
+<script src="../../plugins/bootstrap-table/tableExport.js"></script>
+<!--bootstrap-validator-->
+<script src="../../plugins/bootstrap-validator/js/bootstrap-validator.min.js"></script>
+<script src="../../plugins/bootstrap-validator/js/zh_CN.min.js"></script>
+<script src="../../plugins/jqgrid/grid.locale-cn.js"></script>
+<script src="../../plugins/jqgrid/jquery.jqGrid.min.js"></script>
+<script src="../../plugins/ztree/jquery.ztree.all.min.js"></script>
+<script src="../../js/common.js"></script>
+
+<script src="../../js/modules/integral/integralcard.js"></script>
+</body>
+</html>

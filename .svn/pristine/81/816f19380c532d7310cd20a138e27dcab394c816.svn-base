@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>积分设置</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="../../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../css/AdminLTE.min.css">
+    <link rel="stylesheet" href="../../css/font-awesome.min.css">
+    <link rel="stylesheet" href="../../plugins/jqgrid/ui.jqgrid-bootstrap.css">
+    <link rel="stylesheet" href="../../css/bootstrap-table.min.css">
+    <link rel="stylesheet" href="../../plugins/bootstrap-validator/css/bootstrap-validator.min.css">
+    <link rel="stylesheet" href="../../plugins/ztree/css/metroStyle/metroStyle.css">
+    <link rel="stylesheet" href="../../css/main.css">
+    <link rel="stylesheet" href="../../plugins/treegrid/jquery.treegrid.css">
+    <link rel="stylesheet" href="../../plugins/iCheck/all.css">
+
+</head>
+<body>
+<div id="rrapp" v-cloak class="content-wrapper wzl-content-wrapper">
+    <section class="content-header">
+        <h1>
+            会员设置 &nbsp;<small v-if="title!=''">{{title}}</small>
+        </h1>
+    </section>
+    <div v-show="!showList">
+        <section class="content">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="box">
+                        <form class="form-horizontal" style="padding-left:20px; padding-right:20px">
+                            <div class="row">
+                                <h3>会费设置</h3>
+                                <div class="form-group" style="display:none">
+                                    <label>
+                                        <input type="checkbox" class="minimal" name="memberState">
+                                        开启
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">会费</span>
+                                        <input type="text" class="form-control" v-model="config.member.lose" name="lose">
+                                        <span class="input-group-addon">元/年</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top:20px">
+                                <div class="form-group">
+                                    <div class="col-sm-2 control-label"></div>
+                                    <input type="button" class="btn btn-primary" @click="validate" value="确定"/>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<script src="../../libs/jquery.min.js"></script>
+<script src="../../plugins/layer/layer.js"></script>
+<script src="../../libs/bootstrap.min.js"></script>
+<script src="../../libs/vue.min.js"></script>
+<!--bootstrap-table-->
+<script src="../../plugins/bootstrap-table/bootstrap-table.min.js"></script>
+<script src="../../plugins/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
+<!--bootstrap-validator-->
+<script src="../../plugins/bootstrap-validator/js/bootstrap-validator.min.js"></script>
+<script src="../../plugins/bootstrap-validator/js/zh_CN.min.js"></script>
+<script src="../../plugins/jqgrid/grid.locale-cn.js"></script>
+<script src="../../plugins/jqgrid/jquery.jqGrid.min.js"></script>
+<script src="../../plugins/ztree/jquery.ztree.all.min.js"></script>
+<script src="../../js/common.js"></script>
+<script src="../../plugins/iCheck/icheck.min.js"></script>
+<script src="../../js/modules/sys/membershipsetting.js"></script>
+
+<script>
+    //iCheck for checkbox and radio inputs
+    $('input[type="checkbox"].minimal, input[type="radio"].minimal').iCheck({
+        checkboxClass: 'icheckbox_minimal-blue',
+        radioClass: 'iradio_minimal-blue'
+    });
+    //Red color scheme for iCheck
+    $('input[type="checkbox"].minimal-red, input[type="radio"].minimal-red').iCheck({
+        checkboxClass: 'icheckbox_minimal-red',
+        radioClass: 'iradio_minimal-red'
+    });
+    //Flat red color scheme for iCheck
+    $('input[type="checkbox"].flat-red, input[type="radio"].flat-red').iCheck({
+        checkboxClass: 'icheckbox_flat-green',
+        radioClass: 'iradio_flat-green'
+    });
+
+    $("input:checkbox[name='memberState']").on('ifChecked', function(event){
+        vm.config.member.state = 1;
+    });
+    $("input:checkbox[name='memberState']").on('ifUnchecked', function(event){
+        vm.config.member.state = 0;
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,478 @@
+$(function() {
+	// 列表
+	$("#table").BT({
+		url : baseURL + 'goods/list',
+		columns : [ {
+			checkbox : true
+		}, {
+			title : '商品编号',
+			field : 'id'
+		}, {
+			title : '图片',
+			field : 'picUrl',
+			formatter : function(value, row, index) {
+				return '<img width="100px" height="100px" src=' + value + '>';
+			}
+		}, {
+			title : '商品名称',
+			field : 'goodsName'
+		}, {
+			title : '商品分类',
+			field : 'category.categoryName'
+		}, {
+            title:'价格区间',
+            field:'priceSection'
+
+        }, {
+			title : '价格',
+			field : 'price'
+		},  {
+			title : '活动价格',
+			field : 'payPrice'
+		}, {
+			title : '状态 ',
+			field : 'status',
+			formatter : function(value, row, index) {
+				return value == 1 ? '<span class="label label-primary">上架</span>' : '<span class="label label-default">下架</span>';
+			}
+		}, {
+			title : '创建时间 ',
+			field : 'createTime'
+		} ],
+		// 条件查询
+		queryParams : {}
+
+	});
+	// 表单提交
+	$("form").FM({
+		fields : vm.fields,
+		success : vm.saveOrUpdate
+
+	})
+});
+
+var vm = new Vue({
+	el : '#rrapp',
+	data : {
+		step: 1,
+        showProList: true,//选择规格窗
+        proTable :true,//规格信息表
+		showList : true,
+		title : null,
+		goods : {
+			brandId: '',
+			categoryId: '',
+			//规格
+            specList:[],
+            specEntityList:[]
+		},
+
+        queryParams:{
+		},
+        deptParams: {
+
+        },
+		shopList : [],
+		categoryList : [],
+		addEditor : {},// 编辑器对象
+		brandList : [],// 品牌集合
+		freightTemplateList: [],
+        productParams:'',
+
+		tagList: [],
+		tags: [],
+		propertyList: [],
+		// 验证字段
+		fields : {
+			goodsName : {
+				message : '商品名称验证失败',
+				validators : {
+					notEmpty : {
+						message : '商品名称不能为空'
+					},
+				},
+			},
+			categoryId : {
+				message : '分类验证失败',
+				validators : {
+					notEmpty : {
+						message : '分类不能为空'
+					},
+				},
+			},
+            priceSection : {
+                message : '价格区间验证失败',
+                validators : {
+                    notEmpty : {
+                        message : '价格区间不能为空'
+                    },
+                },
+            },
+			brandId : {
+				message : '品牌验证失败',
+				validators : {
+					notEmpty : {
+						message : '品牌不能为空'
+					},
+				},
+			},
+			price : {
+				message : '价格验证失败',
+				validators : {
+					notEmpty : {
+						message : '价格不能为空'
+					},regexp:{
+                        regexp:/^[0-9]+([.]{1}[0-9]+){0,1}$/,
+                        message:'只能输入数字和小数'
+                    }
+				},
+			},
+			payPrice : {
+				message : '活动价格验证失败',
+				validators : {
+					notEmpty : {
+						message : '活动价格不能为空'
+					},regexp:{
+                        regexp:/^[0-9]+([.]{1}[0-9]+){0,1}$/,
+                        message:'只能输入数字和小数'
+                    }
+				},
+			},
+			stock : {
+				message : '库存验证失败',
+				validators : {
+					notEmpty : {
+						message : '库存不能为空'
+					},
+				},
+			}
+		}
+	},
+	methods : {
+        chooseProduct: function () {
+            vm.initChooseTable();
+            vm.queryProduct();
+            $("#chooseProductModal").modal('show');
+
+        },
+        //规格弹出
+        initChooseTable: function () {
+            //清空历史
+            vm.deptParams.specName=''
+            //列表
+            $("#table1").BT({
+                url: baseURL + 'goods/spec/getPid',
+                columns: [
+                    {checkbox: true,},
+                    {title: '规格总类',field:'specName', align: 'center'},
+                    {title: '序号',field:'sort', align: 'center'}
+
+                ],
+                //条件查询
+                queryParams: vm.deptParams
+            });
+        },
+        //选择规格
+        selectProduct: function () {
+            var grid = $('#table1').bootstrapTable('getSelections');
+            if (!grid.length || grid.length>1) {
+                alert("请选择一条记录");
+                return;
+            }
+            var productName = "";
+
+            grid.forEach(function (item) {
+                //判断有没有重复添加规格
+                var flag = vm.goods.specList.some(function (items, index, array) {
+                    return item.id == items.id;
+                })
+
+                if (!flag) {
+                    var one={};
+                    //获取父级子类
+                    $.get(baseURL + "goods/spec/getSon/"+item.id, function(r) {
+                        vm.goods.specList= r.specList;
+                    })
+
+                    vm.goods.specList.push(vm.goods.specList);
+                }
+            });
+            $("#chooseProductModal").modal('hide');
+
+        },
+        queryProduct: function () {
+
+            $("#table1").BTF5(vm.deptParams);
+            console.log(vm.deptParams)
+        },
+        removeSpu: function (index) {
+            vm.goods.specList.splice(index, 1);
+        },
+
+        goodsOn: function(){
+			var ids = getSelectedRowsId("id");
+			if (ids == null) {
+				return;
+			}
+
+			confirm('确定要上架选中的记录？', function() {
+				$.ajax({
+					type : "POST",
+					url : baseURL + "goods/goodsOn",
+					contentType : "application/json",
+					data : JSON.stringify(ids),
+					success : function(r) {
+						if (r.code == 0) {
+							alert('操作成功', function(index) {
+								vm.reload();
+							});
+						} else {
+							alert(r.msg);
+						}
+					}
+				});
+			});
+		},
+		goodsOff: function(){
+			var ids = getSelectedRowsId("id");
+			if (ids == null) {
+				return;
+			}
+
+			confirm('确定要下架选中的记录？', function() {
+				$.ajax({
+					type : "POST",
+					url : baseURL + "goods/goodsOff",
+					contentType : "application/json",
+					data : JSON.stringify(ids),
+					success : function(r) {
+						if (r.code == 0) {
+							alert('操作成功', function(index) {
+								vm.reload();
+							});
+						} else {
+							alert(r.msg);
+						}
+					}
+				});
+			});
+		},
+		// 品牌集合
+		getBrand : function() {
+			$.get(baseURL + "goods/brand/all", function(r) {
+				vm.brandList = r.list;
+			})
+		},
+		getCategory : function() {
+			// 加载菜单树
+			$.get(baseURL + "goods/category/all", function(r) {
+				vm.categoryList = r.list;
+			})
+		},
+		getFreightTemplate : function() {
+			// 加载菜单树
+			$.get(baseURL + "order/freighttemplate/all", function(r) {
+				vm.freightTemplateList = r.list;
+			})
+		},
+		next: function(){
+			var step = vm.step;
+			vm.step = step + 1;
+			if(step == 3){
+			}
+		},
+		prev: function(){
+			var step = vm.step;
+			vm.step = step - 1;
+		},
+		query : function() {
+			vm.reload();
+		},
+		add : function() {
+			vm.showList = false;
+            vm.showProList = true;
+            vm.proTable = true;
+			vm.title = "新增";
+			vm.goods = {
+				picUrls : [],
+				picUrl : '',
+				status : 1,
+                sign:1,
+				brandId: "",
+				categoryId: "",
+				freightTemplateId: "",
+                content:"",
+                specList:[]
+			};
+            var content =$('#container').val();
+            ue.setContent(content);
+		},
+		update : function(event) {
+			var id = getSelectedRowId("id");
+			if (id == null) {
+				return;
+			}
+			vm.showList = false;
+            vm.showProList = true;
+            vm.proTable = true;
+			vm.title = "修改";
+
+			vm.getInfo(id);
+		},
+		// 表单验证
+		validate : function() {
+			var bl = $('form').VF();// 启用验证
+			if (!bl) {
+				return;
+			}
+		},
+		saveOrUpdate : function(event) {
+			var url = vm.goods.id == null ? "goods/save" : "goods/update";
+
+			if(vm.goods.picUrls.length == 0){
+				alert("请选择商品图片");
+				return;
+			}
+			var price = parseInt(vm.goods.price);//原价
+			var payPrice = parseInt(vm.goods.payPrice);//活动价
+			if (price<=payPrice) {
+                alert("商品活动价格不得高于原价");
+                return;
+			}
+			/*//判断图片格式
+            // 后缀获取
+            var suffix = '';
+            // 获取类型结果
+            var result = '';
+            try {
+                var flieArr = vm.goods.picUrl.split('.');
+                suffix = flieArr[flieArr.length - 1];
+            } catch (err) {
+                suffix = '';
+            }
+            // fileName无后缀返回 false
+            if (!suffix) {
+                result = false;
+                return result;
+            }
+            // 图片格式
+            var imglist = ['png', 'jpg', 'jpeg', 'gif'];
+            // 进行图片匹配
+            result = imglist.some(function (item) {
+                return item == suffix;
+            });
+            if (result) {
+                result = 'image';
+                alert("请上传格式为gif、jpeg、jpg、png的图片");
+                return result;
+            };*/
+
+            var categoryName = $("#categoryId").find("option:selected").text();
+			var brandName = $("#brandId").find("option:selected").text();
+			
+			vm.goods.keywords = vm.goods.goodsName + categoryName + brandName;
+			vm.goods.picUrl = vm.goods.picUrls[0];
+			vm.goods.description = ue.getContent();
+			var propertyList = vm.propertyList;
+			var goodsPropertyList = [];
+			for (var i = 0; i < propertyList.length; i++) {
+				console.log(propertyList);
+				var id = propertyList[i].id;
+				if(!id){
+					id = propertyList[i].propertyId;
+				}
+				goodsPropertyList.push({propertyId: id, goodsId: propertyList[i].goodsId, propertyValue: propertyList[i].propertyValue})
+			}
+			vm.goods.goodsPropertyList = goodsPropertyList;
+			var tagList = [];
+			for(var i = 0; i < vm.tags.length; i++){
+				var tag = {id: vm.tags[i]};
+				tagList.push(tag);
+			}
+			vm.goods.tagList = tagList;
+			$.ajax({
+				type : "POST",
+				url : baseURL + url,
+				contentType : "application/json",
+				data : JSON.stringify(vm.goods),
+				success : function(r) {
+					if (r.code === 0) {
+						alert('操作成功', function(index) {
+							vm.reload();
+						});
+					} else {
+						alert(r.msg);
+					}
+				}
+			});
+		},
+		del : function(event) {
+			var ids = getSelectedRowsId("id");
+			if (ids == null) {
+				return;
+			}
+
+			confirm('确定要删除选中的记录？', function() {
+				$.ajax({
+					type : "POST",
+					url : baseURL + "goods/delete",
+					contentType : "application/json",
+					data : JSON.stringify(ids),
+					success : function(r) {
+						if (r.code == 0) {
+							alert('操作成功', function(index) {
+								vm.reload();
+							});
+						} else {
+							alert(r.msg);
+						}
+					}
+				});
+			});
+		},
+		getInfo : function(id) {
+			var that = this;
+			$.get(baseURL + "goods/info/" + id, function(r) {
+				vm.goods = r.goods;
+                vm.goods.specList=r.goodsSpecEntityList;
+
+				vm.propertyList = r.goods.goodsPropertyList;
+				vm.tags = [];
+				var tagList = r.goods.tagList;
+				for(var i = 0; i < tagList.length; i++){
+					vm.tags.push(tagList[i].id);
+				}
+				// 初始化富文本
+				ue.setContent(r.goods.description);
+			});
+		},
+
+		reload : function(event) {
+			vm.showList = true;
+			vm.title = "";
+			vm.goods = {};
+			$("form").RF();
+			// 刷新 如需条件查询common.js
+			$("#table").BTF5(vm.queryParams);
+		},
+		chooseCategory: function(){
+			var categoryId = vm.goods.categoryId;
+			console.log(categoryId);
+			
+			$.get(baseURL + "goods/property/getByCategoryId?categoryId="+categoryId, function(r) {
+				vm.propertyList = r.propertyList;
+			})
+		},
+		getTag: function(){
+			$.get(baseURL + "goods/tag/getAll", function(r) {
+				vm.tagList = r.tagList;
+			})
+		}
+	},
+	created : function() {
+		this.getCategory();
+		this.getBrand();
+		this.getTag();
+		this.getFreightTemplate();
+	}
+});

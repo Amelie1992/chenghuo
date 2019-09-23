@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wzlue.order.dao.EvaluateDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.wzlue.order.entity.EvaluateEntity" id="evaluateMap">
+        <result property="id" column="id"/>
+        <result property="memberId" column="member_id"/>
+        <result property="orderNumber" column="order_number"/>
+        <result property="content" column="content"/>
+        <result property="evaluate" column="evaluate"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.wzlue.order.entity.EvaluateEntity">
+		SELECT * FROM o_evaluate WHERE id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.wzlue.order.entity.EvaluateEntity">
+		SELECT * FROM o_evaluate
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                ORDER BY ${sidx} ${order}
+            </when>
+			<otherwise>
+                ORDER BY id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			LIMIT #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		SELECT count(*) FROM o_evaluate
+	</select>
+	 
+	<insert id="save" parameterType="com.wzlue.order.entity.EvaluateEntity" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO o_evaluate
+		(
+																				`member_id`, 
+																	`order_number`, 
+																	`content`, 
+																	`evaluate`, 
+																	`create_time`
+									)
+		VALUES
+		(
+																				#{memberId}, 
+																	#{orderNumber}, 
+																	#{content}, 
+																	#{evaluate}, 
+																	#{createTime}
+									)
+	</insert>
+	 
+	<update id="update" parameterType="com.wzlue.order.entity.EvaluateEntity">
+		UPDATE o_evaluate
+		<set>
+																				<if test="memberId != null">`member_id` = #{memberId}, </if>
+																	<if test="orderNumber != null">`order_number` = #{orderNumber}, </if>
+																	<if test="content != null">`content` = #{content}, </if>
+																	<if test="evaluate != null">`evaluate` = #{evaluate}, </if>
+																	<if test="createTime != null">`create_time` = #{createTime}</if>
+									</set>
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="delete">
+		DELETE FROM o_evaluate WHERE id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		DELETE FROM o_evaluate WHERE id IN
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

@@ -1,0 +1,31 @@
+/* pages/invoice/index.wxss */
+.pages{
+  font-size: 28rpx;
+}
+.weui-select {
+  text-align: right;
+}
+.weui-cell_select{
+  padding: 2px 0;
+}
+.weui-cell_input {
+  padding-top: 2px;
+  padding-bottom: 2px; 
+}
+.weui-cell__ft{
+  color: #333;
+}
+.weui-cell{
+  font-size: 28rpx;
+}
+.weui-cells::after,
+.weui-cells::before{
+  display: none;
+}
+.line{
+  height:20rpx;
+  background: #eee;width:100%;
+}
+.weui-input{
+  text-align: right;
+}

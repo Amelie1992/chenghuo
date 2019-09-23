@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wzlue.order.dao.OrderGoodsDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+	<resultMap type="com.wzlue.order.entity.OrderGoodsEntity" id="orderGoodsMap">
+		<result property="id" column="id" />
+		<result property="orderNumber" column="order_number" />
+		<result property="goodsId" column="goods_id" />
+		<result property="goodsName" column="goods_name" />
+		<result property="picUrl" column="pic_url" />
+		<result property="buyNum" column="buy_num" />
+		<result property="price" column="price" />
+	</resultMap>
+
+	<select id="queryObject" resultType="com.wzlue.order.entity.OrderGoodsEntity">
+		SELECT * FROM o_order_goods
+		WHERE id = #{value}
+	</select>
+
+	<select id="queryByOrderNumber" resultType="com.wzlue.order.entity.OrderGoodsEntity">
+		SELECT * FROM
+		o_order_goods where order_number = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.wzlue.order.entity.OrderGoodsEntity">
+		SELECT * FROM o_order_goods
+		<where>
+			<if test="orderNumber != null">
+				order_number = #{orderNumber}
+			</if>
+		</where>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				ORDER BY ${sidx} ${order}
+			</when>
+			<otherwise>
+				ORDER BY id desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			LIMIT #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryTotal" resultType="int">
+		SELECT count(*) FROM
+		o_order_goods
+	</select>
+
+	<insert id="save" parameterType="com.wzlue.order.entity.OrderGoodsEntity"
+		useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO o_order_goods
+		(
+		`order_number`,
+		`goods_id`,
+		`goods_name`,
+		`pic_url`,
+		`buy_num`,
+		`price`
+		)
+		VALUES
+		(
+		#{orderNumber},
+		#{goodsId},
+		#{goodsName},
+		#{picUrl},
+		#{buyNum},
+		#{price}
+		)
+	</insert>
+
+	<update id="update" parameterType="com.wzlue.order.entity.OrderGoodsEntity">
+		UPDATE o_order_goods
+		<set>
+			<if test="orderNumber != null">`order_number` = #{orderNumber}, </if>
+			<if test="goodsId != null">`goods_id` = #{goodsId}, </if>
+			<if test="goodsName != null">`goods_name` = #{goodsName}, </if>
+			<if test="picUrl != null">`pic_url` = #{picUrl}, </if>
+			<if test="buyNum != null">`buy_num` = #{buyNum}, </if>
+			<if test="price != null">`price` = #{price}</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<delete id="delete">
+		DELETE FROM o_order_goods WHERE id = #{value}
+	</delete>
+
+	<delete id="deleteBatch">
+		DELETE FROM o_order_goods WHERE id IN
+		<foreach item="id" collection="array" open="(" separator=","
+			close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

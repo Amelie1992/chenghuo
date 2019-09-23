@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wzlue.member.dao.MemberRecommendDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.wzlue.member.entity.MemberRecommendEntity" id="mMemberRecommendMap">
+        <result property="id" column="id"/>
+        <result property="memberId" column="member_id"/>
+        <result property="memberMobile" column="member_mobile"/>
+        <result property="memberNickName" column="member_nick_name"/>
+        <result property="recommenderId" column="recommender_id"/>
+        <result property="recommenderMobile" column="recommender_mobile"/>
+        <result property="recommenderNickName" column="recommender_nick_name"/>
+        <result property="memberIsVip" column="member_is_vip"/>
+    </resultMap>
+
+    <select id="queryObject" resultType="com.wzlue.member.entity.MemberRecommendEntity">
+		SELECT * FROM m_member_recommend WHERE id = #{value}
+	</select>
+
+    <select id="queryList" resultType="com.wzlue.member.entity.MemberRecommendEntity">
+        SELECT * FROM m_member_recommend
+        <where>
+            1=1
+            <if test="recommenderId!=null and recommenderId!=''">
+                and recommender_id = #{recommenderId}
+            </if>
+            and member_is_vip = 1
+        </where>
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                ORDER BY ${sidx} ${order}
+            </when>
+            <otherwise>
+                ORDER BY id desc
+            </otherwise>
+        </choose>
+        <if test="offset != null and limit != null">
+            LIMIT #{offset}, #{limit}
+        </if>
+    </select>
+
+    <select id="queryTotal" resultType="int">
+		SELECT count(*) FROM m_member_recommend
+	</select>
+
+    <insert id="save" parameterType="com.wzlue.member.entity.MemberRecommendEntity" useGeneratedKeys="true"
+            keyProperty="id">
+		INSERT INTO m_member_recommend
+		(
+																	`member_id`,
+																	`member_mobile`, 
+																	`member_nick_name`, 
+																	`recommender_id`, 
+																	`recommender_mobile`, 
+																	`recommender_nick_name`, 
+																	`member_is_vip`
+		)
+		VALUES
+		(
+																	#{memberId},
+																	#{memberMobile}, 
+																	#{memberNickName}, 
+																	#{recommenderId}, 
+																	#{recommenderMobile}, 
+																	#{recommenderNickName}, 
+																	#{memberIsVip}
+		)
+	</insert>
+
+    <update id="update" parameterType="com.wzlue.member.entity.MemberRecommendEntity">
+        UPDATE m_member_recommend
+        <set>
+            <if test="memberId != null">`member_id` = #{memberId},</if>
+            <if test="memberMobile != null">`member_mobile` = #{memberMobile},</if>
+            <if test="memberNickName != null">`member_nick_name` = #{memberNickName},</if>
+            <if test="recommenderId != null">`recommender_id` = #{recommenderId},</if>
+            <if test="recommenderMobile != null">`recommender_mobile` = #{recommenderMobile},</if>
+            <if test="recommenderNickName != null">`recommender_nick_name` = #{recommenderNickName},</if>
+            <if test="memberIsVip != null">`member_is_vip` = #{memberIsVip}</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+		DELETE FROM m_member_recommend WHERE id = #{value}
+	</delete>
+
+    <delete id="deleteBatch">
+        DELETE FROM m_member_recommend WHERE id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

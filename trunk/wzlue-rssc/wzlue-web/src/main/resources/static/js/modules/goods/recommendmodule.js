@@ -1,0 +1,461 @@
+$(function () {
+    //列表
+    $("#table").BT({
+        url: baseURL + 'goods/recommendModule/list',
+        columns: [
+            {checkbox: true},
+            {title: '模块名', field: 'moduleName', align: 'center'},
+            {title: '排序', field: 'sort', align: 'center'},
+            {
+                title: '状态', field: 'status', align: 'center',
+                formatter: function (value, row, index) {
+                    return value == 1 ? '<span class="label label-primary">正常</span>' : '<span class="label label-default">禁用</span>';
+                }
+            },
+            {title: '添加时间', field: 'addTime', align: 'center'},
+            {title: '更新时间', field: 'updateTime', align: 'center'},
+            {
+                title: '操作', align: 'center', events: operateEvent,
+                formatter: function (value, row, index) {
+                    return '<a id="btn_data">模块商品</a>'
+                }
+            }
+        ],
+        //条件查询
+        queryParams: {}
+    });
+    //表单提交
+    $("#form").FM({
+        fields: vm.fields,
+        success: vm.saveOrUpdate
+    })
+    //二级表单提交
+    $("#formOne").FM({
+        fields: {},
+        success: vm.saveOrUpdateData
+    })
+
+    $("#table2").BT({
+        url: baseURL + 'goods/recommendGoods/list',//根据模块iD查询该模块下的产品列表
+        columns: [
+            {checkbox: true},
+            {title: '模块名', field: 'moduleName', align: 'center'},
+            {title: '商品名', field: 'goodsName', align: 'center'},
+            {
+                title: '图片', field: 'picUrl',
+                formatter: function (value, row, index) {
+                    return '<img width="70px" height="50px" src=' + value + '>';
+                }
+            },
+            {title: '交易价格(元)', field: 'payPrice', align: 'center'},
+            {title: '商品排序', field: 'sort', align: 'center'},
+            {title: '添加时间', field: 'addTime', align: 'center'},
+            {title: '更新时间', field: 'updateTime', align: 'center'},
+            {
+                title: '操作', width: '10%', align: 'center', formatter: function (value, row, index) {
+                    return '<a id="btn_dataUpdate">修改</a>';
+                }, events: {
+                    //修改
+                    'click #btn_dataUpdate': function (e, value, row, index) {
+                        vm.showList2 = false;
+                        vm.showList = false;
+                        vm.edit = false;
+                        vm.edit2 = true;
+                        vm.showProList = true;
+                        vm.proTable = false;
+                        vm.goodTable = true;
+                        vm.chooseGoods = false;
+                        vm.title = "属性修改";
+                        $.get(baseURL + "goods/recommendGoods/info/" + row.id, function (r) {
+                            vm.recommendGoods = r.recommendGoods;
+                        })
+                    },
+                }
+            }
+        ]
+    });
+});
+
+function getSelectedRowIdData(dataId) {
+    var grid = $('#table2').bootstrapTable('getSelections');
+    if (!grid.length) {
+        alert("请选择一条记录");
+        return;
+    }
+    var ids = [];
+    $.each(grid, function (idx, item) {
+        ids[idx] = item[dataId.toString()];
+    });
+    return ids;
+}
+
+//模块商品二级方法
+window.operateEvent = {
+    //操作的点击事件
+    'click #btn_data': function (e, value, row, index) {
+        vm.title = '模块商品管理';
+        vm.showList = false;
+        vm.edit = false;
+        //二级目录列表
+        vm.showList2 = true;
+        //二级编辑页
+        vm.edit2 = false;
+        vm.queryParams2.moduleId = row.id;//模块Id
+        vm.recommendModule = {};
+        vm.reloadData();
+    },
+};
+
+var vm = new Vue({
+    el: '#rrapp',
+    data: {
+        showList: true,//一级列表
+        showList2: false,//一级列表
+        edit: false,//一级编辑页
+        edit2: false,//二级编辑页面
+        showProList: true,//选择商品框
+        proTable: true,//添加产品信息表
+        goodTable: true,//修改模块商品信息
+        chooseGoods: true,//选择商品按钮
+        title: null,
+        recommendModule: {},
+        queryParams: {},
+        queryParams2: {
+            moduleId: ""
+        },
+        goodsParams: {
+            goodsName: '',
+        },
+        recommendGoods: {},//推荐商品
+        //验证字段
+        fields: {
+            moduleName: {
+                message: '模块名验证失败',
+                validators: {
+                    notEmpty: {
+                        message: '模块名不能为空'
+                    },
+                    stringLength: {
+                        min: 1, max: 50, message: '最大长度50'
+                    }
+                },
+            }, sort: {
+                message: '排序验证失败',
+                validators: {
+                    notEmpty: {
+                        message: '排序不能为空'
+                    },
+                    regexp: {
+                        regexp: /^[+]{0,1}(\d+)$/,
+                        message: '请输入整数'
+                    },
+                    stringLength: {
+                        min: 1, max: 20, message: '最大长度20'
+                    }
+                },
+            }
+        }
+    },
+    methods: {
+        //选择产品
+        initChooseTable: function () {
+            //清空历史
+            vm.goodsParams.goodsName = '';
+            //列表
+            $("#table1").BT({
+                url: baseURL + 'goods/list?status=1',//有效的商品=1
+                columns: [
+                    {checkbox: true,},
+                    {
+                        title: '图片', field: 'picUrl',
+                        formatter: function (value, row, index) {
+                            return '<img width="100px" height="100px" src=' + value + '>';
+                        }
+                    },
+                    {title: '商品名称', field: 'goodsName'},
+                    {title: '商品分类', field: 'category.categoryName'},
+                    {title: '价格', field: 'price'},
+                ],
+                //条件查询
+                queryParams: vm.goodsParams
+            });
+        },
+        chooseProduct: function () {
+            vm.initChooseTable();
+            $("#chooseProductModal").modal('show');
+        },
+        selectProduct: function () {
+            var grid = $('#table1').bootstrapTable('getSelections');
+            if (!grid.length) {
+                alert("请选择一条记录");
+                return;
+            }
+            grid.forEach(function (item) {
+                //判断有没有重复
+                var flag = vm.recommendGoods.recommendGoodsList.some(function (items, index, array) {
+                    return item.id == items.goodsId;
+                })
+                if (!flag) {
+                    item.goodsId = item.id;
+                    item.id = '';
+                    item.moduleId = vm.queryParams2.moduleId;
+                    vm.recommendGoods.recommendGoodsList.push(item);
+                }
+            });
+            $("#chooseProductModal").modal('hide');
+            $("#table1").BTF5(vm.goodsParams);
+        },
+        queryGoods: function () {
+            $("#table1").BTF5(vm.goodsParams);
+        },
+        removeSpu: function (index) {
+            vm.recommendGoods.recommendGoodsList.splice(index, 1);
+        },
+        query: function () {
+            vm.reload();
+        },
+        query2: function () {
+            vm.reloadData();
+        },
+        add: function () {
+            vm.showList = false;
+            vm.showList2 = false;
+            vm.edit = true;
+            vm.edit2 = false;
+            vm.title = "新增";
+            vm.recommendModule = {
+                status: 1,
+            };
+            vm.recommendGoods = {}
+        },
+        adds: function () {
+            vm.showList = false;
+            vm.showList2 = false;
+            vm.edit = false;
+            vm.edit2 = true;
+            vm.showProList = true;
+            vm.proTable = true;
+            vm.goodTable = false;
+            vm.chooseGoods = true;
+            vm.title = "推荐商品新增";
+            vm.recommendGoods = {
+                recommendGoodsList: []
+            };
+        },
+        update: function (event) {
+            var id = getSelectedRowId("id");
+            if (id == null) {
+                return;
+            }
+            vm.edit = true;
+            vm.showList = false;
+            vm.showList2 = false;
+            vm.edit2 = false;
+            vm.title = "修改";
+            vm.getInfo(id)
+        },
+        /*updates: function (event) {
+            var id = getSelectedRowId("id");
+            if (id == null) {
+                return;
+            }
+            vm.edit2 = true;
+            vm.showList = false;
+            vm.showList2 = false;
+            vm.edit = false;
+            vm.showProList = true;
+            vm.proTable = true;
+            vm.title = "推荐商品修改";
+            vm.getInfos(id)
+        },*/
+        //表单验证
+        validate: function () {
+            var bl = $('form').VF();//启用验证
+            if (!bl) {
+                return;
+            }
+        },
+        //二级确认提交
+        formOneValidate: function () {
+            var bl = $('#formOne').VF();
+            if (!bl) {
+                return;
+            }
+        },
+        saveOrUpdate: function (event) {
+            var url = vm.recommendModule.id == null ? "goods/recommendModule/save" : "goods/recommendModule/update";
+            $.ajax({
+                type: "POST",
+                url: baseURL + url,
+                contentType: "application/json",
+                data: JSON.stringify(vm.recommendModule),
+                success: function (r) {
+                    if (r.code === 0) {
+                        alert('操作成功', function (index) {
+                            vm.reload();
+                        });
+                    } else {
+                        alert(r.msg);
+                    }
+                }
+            });
+        },
+        //二级表单新增修改
+        saveOrUpdateData: function (event) {
+            var regu = /^[+]{0,1}(\d+)$/;
+            var re = new RegExp(regu);
+            if (vm.recommendGoods.id == null) {
+                if (vm.recommendGoods.recommendGoodsList.length === 0) {
+                    alert("添加不能为空！")
+                    return;
+                } else {
+                    var goodsList = vm.recommendGoods.recommendGoodsList;
+                    for (var i = 0; i < goodsList.length; i++) {
+                        if (goodsList[i].sort === "") {
+                            alert("排序不能为空！")
+                            return;
+                        } else {
+                            if (!re.test(goodsList[i].sort)) {
+                                alert("排序为正整数！")
+                                return;
+                            }
+                            if (goodsList[i].sort.length > 20) {
+                                alert("排序不得超过20！")
+                                return;
+                            }
+                        }
+                    }
+                }
+            } else {
+                if (vm.recommendGoods.sort === "") {
+                    alert("排序不能为空！")
+                    return;
+                } else {
+                    if (!re.test(vm.recommendGoods.sort)) {
+                        alert("排序为正整数！")
+                        return;
+                    }
+                    if (vm.recommendGoods.sort.length > 20) {
+                        alert("排序不得超过20！")
+                        return;
+                    }
+                }
+            }
+            var url = vm.recommendGoods.id == null ? "goods/recommendGoods/save" : "goods/recommendGoods/update";
+            $.ajax({
+                type: "POST",
+                url: baseURL + url,
+                contentType: "application/json",
+                data: JSON.stringify(vm.recommendGoods),
+                success: function (r) {
+                    if (r.code === 0) {
+                        alert('操作成功', function (index) {
+                            vm.reloadData();
+                        });
+                    } else {
+                        alert(r.msg);
+                    }
+                }
+            });
+        },
+
+        del: function (event) {
+            var ids = getSelectedRowsId("id");
+            if (ids == null) {
+                return;
+            }
+
+            confirm('确定要删除选中的记录？', function () {
+                $.ajax({
+                    type: "POST",
+                    url: baseURL + "goods/recommendModule/delete",
+                    contentType: "application/json",
+                    data: JSON.stringify(ids),
+                    success: function (r) {
+                        if (r.code == 0) {
+                            alert('操作成功', function (index) {
+                                vm.reload();
+                            });
+                        } else {
+                            alert(r.msg);
+                        }
+                    }
+                });
+            });
+        },
+        //二级删除
+        delData: function () {
+            var ids = getSelectedRowIdData("id");
+            if (ids == null) {
+                return;
+            }
+            confirm('确定要删除选中的记录？', function () {
+                $.ajax({
+                    type: "POST",
+                    url: baseURL + "goods/recommendGoods/delete",
+                    contentType: "application/json",
+                    data: JSON.stringify(ids),
+                    success: function (r) {
+                        if (r.code == 0) {
+                            alert('操作成功', function (index) {
+                                vm.reloadData();
+                            });
+                        } else {
+                            alert(r.msg);
+                        }
+                    }
+                });
+            });
+        },
+
+        getInfo: function (id) {
+            $.get(baseURL + "goods/recommendModule/info/" + id, function (r) {
+                vm.recommendModule = r.recommendModule;
+            });
+        },
+
+        //二级详情
+        /*getInfos: function (id) {
+            $.get(baseURL + "goods/recommendGoods/info/" + id, function (r) {
+                vm.recommendGoods = r.recommendGoods;
+            });
+        },*/
+
+        //二级  的返回
+        dataBack: function () {
+            vm.reload();
+            vm.title = "属性管理";
+            vm.showList = false;
+            vm.showList2 = true;
+            vm.edit = false;
+            vm.edit2 = false;
+        },
+        //一级列表的刷新
+        reload: function (event) {
+            vm.showList = true;
+            vm.showList2 = false;
+            vm.edit = false;
+            vm.edit2 = false;
+            //刷新 如需条件查询common.js
+            $("#table").BTF5(vm.queryParams);
+            $("#form").RF();
+        },
+
+        //二级列表的刷新
+        reloadData: function (event) {
+            vm.title = "推荐商品管理"
+            vm.showList2 = true;
+            vm.showList = false;
+            vm.edit = false;
+            vm.edit2 = false;
+            $("#table2").BTF5(vm.queryParams2);
+            $("#table1").BTF5(vm.goodsParams);
+            $("#formOne").RF();
+        },
+
+        //页面强刷
+        reloadTwo: function () {
+            vm.reload();
+        }
+    }
+});

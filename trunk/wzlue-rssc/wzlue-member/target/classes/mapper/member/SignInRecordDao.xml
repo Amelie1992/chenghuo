@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wzlue.member.dao.SignInRecordDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+	<resultMap type="com.wzlue.member.entity.SignInRecordEntity"
+		id="signInRecordMap">
+		<result property="id" column="id" />
+		<result property="memberId" column="member_id" />
+		<result property="createTime" column="create_time" />
+	</resultMap>
+
+	<select id="queryObject" resultType="com.wzlue.member.entity.SignInRecordEntity">
+		SELECT * FROM
+		m_sign_in_record WHERE id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.wzlue.member.entity.SignInRecordEntity">
+		SELECT * FROM m_sign_in_record
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				ORDER BY ${sidx} ${order}
+			</when>
+			<otherwise>
+				ORDER BY id desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			LIMIT #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryTotal" resultType="int">
+		SELECT count(*) FROM
+		m_sign_in_record
+		<where>
+			<if test="memberId != null">
+				member_id = #{memberId}
+			</if>
+			<if test="date != null">
+				and DATE_FORMAT(create_time, '%Y-%m-%d') = #{date}
+			</if>
+		</where>
+	</select>
+
+	<insert id="save" parameterType="com.wzlue.member.entity.SignInRecordEntity"
+		useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO m_sign_in_record
+		(
+		`member_id`,
+		`create_time`
+		)
+		VALUES
+		(
+		#{memberId},
+		#{createTime}
+		)
+	</insert>
+
+	<update id="update" parameterType="com.wzlue.member.entity.SignInRecordEntity">
+		UPDATE m_sign_in_record
+		<set>
+			<if test="memberId != null">`member_id` = #{memberId}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<delete id="delete">
+		DELETE FROM m_sign_in_record WHERE id = #{value}
+	</delete>
+
+	<delete id="deleteBatch">
+		DELETE FROM m_sign_in_record WHERE id IN
+		<foreach item="id" collection="array" open="(" separator=","
+			close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

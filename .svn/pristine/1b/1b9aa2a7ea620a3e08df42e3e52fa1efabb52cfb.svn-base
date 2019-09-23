@@ -1,0 +1,229 @@
+package com.wzlue.order.entity;
+
+import java.io.Serializable;
+import java.util.Date;
+
+import com.wzlue.member.entity.MemberInfoEntity;
+
+import java.math.BigDecimal;
+
+
+/**
+ * 退款
+ * 
+ * @author wzlue
+ * @email wzlue.com
+ * @date 2018-08-08 21:03:13
+ */
+public class OrderRefundEntity implements Serializable {
+	private static final long serialVersionUID = 1L;
+	
+	//
+	private Long id;
+	//订单编号
+	private String orderNumber;
+	//退款编号
+	private String refundNumber;
+	//会员id
+	private Long memberId;
+	//退款金额
+	private BigDecimal refundAmount;
+	//申请时间
+	private Date createTime;
+	//处理时间
+	private Date processTime;
+	
+	private String[] picUrls;
+	//处理备注
+	private String remarks;
+	
+	private Integer goodsStatus;
+	
+	private Integer reason;
+	
+	private MemberInfoEntity memberInfo;
+	//状态(1待处理.2.退款成功3.退款失败)
+	private Integer status;
+	
+	private Integer type;
+	
+	private String explain;
+	private String nickName;
+
+	/**
+	 * 快递费（后台输入）
+	 */
+	private BigDecimal expressFee;
+
+	//订单物流
+	private OrderLogisticsEntity orderLogistics;
+
+	//凭证图片
+	private OrderRefundPicEntity refundPicEntity;
+
+	public OrderRefundPicEntity getRefundPicEntity() {
+		return refundPicEntity;
+	}
+
+	public void setRefundPicEntity(OrderRefundPicEntity refundPicEntity) {
+		this.refundPicEntity = refundPicEntity;
+	}
+
+	public BigDecimal getExpressFee() {
+		return expressFee;
+	}
+
+	public void setExpressFee(BigDecimal expressFee) {
+		this.expressFee = expressFee;
+	}
+
+	public OrderLogisticsEntity getOrderLogistics() {
+		return orderLogistics;
+	}
+
+	public void setOrderLogistics(OrderLogisticsEntity orderLogistics) {
+		this.orderLogistics = orderLogistics;
+	}
+
+	public String getNickName() {
+		return nickName;
+	}
+
+	public void setNickName(String nickName) {
+		this.nickName = nickName;
+	}
+
+	/**
+	 * 设置：
+	 */
+	public void setId(Long id) {
+		this.id = id;
+	}
+	/**
+	 * 获取：
+	 */
+	public Long getId() {
+		return id;
+	}
+	/**
+	 * 设置：订单编号
+	 */
+	public void setOrderNumber(String orderNumber) {
+		this.orderNumber = orderNumber;
+	}
+	/**
+	 * 获取：订单编号
+	 */
+	public String getOrderNumber() {
+		return orderNumber;
+	}
+	/**
+	 * 设置：退款编号
+	 */
+	public void setRefundNumber(String refundNumber) {
+		this.refundNumber = refundNumber;
+	}
+	/**
+	 * 获取：退款编号
+	 */
+	public String getRefundNumber() {
+		return refundNumber;
+	}
+	/**
+	 * 设置：会员id
+	 */
+	public void setMemberId(Long memberId) {
+		this.memberId = memberId;
+	}
+	/**
+	 * 获取：会员id
+	 */
+	public Long getMemberId() {
+		return memberId;
+	}
+	/**
+	 * 设置：退款金额
+	 */
+	public void setRefundAmount(BigDecimal refundAmount) {
+		this.refundAmount = refundAmount;
+	}
+	/**
+	 * 获取：退款金额
+	 */
+	public BigDecimal getRefundAmount() {
+		return refundAmount;
+	}
+	/**
+	 * 设置：申请时间
+	 */
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
+	/**
+	 * 获取：申请时间
+	 */
+	public Date getCreateTime() {
+		return createTime;
+	}
+	/**
+	 * 设置：处理时间
+	 */
+	public void setProcessTime(Date processTime) {
+		this.processTime = processTime;
+	}
+	/**
+	 * 获取：处理时间
+	 */
+	public Date getProcessTime() {
+		return processTime;
+	}
+	public String[] getPicUrls() {
+		return picUrls;
+	}
+	public void setPicUrls(String[] picUrls) {
+		this.picUrls = picUrls;
+	}
+	public Integer getGoodsStatus() {
+		return goodsStatus;
+	}
+	public void setGoodsStatus(Integer goodsStatus) {
+		this.goodsStatus = goodsStatus;
+	}
+	public Integer getReason() {
+		return reason;
+	}
+	public void setReason(Integer reason) {
+		this.reason = reason;
+	}
+	public String getRemarks() {
+		return remarks;
+	}
+	public void setRemarks(String remarks) {
+		this.remarks = remarks;
+	}
+	public MemberInfoEntity getMemberInfo() {
+		return memberInfo;
+	}
+	public void setMemberInfo(MemberInfoEntity memberInfo) {
+		this.memberInfo = memberInfo;
+	}
+	public Integer getStatus() {
+		return status;
+	}
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+	public Integer getType() {
+		return type;
+	}
+	public void setType(Integer type) {
+		this.type = type;
+	}
+	public String getExplain() {
+		return explain;
+	}
+	public void setExplain(String explain) {
+		this.explain = explain;
+	}
+	
+}

@@ -1,0 +1,19 @@
+<!--pages/makeapp/index.wxml-->
+<view>
+  <image src='/img/makeapp.png' mode='widthFix'></image>
+  <view class='text'>留下电话号码，客服马上联系你</view>
+
+  <view class='form'>
+  <form bindsubmit="formSubmit">
+  
+    <input name="name" placeholder='请输入真实姓名' value='{{form.name}}'></input>
+
+    <input name="mobile" placeholder='请输入手机号码' value='{{form.mobile}}'></input>
+
+    <input name="remark" placeholder='请输入你所从事的行业' value='{{form.remark}}'></input>
+
+    <button  formType="submit">提交</button>
+  </form>
+
+  </view>
+</view>

@@ -1,0 +1,8 @@
+<view class="page">
+  <image src='/img/auth-logo.png'></image>
+  <view class='text'>
+    <text class='big'>申请获取以下权限</text>
+    <text class='small'>获得你的公开信息（昵称、头像等）</text>
+  </view>
+  <button type="primary" open-type='getUserInfo' bindgetuserinfo="getUserInfo">授权登录</button>
+</view>

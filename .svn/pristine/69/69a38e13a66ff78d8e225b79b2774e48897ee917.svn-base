@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wzlue.menu.dao.CustomMenuDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.wzlue.menu.entity.CustomMenuEntity" id="customMenuMap">
+        <result property="id" column="id"/>
+        <result property="head" column="head"/>
+        <result property="title" column="title"/>
+        <result property="body" column="body"/>
+        <result property="state" column="state"/>
+        <result property="classification" column="classification"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <select id="queryObject" resultType="com.wzlue.menu.entity.CustomMenuEntity">
+		SELECT * FROM custom_menu WHERE id = #{value}
+	</select>
+
+    <select id="queryList" resultType="com.wzlue.menu.entity.CustomMenuEntity">
+        SELECT * FROM custom_menu
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                ORDER BY ${sidx} ${order}
+            </when>
+            <otherwise>
+                ORDER BY classification ASC, state ASC, id DESC
+            </otherwise>
+        </choose>
+        <if test="offset != null and limit != null">
+            LIMIT #{offset}, #{limit}
+        </if>
+    </select>
+
+    <select id="queryTotal" resultType="int">
+		SELECT count(*) FROM custom_menu
+	</select>
+
+    <insert id="save" parameterType="com.wzlue.menu.entity.CustomMenuEntity" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO custom_menu
+		(
+          `head`,
+          `title`,
+          `body`,
+          `state`,
+          `classification`,
+          `create_time`,
+          `update_time`
+				)
+		VALUES
+		(
+		  #{head},
+		  #{title},
+		  #{body},
+		  2,
+		  3,
+		  now(),
+		  now()
+				)
+	</insert>
+
+    <update id="update" parameterType="com.wzlue.menu.entity.CustomMenuEntity">
+        UPDATE custom_menu
+        <set>
+            `update_time` = now(),
+            <if test="head != null">`head` = #{head},</if>
+            <if test="title != null">`title` = #{title},</if>
+            <if test="body != null">`body` = #{body},</if>
+            <if test="state != null">`state` = #{state}</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+		DELETE FROM custom_menu WHERE id = #{value}
+	</delete>
+
+    <delete id="deleteBatch">
+        DELETE FROM custom_menu WHERE id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <update id="hide">
+        UPDATE custom_menu SET `state` = 2 WHERE id != #{id}
+    </update>
+
+</mapper>

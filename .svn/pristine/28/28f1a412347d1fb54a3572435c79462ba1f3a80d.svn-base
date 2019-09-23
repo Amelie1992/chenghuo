@@ -1,0 +1,71 @@
+server:
+    port: 8088
+spring:
+    datasource:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driverClassName: com.mysql.jdbc.Driver
+        druid:
+            first:  #数据源1
+                url: jdbc:mysql://10.0.100.202:3306/rongshi?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8
+                username: rongshi
+                password: 2PZDM7kZNDpXwnRW
+            second:  #数据源2
+                url: jdbc:mysql://10.0.100.202:3306/rongshi?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8
+                username: rongshi
+                password: 2PZDM7kZNDpXwnRW
+            initial-size: 10
+            max-active: 100
+            min-idle: 10
+            max-wait: 60000
+            pool-prepared-statements: true
+            max-pool-prepared-statement-per-connection-size: 20
+            time-between-eviction-runs-millis: 60000
+            min-evictable-idle-time-millis: 300000
+            validation-query: SELECT 1 FROM DUAL
+            test-while-idle: true
+            test-on-borrow: false
+            test-on-return: false
+            stat-view-servlet:
+                enabled: true
+                url-pattern: /druid/*
+                #login-username: admin
+                #login-password: admin
+            filter:
+                stat:
+                    log-slow-sql: true
+                    slow-sql-millis: 1000
+                    merge-sql: true
+                wall:
+                    config:
+                        multi-statement-allow: true
+wechat:
+  miniapp:
+    appid: wx6c3d3edbd0dda7bf
+    secret: 5aed3f63dbe5c57a65949ef350e34e0d
+    token: 
+    aesKey: 
+    msgDataFormat: JSON
+  pay:
+    appId: wx242894521962eefa
+    mchId: 1385804302
+    mchKey: 09b6d3eb363577978008583740351167
+    subAppId: 
+    subMchId:
+    keyPath: /home/cert/apiclient_key.pem
+    notifyUrl: https://app.njwbiao.com/app/wechat/pay/parseOrderNotifyResult
+    
+# 文件上传
+fileupload:
+    server: http://10.0.32.221:8088/fileupload
+    filepath: d:/file
+ueditor:
+    imageActionName: uploadimage
+    imageUrlPrefix: http://10.0.32.221:8088/fileupload
+    imagePath: /fileupload/
+    imageFieldName: upfile
+    imageMaxSize: 2048
+# 日志
+logback:
+    logdir: D://wzlue-logs/wzlue-group-app
+    appname: wzlue-app
+    logCount: 10000 #日志阈值

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wzlue.goods.dao.GoodsSpecDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.wzlue.goods.entity.GoodsSpecEntity" id="goodsSpecMap">
+        <result property="id" column="id"/>
+        <result property="goodsId" column="goods_id"/>
+        <result property="specId" column="spec_id"/>
+        <result property="specName" column="spec_name"/>
+        <result property="specPrice" column="spec_price"/>
+        <result property="specVipPrice" column="spec_vip_price"/>
+        <result property="stock" column="stock"/>
+        <result property="specNo" column="spec_no"/>
+        <result property="specUnit" column="spec_unit"/>
+
+        <result property="specNameTwo" column="spec_name_two"/>
+        <result property="specIdTwo" column="spec_id_two"/>
+        <result property="specPic" column="spec_pic"/>
+        <result property="goodsName" column="goods_name"/>
+
+
+    </resultMap>
+
+    <select id="queryObject" resultType="com.wzlue.goods.entity.GoodsSpecEntity">
+		SELECT * FROM g_goods_spec ggs
+		LEFT JOIN g_goods gg ON gg.id = ggs.goods_id
+		WHERE ggs.id = #{value}
+	</select>
+    <!--详情规格-->
+    <select id="querySpecPrice" resultType="com.wzlue.goods.entity.GoodsSpecEntity">
+        SELECT * FROM g_goods_spec ggs
+        LEFT JOIN g_goods gg ON gg.id = ggs.goods_id
+        <where>
+            ggs.goods_id = #{goodsId}
+            <if test="specId!=null and specId!=''">and ggs.spec_id=#{specId}</if>
+            <if test="specIdTwo!=null and specIdTwo!=''">and ggs.spec_id_two=#{specIdTwo}</if>
+        </where>
+
+    </select>
+
+    <select id="queryList" resultType="com.wzlue.goods.entity.GoodsSpecEntity">
+        SELECT * FROM g_goods_spec ggs
+        LEFT JOIN g_goods gg ON gg.id = ggs.goods_id
+        <where>
+            <if test="goodsName != null and goodsName !=''">
+                gg.goods_name like CONCAT('%',#{goodsName},'%')
+            </if>
+            <if test="specName != null and specName !=''">
+                ggs.spec_name like CONCAT('%',#{specName},'%')
+            </if>
+        </where>
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                ORDER BY ${sidx} ${order}
+            </when>
+            <otherwise>
+                ORDER BY ggs.id desc
+            </otherwise>
+        </choose>
+        <if test="offset != null and limit != null">
+            LIMIT #{offset}, #{limit}
+        </if>
+    </select>
+
+    <select id="queryTotal" resultType="int">
+		SELECT count(*) FROM g_goods_spec
+	</select>
+
+    <insert id="save" parameterType="com.wzlue.goods.entity.GoodsSpecEntity" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO g_goods_spec
+		(
+				`goods_id`,
+				`spec_id`,
+				`spec_name`,
+				`spec_price`,
+				`spec_vip_price`,
+				`stock`,
+				`spec_no`,
+				`spec_unit`,
+				`spec_name_two`,
+				`spec_id_two`,
+				`spec_pic`,
+				`goods_name`
+
+		)
+		VALUES
+		(
+				#{goodsId},
+				#{specId},
+				#{specName},
+				#{specPrice},
+				#{specVipPrice},
+				#{stock},
+				#{specNo},
+				#{specUnit},
+				#{specNameTwo},
+				#{specIdTwo},
+				#{specPic},
+				#{goodsName}
+		)
+	</insert>
+
+    <update id="update" parameterType="com.wzlue.goods.entity.GoodsSpecEntity">
+        UPDATE g_goods_spec
+        <set>
+            <if test="goodsId != null">`goods_id` = #{goodsId},</if>
+            <if test="specId != null">`spec_id` = #{specId},</if>
+            <if test="specName != null">`spec_name` = #{specName},</if>
+            <if test="specPrice != null">`spec_price` = #{specPrice},</if>
+            <if test="specVipPrice != null">`spec_vip_price` = #{specVipPrice},</if>
+            <if test="specNo != null">`spec_no` = #{specNo},</if>
+            <if test="specUnit != null">`spec_unit` = #{specUnit},</if>
+            <if test="specNameTwo != null">`spec_name_two` = #{specNameTwo},</if>
+            <if test="specIdTwo != null">`spec_id_two` = #{specIdTwo},</if>
+            <if test="specPic != null">`spec_pic` = #{specPic},</if>
+            <if test="stock != null">`stock` = #{stock},</if>
+            <if test="goodsName != null">`goods_name` = #{goodsName}</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+		DELETE FROM g_goods_spec WHERE id = #{value}
+	</delete>
+
+    <delete id="deleteBatch">
+        DELETE FROM g_goods_spec WHERE id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <!--根据产品id获取规格详情-->
+    <select id="getSpecs" resultType="com.wzlue.goods.entity.GoodsSpecEntity">
+		SELECT  * FROM g_goods_spec WHERE goods_id=#{id}
+	</select>
+    <!--获取多个规格-->
+    <select id="goodSpecId" resultType="com.wzlue.goods.entity.GoodsSpecEntity">
+		select * from g_goods_spec where  goods_id IN (${ids})
+	</select>
+
+</mapper>

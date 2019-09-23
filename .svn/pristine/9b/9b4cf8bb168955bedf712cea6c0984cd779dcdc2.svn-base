@@ -1,0 +1,263 @@
+package com.wzlue.order.entity;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
+
+import com.wzlue.member.entity.InvoiceEntity;
+import com.wzlue.member.entity.MemberInfoEntity;
+import com.wzlue.order.dao.OrderInvoiceDao;
+
+
+/**
+ * 订单
+ * 
+ * @author wzlue
+ * @email wzlue.com
+ * @date 2018-07-26 10:25:17
+ */
+public class OrderEntity implements Serializable {
+	private static final long serialVersionUID = 1L;
+	
+	//主键
+	private Long id;
+	//订单编码
+	private String orderNumber;
+	//订单类型 1普通订单
+	private String orderType;
+	//客户id
+	private Long memberId;
+	//订单的状态 1未付款  2 已付款,待发货  3.已发货 4 确认收货 5待评价  6.已退款 7 取消订单 8 退款成功 9退款失败
+	private Integer status;
+	//支付方式：wechat
+	private String payType;
+	//物流价格
+	private BigDecimal logisticsAmount;
+	//商品总价格
+	private BigDecimal productAmount;
+	//实付金额
+	private BigDecimal paymentAmount;
+	//备注
+	private String ramarks;
+	//创建时间
+	private Date createTime;
+	//订单删除
+	private Integer delFlag;
+	//付款时间
+	private Date payTime;
+	//发货时间
+	private Date deliveryTime;
+
+	public Date getPayTime() {
+		return payTime;
+	}
+
+	public void setPayTime(Date payTime) {
+		this.payTime = payTime;
+	}
+
+	public Date getDeliveryTime() {
+		return deliveryTime;
+	}
+
+	public void setDeliveryTime(Date deliveryTime) {
+		this.deliveryTime = deliveryTime;
+	}
+
+	private List<OrderGoodsEntity> orderGoodsList;
+	
+	private MemberInfoEntity memberInfo;
+	
+	private OrderAddressEntity orderAddress;
+	//订单物流
+	private OrderLogisticsEntity orderLogistics;
+	//发票实体类
+	private OrderInvoiceEntity orderInvoice;
+	
+	private Integer useIntegral;
+	
+	/**
+	 * 设置：主键
+	 */
+	public void setId(Long id) {
+		this.id = id;
+	}
+	/**
+	 * 获取：主键
+	 */
+	public Long getId() {
+		return id;
+	}
+	/**
+	 * 设置：订单编码
+	 */
+	public void setOrderNumber(String orderNumber) {
+		this.orderNumber = orderNumber;
+	}
+	/**
+	 * 获取：订单编码
+	 */
+	public String getOrderNumber() {
+		return orderNumber;
+	}
+	/**
+	 * 设置：订单类型 1普通订单
+	 */
+	public void setOrderType(String orderType) {
+		this.orderType = orderType;
+	}
+	/**
+	 * 获取：订单类型 1普通订单
+	 */
+	public String getOrderType() {
+		return orderType;
+	}
+	/**
+	 * 设置：客户id
+	 */
+	public void setMemberId(Long memberId) {
+		this.memberId = memberId;
+	}
+	/**
+	 * 获取：客户id
+	 */
+	public Long getMemberId() {
+		return memberId;
+	}
+	/**
+	 * 设置：订单的状态 1未付款  2 已付款,待发货  3.已发货 4 确认收货 5待评价  6.已退款 7 取消订单 8 退款成功 9退款失败
+	 */
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+	/**
+	 * 获取：订单的状态 1未付款  2 已付款,待发货  3.已发货 4 确认收货 5待评价  6.已退款 7 取消订单 8 退款成功 9退款失败
+	 */
+	public Integer getStatus() {
+		return status;
+	}
+	/**
+	 * 设置：支付方式：wechat
+	 */
+	public void setPayType(String payType) {
+		this.payType = payType;
+	}
+	/**
+	 * 获取：支付方式：wechat
+	 */
+	public String getPayType() {
+		return payType;
+	}
+	/**
+	 * 设置：物流价格
+	 */
+	public void setLogisticsAmount(BigDecimal logisticsAmount) {
+		this.logisticsAmount = logisticsAmount;
+	}
+	/**
+	 * 获取：物流价格
+	 */
+	public BigDecimal getLogisticsAmount() {
+		return logisticsAmount;
+	}
+	/**
+	 * 设置：商品总价格
+	 */
+	public void setProductAmount(BigDecimal productAmount) {
+		this.productAmount = productAmount;
+	}
+	/**
+	 * 获取：商品总价格
+	 */
+	public BigDecimal getProductAmount() {
+		return productAmount;
+	}
+	/**
+	 * 设置：实付金额
+	 */
+	public void setPaymentAmount(BigDecimal paymentAmount) {
+		this.paymentAmount = paymentAmount;
+	}
+	/**
+	 * 获取：实付金额
+	 */
+	public BigDecimal getPaymentAmount() {
+		return paymentAmount;
+	}
+	/**
+	 * 设置：备注
+	 */
+	public void setRamarks(String ramarks) {
+		this.ramarks = ramarks;
+	}
+	/**
+	 * 获取：备注
+	 */
+	public String getRamarks() {
+		return ramarks;
+	}
+	/**
+	 * 设置：创建时间
+	 */
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
+	/**
+	 * 获取：创建时间
+	 */
+	public Date getCreateTime() {
+		
+		return createTime;
+	}
+	/**
+	 * 设置：订单删除
+	 */
+	public void setDelFlag(Integer delFlag) {
+		this.delFlag = delFlag;
+	}
+	/**
+	 * 获取：订单删除
+	 */
+	public Integer getDelFlag() {
+		return delFlag;
+	}
+	
+	public List<OrderGoodsEntity> getOrderGoodsList() {
+		return orderGoodsList;
+	}
+	public void setOrderGoodsList(List<OrderGoodsEntity> orderGoodsList) {
+		this.orderGoodsList = orderGoodsList;
+	}
+	public MemberInfoEntity getMemberInfo() {
+		return memberInfo;
+	}
+	public void setMemberInfo(MemberInfoEntity memberInfo) {
+		this.memberInfo = memberInfo;
+	}
+	public OrderAddressEntity getOrderAddress() {
+		return orderAddress;
+	}
+	public void setOrderAddress(OrderAddressEntity orderAddress) {
+		this.orderAddress = orderAddress;
+	}
+	public OrderLogisticsEntity getOrderLogistics() {
+		return orderLogistics;
+	}
+	public void setOrderLogistics(OrderLogisticsEntity orderLogistics) {
+		this.orderLogistics = orderLogistics;
+	}
+	public OrderInvoiceEntity getOrderInvoice() {
+		return orderInvoice;
+	}
+	public void setOrderInvoice(OrderInvoiceEntity orderInvoice) {
+		this.orderInvoice = orderInvoice;
+	}
+	public Integer getUseIntegral() {
+		return useIntegral;
+	}
+	public void setUseIntegral(Integer useIntegral) {
+		this.useIntegral = useIntegral;
+	}
+	
+}

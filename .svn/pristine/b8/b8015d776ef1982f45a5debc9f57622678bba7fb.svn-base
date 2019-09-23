@@ -1,0 +1,131 @@
+package com.wzlue.order.service.impl;
+
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.fasterxml.jackson.core.JsonParser.NumberType;
+import com.github.binarywang.wxpay.bean.request.WxPayRefundRequest;
+import com.github.binarywang.wxpay.exception.WxPayException;
+import com.github.binarywang.wxpay.service.WxPayService;
+import com.wzlue.common.utils.NumberUtils;
+import com.wzlue.order.dao.OrderDao;
+import com.wzlue.order.dao.OrderRefundDao;
+import com.wzlue.order.dao.OrderRefundPicDao;
+import com.wzlue.order.entity.OrderEntity;
+import com.wzlue.order.entity.OrderRefundEntity;
+import com.wzlue.order.entity.OrderRefundPicEntity;
+import com.wzlue.order.service.OrderRefundService;
+
+
+
+@Service("orderRefundService")
+public class OrderRefundServiceImpl implements OrderRefundService {
+	@Autowired
+	private OrderRefundDao orderRefundDao;
+	@Autowired
+	private OrderRefundPicDao orderRefundPicDao;
+	@Autowired
+	private OrderDao orderDao;
+	@Autowired
+    private WxPayService wxService;
+	
+	@Override
+	public OrderRefundEntity queryObject(Long id){
+		return orderRefundDao.queryObject(id);
+	}
+	
+	@Override
+	public List<OrderRefundEntity> queryList(Map<String, Object> map){
+		return orderRefundDao.queryList(map);
+	}
+	
+	@Override
+	public int queryTotal(Map<String, Object> map){
+		return orderRefundDao.queryTotal(map);
+	}
+	
+	@Override
+	@Transactional
+	public void save(OrderRefundEntity orderRefund){
+		String refundNumber = NumberUtils.getOrderNumder();
+		orderRefund.setRefundNumber(refundNumber);
+		orderRefundDao.save(orderRefund);
+		String[] picUrls = orderRefund.getPicUrls();
+		for (String picUrl : picUrls) {
+			OrderRefundPicEntity orderRefundPic = new OrderRefundPicEntity();
+			orderRefundPic.setRefundNumber(refundNumber);
+			orderRefundPic.setPicUrl(picUrl);
+			orderRefundPicDao.save(orderRefundPic);
+		}
+		OrderEntity order = new OrderEntity();
+		order.setOrderNumber(orderRefund.getOrderNumber());
+		order.setStatus(4);
+		orderDao.updateByOrderNumber(order);
+	}
+	
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void update(OrderRefundEntity orderRefund) throws WxPayException{
+		orderRefund.setProcessTime(new Date());
+		orderRefundDao.update(orderRefund);
+		orderRefund = orderRefundDao.queryObject(orderRefund.getId());
+		OrderEntity order = new OrderEntity();
+		order.setOrderNumber(orderRefund.getOrderNumber());
+		if(orderRefund.getStatus() == 2){ //退款成功
+			order.setStatus(5);//5退款成功 6退款失败
+			if (orderRefund.getType()==1) {//类型  1：退款，2：退款退货
+				WxPayRefundRequest request = new WxPayRefundRequest();
+				request.setOutTradeNo(orderRefund.getOrderNumber());//商户订单号
+				request.setOutRefundNo(orderRefund.getRefundNumber());//商户退款单号
+				request.setAppid(wxService.getConfig().getAppId());//appid
+				request.setMchId(wxService.getConfig().getMchId());//商户id
+				request.setRefundDesc("退款");//退款原因
+				OrderEntity orderEntity = orderDao.queryByOrderNumber(orderRefund.getOrderNumber());
+				request.setTotalFee(orderEntity.getPaymentAmount().multiply(new BigDecimal(100)).intValue());//订单金额
+				request.setRefundFee(orderRefund.getRefundAmount().multiply(new BigDecimal(100)).intValue());//退款金额
+				wxService.refund(request);
+			} else {
+				//退款
+				WxPayRefundRequest request = new WxPayRefundRequest();
+				request.setOutTradeNo(orderRefund.getOrderNumber());//商户订单号
+				request.setOutRefundNo(orderRefund.getRefundNumber());//商户退款单号
+				request.setAppid(wxService.getConfig().getAppId());//appid
+				request.setMchId(wxService.getConfig().getMchId());//商户id
+				request.setRefundDesc("退款");//退款原因
+				OrderEntity orderEntity = orderDao.queryByOrderNumber(orderRefund.getOrderNumber());
+				request.setTotalFee(orderEntity.getPaymentAmount().multiply(new BigDecimal(100)).intValue());//订单金额
+				request.setRefundFee(orderRefund.getRefundAmount().multiply(new BigDecimal(100)).intValue());//退款金额
+				wxService.refund(request);
+				//退货
+
+			}
+
+		}else if(orderRefund.getStatus() == 3){
+			order.setStatus(6);
+		}
+		//orderDao.update(order);
+		orderDao.updateByOrderNumber(order);
+	}
+	
+	@Override
+	public void delete(Long id){
+		orderRefundDao.delete(id);
+	}
+	
+	@Override
+	public void deleteBatch(Long[] ids){
+		orderRefundDao.deleteBatch(ids);
+	}
+
+	@Override
+	public OrderRefundEntity queryByOrderNumber(String orderNumber) {
+		return orderRefundDao.queryByOrderNumber(orderNumber);
+	}
+	
+}

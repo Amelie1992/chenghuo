@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wzlue.order.dao.OrderDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+	<resultMap type="com.wzlue.order.entity.OrderEntity" id="orderMap">
+		<result property="id" column="id" />
+		<result property="orderNumber" column="order_number" />
+		<result property="orderType" column="order_type" />
+		<result property="memberId" column="member_id" />
+		<result property="status" column="status" />
+		<result property="payType" column="pay_type" />
+		<result property="logisticsAmount" column="logistics_amount" />
+		<result property="productAmount" column="product_amount" />
+		<result property="paymentAmount" column="payment_amount" />
+		<result property="ramarks" column="ramarks" />
+		<result property="createTime" column="create_time" />
+		<result property="delFlag" column="del_flag" />
+		<result property="payTime" column="pay_time" />
+		<result property="deliveryTime" column="delivery_time" />
+		<association property="memberInfo" javaType="com.wzlue.member.entity.MemberInfoEntity">
+        	<result property="nickName" column="nick_name"/>
+        	<result property="avatarUrl" column="avatar_url"/>
+        </association>
+        
+        <association property="orderAddress" javaType="com.wzlue.order.entity.OrderAddressEntity">
+        	<result property="customerName" column="customer_name"/>
+        	<result property="telephone" column="telephone"/>
+        	<result property="province" column="province"/>
+        	<result property="city" column="city"/>
+        	<result property="county" column="county"/>
+        	<result property="street" column="street"/>
+        </association>
+		<!--发票实体类-->
+		<association property="orderInvoice" javaType="com.wzlue.order.entity.OrderInvoiceEntity">
+			<result property="invoiceType" column="invoice_type"/>
+			<result property="invoiceTitle" column="invoice_title"/>
+			<result property="taxNumber" column="tax_number"/>
+		</association>
+
+		<!--订单物流-->
+		<association property="orderLogistics" javaType="com.wzlue.order.entity.OrderLogisticsEntity">
+			<result property="id" column="id" />
+			<result property="orderNumber" column="order_number" />
+			<result property="companyId" column="company_id" />
+			<result property="companyName" column="company_name" />
+			<result property="logisticsNumber" column="logistics_number" />
+			<result property="createTime" column="create_time" />
+		</association>
+        
+        <collection property="orderGoodsList" column="order_number" select="com.wzlue.order.dao.OrderGoodsDao.queryByOrderNumber">
+        	<result property="goodsName" column="goods_name"/>
+        	<result property="price" column="price"/>
+        	<result property="picUrl" column="pic_url"/>
+        	<result property="buyNum" column="buy_num"/>
+        </collection>
+
+	</resultMap>
+	
+	<select id="queryByOrderNumber" resultMap="orderMap">
+		select t.*, ui.nick_name, ui.avatar_url, 
+		og.goods_name, og.pic_url, og.price, og.buy_num, 
+		oa.customer_name, oa.telephone, oa.province, oa.city, oa.county, oa.street from o_order t
+		left join m_member_info ui on t.member_id=ui.id
+		left join o_order_goods og on t.order_number = og.order_number
+		left join o_order_address oa on t.order_number = oa.order_number
+		LEFT JOIN o_order_invoice oi ON t.order_number=oi.order_number
+		where t.order_number = #{value}
+	</select>
+
+	<select id="queryObject" resultMap="orderMap">
+		select t.*, ui.nick_name, ui.avatar_url, 
+		og.goods_name, og.pic_url, og.price, og.buy_num, 
+		oa.customer_name, oa.telephone, oa.province, oa.city, oa.county, oa.street,
+		oi.invoice_type,oi.invoice_title,oi.tax_number
+		from o_order t
+		left join m_member_info ui on t.member_id=ui.id
+		left join o_order_goods og on t.order_number = og.order_number
+		left join o_order_address oa on t.order_number = oa.order_number
+		LEFT JOIN o_order_invoice oi ON t.order_number=oi.order_number
+		where t.id = #{value}
+	</select>
+
+	<select id="queryList" resultMap="orderMap">
+		select t.*, ui.nick_name, ui.avatar_url, og.goods_name, og.pic_url, og.price, og.buy_num from o_order t
+		left join m_member_info ui on t.member_id=ui.id
+		left join o_order_goods og on t.order_number = og.order_number
+		LEFT JOIN o_order_invoice oi ON t.order_number=oi.order_number
+		<where>
+			<if test="memberId != null">
+				t.member_id = #{memberId}
+			</if>
+			<if test="status != null and status!=''">
+				and t.status = #{status}
+			</if>
+			<if test="orderNumber != null and orderNumber!=''">
+				and t.order_number = #{orderNumber}
+			</if>
+			<if test="statuses != null">
+				and t.status in
+				<foreach item="status" collection="statuses" open="(" separator=","
+					close=")">
+					#{status}
+				</foreach>
+			</if>
+		</where>
+
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				ORDER BY ${sidx} ${order}
+			</when>
+			<otherwise>
+				ORDER BY id desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			LIMIT #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryTotal" resultType="int">
+		SELECT count(*) FROM o_order t
+		<where>
+			<if test="memberId != null">
+				t.member_id = #{memberId}
+			</if>
+			<if test="orderNumber != null">
+				and t.order_number = #{orderNumber}
+			</if>
+			<if test="status != null">
+				and t.status = #{status}
+			</if>
+		</where>
+	</select>
+
+	<insert id="save" parameterType="com.wzlue.order.entity.OrderEntity"
+		useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO o_order
+		(
+		`order_number`,
+		`order_type`,
+		`member_id`,
+		`status`,
+		`pay_type`,
+		`logistics_amount`,
+		`product_amount`,
+		`payment_amount`,
+		`ramarks`,
+		`create_time`,
+		`use_integral`,
+		`del_flag`,
+		`pay_time`,
+		`delivery_time`
+		)
+		VALUES
+		(
+		#{orderNumber},
+		#{orderType},
+		#{memberId},
+		#{status},
+		#{payType},
+		#{logisticsAmount},
+		#{productAmount},
+		#{paymentAmount},
+		#{ramarks},
+		#{createTime},
+		#{useIntegral},
+		#{delFlag},
+		#{payTime},
+		#{deliveryTime}
+		)
+	</insert>
+
+	<update id="update" parameterType="com.wzlue.order.entity.OrderEntity">
+		UPDATE o_order
+		<set>
+			<if test="orderNumber != null">`order_number` = #{orderNumber}, </if>
+			<if test="orderType != null">`order_type` = #{orderType}, </if>
+			<if test="memberId != null">`member_id` = #{memberId}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="payType != null">`pay_type` = #{payType}, </if>
+			<if test="logisticsAmount != null">`logistics_amount` = #{logisticsAmount}, </if>
+			<if test="productAmount != null">`product_amount` = #{productAmount}, </if>
+			<if test="paymentAmount != null">`payment_amount` = #{paymentAmount}, </if>
+			<if test="ramarks != null">`ramarks` = #{ramarks}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="delFlag != null">`del_flag` = #{delFlag},</if>
+			<if test="payTime != null">`pay_time` = #{payTime}, </if>
+			<if test="deliveryTime != null">`delivery_time` = #{deliveryTime}</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<delete id="delete">
+		DELETE FROM o_order WHERE id = #{value}
+	</delete>
+
+	<delete id="deleteBatch">
+		DELETE FROM o_order WHERE id IN
+		<foreach item="id" collection="array" open="(" separator=","
+			close=")">
+			#{id}
+		</foreach>
+	</delete>
+	
+	<update id="updateByOrderNumber" parameterType="com.wzlue.order.entity.OrderEntity">
+		update o_order set status = #{status} where order_number = #{orderNumber}
+	</update>
+	
+	<!-- 查询近7天已完成订单数 -->
+	<select id="queryOrderCount" resultType="int">
+		SELECT count(1) count
+		FROM o_order t
+		where DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt;= date(create_time)
+	</select>
+	
+	<!-- 查询近7天已完成订单数 -->
+	<select id="queryOrderChart" resultType="java.util.Map">
+		SELECT date_format(create_time,'%Y-%m-%d') as createTime, count(1) count
+		FROM o_order t
+		where DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt;= date(create_time)
+		GROUP BY date_format(create_time,'%Y-%m-%d')
+	</select>
+
+</mapper>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wzlue.integral.dao.IntegralCardBatchDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.wzlue.integral.entity.IntegralCardBatchEntity" id="integralCardBatchMap">
+        <result property="id" column="id"/>
+        <result property="batchNumber" column="batch_number"/>
+        <result property="integral" column="integral"/>
+        <result property="number" column="number"/>
+        <result property="createTime" column="create_time"/>
+        <result property="remarks" column="remarks"/>
+    </resultMap>
+
+    <select id="queryObject" resultType="com.wzlue.integral.entity.IntegralCardBatchEntity">
+		SELECT * FROM integral_card_batch WHERE id = #{value}
+	</select>
+
+    <select id="queryList" resultType="com.wzlue.integral.entity.IntegralCardBatchEntity">
+        SELECT * FROM integral_card_batch
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                ORDER BY ${sidx} ${order}
+            </when>
+            <otherwise>
+                ORDER BY id desc
+            </otherwise>
+        </choose>
+        <if test="offset != null and limit != null">
+            LIMIT #{offset}, #{limit}
+        </if>
+    </select>
+
+    <select id="queryTotal" resultType="int">
+		SELECT count(*) FROM integral_card_batch
+	</select>
+
+    <insert id="save" parameterType="com.wzlue.integral.entity.IntegralCardBatchEntity" useGeneratedKeys="true"
+            keyProperty="id">
+		INSERT INTO integral_card_batch
+		(
+			`batch_number`,
+			`integral`,
+			`number`,
+			`create_time`,
+			`remarks`
+						)
+		VALUES
+		(
+			#{batchNumber},
+			#{integral},
+			#{number},
+			now(),
+			#{remarks}
+						)
+	</insert>
+
+    <update id="update" parameterType="com.wzlue.integral.entity.IntegralCardBatchEntity">
+        UPDATE integral_card_batch
+        <set>
+            <if test="batchNumber != null">`batch_number` = #{batchNumber},</if>
+            <if test="integral != null">`integral` = #{integral},</if>
+            <if test="number != null">`number` = #{number},</if>
+            <if test="createTime != null">`create_time` = #{createTime},</if>
+            <if test="remarks != null">`remarks` = #{remarks}</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+		DELETE FROM integral_card_batch WHERE id = #{value}
+	</delete>
+
+    <delete id="deleteBatch">
+        DELETE FROM integral_card_batch WHERE id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

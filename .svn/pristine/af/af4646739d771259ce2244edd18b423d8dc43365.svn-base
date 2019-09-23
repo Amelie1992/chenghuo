@@ -1,0 +1,386 @@
+package com.wzlue.app.controller.member;
+
+import java.math.BigDecimal;
+import java.util.*;
+
+import cn.hutool.core.util.ReUtil;
+import com.alibaba.fastjson.JSONObject;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.wzlue.app.controller.wechat.ApiPayController;
+import com.wzlue.common.base.Query;
+import com.wzlue.common.utils.NumberUtils;
+import com.wzlue.goods.service.GoodsCollectionService;
+import com.wzlue.goods.service.GoodsFootprintService;
+import com.wzlue.member.entity.IntegralRecordEntity;
+import com.wzlue.member.entity.MemberAgreementEntity;
+import com.wzlue.member.entity.MemberRecommendEntity;
+import com.wzlue.member.service.IntegralRecordService;
+import com.wzlue.member.service.MemberAgreementService;
+import com.wzlue.member.service.MemberRecommendService;
+import com.wzlue.order.entity.OrderEntity;
+import com.wzlue.order.service.OrderService;
+import com.wzlue.sys.MSdx.ApiDemo4Java;
+import com.wzlue.sys.service.SysConfigService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
+
+import com.wzlue.app.common.annotation.Login;
+import com.wzlue.common.base.R;
+import com.wzlue.member.entity.MemberInfoEntity;
+import com.wzlue.member.service.MemberInfoService;
+import com.wzlue.sys.common.config.IntegralConfig;
+
+@RestController
+
+@RequestMapping("/app/member")
+public class ApiMemberInfoController {
+
+	@Autowired
+	private MemberInfoService memberInfoService;
+	@Autowired
+	private IntegralConfig integralConfig;
+	@Autowired
+	private GoodsCollectionService goodsCollectionService;
+	@Autowired
+	private GoodsFootprintService goodsFootprintService;
+	@Autowired
+	private MemberAgreementService memberAgreementService;
+	@Autowired
+	private SysConfigService sysConfigService;
+	@Autowired
+	private IntegralRecordService integralRecordService;
+	@Autowired
+	private MemberRecommendService memberRecommendService;
+	@Autowired
+	private OrderService orderService;
+
+	@Login
+	@RequestMapping("/info")
+	public R info(@RequestAttribute("userId") Long userId) {
+		MemberInfoEntity memberInfo = memberInfoService.queryObject(userId);
+		Map<String, Object> map = new HashMap<>();
+		map.put("memberId", userId);
+		int saveNum = goodsCollectionService.queryTotal(map);
+		int footNum = goodsFootprintService.queryTotal(map);
+		R r = new R();
+		r.put("saveNum", saveNum);
+		r.put("footNum", footNum);
+		r.put("memberInfo", memberInfo);
+		return r;
+	}
+
+	@Login
+	@RequestMapping("/updateMobile")
+	public R updateMobile(String mobile, @RequestAttribute("userId") Long userId) {
+		MemberInfoEntity memberInfo = new MemberInfoEntity();
+		memberInfo.setId(userId);
+		memberInfo.setMobile(mobile);
+		memberInfoService.update(memberInfo);
+		return R.ok();
+	}
+
+
+	@Login
+	@RequestMapping("/updateRealName")
+	public R updateRealName(String realName, @RequestAttribute("userId") Long userId) {
+		MemberInfoEntity memberInfo = new MemberInfoEntity();
+		memberInfo.setId(userId);
+		memberInfo.setRealName(realName);
+		memberInfoService.update(memberInfo);
+		return R.ok();
+	}
+
+	/**
+	 * 发送手机验证码
+	 *
+	 * @param mobile
+	 * @return
+	 */
+	@Login
+	@RequestMapping("/sendSMS")
+	public R sendSMS(String mobile) {
+		String smsCode = null;
+		String regex = "^((13[0-9])|(14[5,7,9])|(15([0-3]|[5-9]))|(166)|(17[0,1,3,5,6,7,8])|(18[0-9])|(19[8|9]))\\d{8}$";
+		if (!"".equals(mobile) && ReUtil.contains(regex, mobile)) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("mobile", mobile);
+			int total = memberInfoService.queryTotal(map);
+			if (total > 0)
+				return R.error("手机号码已被绑定！");
+			ApiDemo4Java.send(mobile);
+			return R.ok();
+		}
+		return R.error();
+	}
+
+	/**
+	 * 验证短信码
+	 *
+	 * @param userId
+	 * @param mobile
+	 * @param smsCode
+	 * @return
+	 */
+	@Login
+	@RequestMapping("/testSmsCode")
+	public R register(Long userId, String mobile, String smsCode) {
+		// 验证短信码
+		if (!ApiDemo4Java.yz(mobile, smsCode)) {
+			return R.error("短信码错误!");
+		}
+		//绑定用户
+		MemberInfoEntity memberInfo = memberInfoService.queryObject(userId);
+		memberInfo.setMobile(mobile);
+		memberInfoService.update(memberInfo);
+		return R.ok();
+	}
+
+	/**
+	 * 添加积分记录
+	 *
+	 * @param memberInfo 用户
+	 * @param integral   积分
+	 * @param type       积分来源 1推广；2充值；3消费；4购买会员；5解冻
+	 */
+	@Transactional
+	private void addIntegral(MemberInfoEntity memberInfo, Integer integral, Integer type, Integer flag) {
+		IntegralRecordEntity integralRecord = new IntegralRecordEntity();
+		if (type == 1) {//推广
+			//推荐人
+			MemberInfoEntity reMemberInfo = memberInfoService.queryObject(memberInfo.getRecommenderId());
+			//添加一条推广记录
+			MemberRecommendEntity memberRecommend = new MemberRecommendEntity();
+			memberRecommend.setMemberId(memberInfo.getId());
+			memberRecommend.setMemberMobile(memberInfo.getMobile());
+			memberRecommend.setMemberNickName(memberInfo.getNickName());
+			memberRecommend.setRecommenderId(reMemberInfo.getId());
+			memberRecommend.setRecommenderMobile(reMemberInfo.getMobile());
+			memberRecommend.setRecommenderNickName(reMemberInfo.getNickName());
+			memberRecommendService.save(memberRecommend);
+			integralRecord.setMemberId(reMemberInfo.getId());
+			integralRecord.setRemarks("推广返积分");
+			integralRecord.setTraceId(memberRecommend.getId());
+		} else {//购买会员
+			integralRecord.setMemberId(memberInfo.getId());
+			integralRecord.setRemarks("纯冻结积分购买会员");
+			integralRecord.setTraceId(memberInfo.getId());
+		}
+		//购买会员积分记录
+		integralRecord.setIntegral(integral);
+		integralRecord.setType(type);//分类：1推广；2充值；3消费；4购买会员；5解冻
+		integralRecord.setTrace(memberInfo.getNickName());
+		integralRecord.setFreezingIntegral(flag);
+		integralRecordService.save(integralRecord);
+	}
+
+	/**
+	 * 积分支付(积分减99,加一条积分记录)
+	 * 前提总积分>99，优先扣除冻结积分
+	 *
+	 * @param userId
+	 * @return
+	 */
+	@Login
+	@Transactional
+	@RequestMapping("/integralPay")
+		public R integralPay(Long userId) {
+		MemberInfoEntity memberInfo = memberInfoService.queryObject(userId);
+		JsonParser jp = new JsonParser();
+		//会费99元
+		String value = sysConfigService.queryByKey("MEMBERSHIP_SETTING");
+		JsonObject jo = jp.parse(value).getAsJsonObject();
+		String val = jo.get("member").getAsJsonObject().get("lose").getAsString();
+		//推广返积分66
+		String value2 = sysConfigService.queryByKey("INTEGRAL_SETTING");
+		JsonObject jo2 = jp.parse(value2).getAsJsonObject();
+		String val2 = jo2.get("popularization").getAsJsonObject().get("get").getAsString();
+		//用户冻结积分减99,会员=1,冻结积分转入正常积分
+		if (memberInfo.getFreezingIntegral() < 99 && memberInfo.getIntegral() > 0) {//冻结积分不够
+			int diff = memberInfo.getIntegral() - memberInfo.getFreezingIntegral();
+			memberInfo.setIntegral(memberInfo.getIntegral() - diff);
+			addIntegral(memberInfo, diff, 4, 0);
+		} else {
+			int score = memberInfo.getFreezingIntegral() - Integer.valueOf(val);
+			memberInfo.setFreezingIntegral(0);//冻结积分清空
+			memberInfo.setIntegral(memberInfo.getIntegral() + score);
+			addIntegral(memberInfo, Integer.valueOf(val), 4, 1);
+		}
+		memberInfo.setIsVip(1);
+		memberInfo.setVipAddTime(new Date());
+		Calendar curr = Calendar.getInstance();
+		//会员有效期一年（到期时间一年后）
+		curr.set(Calendar.YEAR, curr.get(Calendar.YEAR) + 1);
+		memberInfo.setVipEndTime(curr.getTime());
+		memberInfoService.update(memberInfo);
+		//推广返积分
+		if (memberInfo.getRecommenderId() != null) {
+			//推荐人积分加66
+			MemberInfoEntity reMemberInfo = memberInfoService.queryObject(memberInfo.getRecommenderId());
+			if (reMemberInfo.getIsVip() == 1) {
+				int score2 = reMemberInfo.getIntegral() + Integer.valueOf(val2);
+				reMemberInfo.setIntegral(score2);
+				//推广加积分记录
+				addIntegral(memberInfo, Integer.valueOf(val2), 1, 1);
+			} else {
+				int score2 = reMemberInfo.getFreezingIntegral() + Integer.valueOf(val2);
+				reMemberInfo.setFreezingIntegral(score2);
+				//推广加积分记录
+				addIntegral(memberInfo, Integer.valueOf(val2), 1, 1);
+			}
+			memberInfoService.update(reMemberInfo);
+		}
+		return R.ok();
+	}
+
+	/**
+	 * 创建虚拟订单
+	 * @param userId
+	 * @param integral
+	 * @param payment
+	 * @return
+	 */
+	@Login
+	@RequestMapping("/createOrder")
+	public R createOrder(Long userId, Integer integral, BigDecimal payment) {
+		//纯现金支付--微信支付
+		OrderEntity order = new OrderEntity();
+		String orderNumber = NumberUtils.getOrderNumder();
+		order.setOrderNumber(orderNumber);
+		order.setOrderType("2");//生成虚拟订单
+		order.setMemberId(userId);
+		order.setStatus(1);//待付款
+		order.setPayType("wechat");
+		order.setRamarks("购买会员微信支付");
+		order.setPaymentAmount(payment);//实付金额
+		order.setCreateTime(new Date());
+		orderService.save(order);
+		return R.ok().put("orderNumber", order.getOrderNumber()).put("paymentAmount", order.getPaymentAmount());
+	}
+
+	/**
+	 * 混合支付购买会员
+	 * 微信支付后回调的方法
+	 * @param userId   用户id
+	 * @param integral 积分
+	 * @param payment  实付
+	 * @return
+	 */
+	@Login
+	@Transactional
+	@RequestMapping("/blendPay")
+	public R blendPay(Long userId, Integer integral) {
+		//推广返积分66
+		JsonParser jp = new JsonParser();
+		String value2 = sysConfigService.queryByKey("INTEGRAL_SETTING");
+		JsonObject jo2 = jp.parse(value2).getAsJsonObject();
+		String val2 = jo2.get("popularization").getAsJsonObject().get("get").getAsString();
+		MemberInfoEntity memberInfo = memberInfoService.queryObject(userId);
+		if (integral!=0){
+			int integrals = memberInfo.getIntegral();//正常积分
+			int freezingIntegrals = memberInfo.getFreezingIntegral();//冻结积分
+			//用户积分清空
+			memberInfo.setFreezingIntegral(0);
+			memberInfo.setIntegral(0);
+			//购买会员积分记录
+			if (integrals>0){
+				addIntegral(memberInfo, integrals, 4, 0);
+			}
+			if (freezingIntegrals>0){
+				addIntegral(memberInfo, freezingIntegrals, 4, 1);
+			}
+		}
+		memberInfo.setIsVip(1);
+		memberInfo.setVipAddTime(new Date());
+		Calendar curr = Calendar.getInstance();
+		//会员有效期一年（到期时间一年后）
+		curr.set(Calendar.YEAR, curr.get(Calendar.YEAR) + 1);
+		memberInfo.setVipEndTime(curr.getTime());
+		memberInfoService.update(memberInfo);
+		//推广返积分
+		if (memberInfo.getRecommenderId() != null) {
+			//推荐人积分加66
+			MemberInfoEntity reMemberInfo = memberInfoService.queryObject(memberInfo.getRecommenderId());
+			if (reMemberInfo.getIsVip() == 1) {
+				int score2 = reMemberInfo.getIntegral() + Integer.valueOf(val2);
+				reMemberInfo.setIntegral(score2);
+				//推广加积分记录
+				addIntegral(memberInfo, Integer.valueOf(val2), 1, 1);
+			} else {
+				int score2 = reMemberInfo.getFreezingIntegral() + Integer.valueOf(val2);
+				reMemberInfo.setFreezingIntegral(score2);
+				//推广加积分记录
+				addIntegral(memberInfo, Integer.valueOf(val2), 1, 1);
+			}
+			memberInfoService.update(reMemberInfo);
+		}
+		return R.ok();
+	};
+
+	@Login
+	@RequestMapping("/getIntegral")
+	public R getIntegral(@RequestAttribute("userId") Long userId) {
+		MemberInfoEntity memberInfo = memberInfoService.queryObject(userId);
+		return R.ok().put("integral", memberInfo.getIntegral());
+	}
+
+	@Login
+	@RequestMapping("/signIn")
+	public R signIn(@RequestAttribute("userId") Long userId) {
+		memberInfoService.signIn(userId);
+		return R.ok();
+	}
+
+	@Login
+	@RequestMapping("/isSignIn")
+	public R isSignIn(@RequestAttribute("userId") Long userId) {
+		boolean isSignIn = memberInfoService.isSignIn(userId);
+		return R.ok().put("isSignIn", isSignIn);
+	}
+
+	@Login
+	@RequestMapping("/getAvailableIntegral")
+	public R getAvailableIntegral(@RequestAttribute("userId") Long userId, BigDecimal paymentAmount) {
+		Integer integral = memberInfoService.queryIntegral(userId);
+		if (integral > 0) {
+
+			int lose = integralConfig.config3().getDeduction().getLose(); //失去
+			int get = integralConfig.config3().getDeduction().getGet(); //获得
+			int upLimit = integralConfig.config3().getDeduction().getUpperLimit(); //上限
+
+			int purposeMoney = integral / lose * get;
+
+			if (purposeMoney > paymentAmount.intValue() * upLimit / 100) {
+				purposeMoney = paymentAmount.intValue() * upLimit / 100;
+				integral = purposeMoney / lose * get;
+			}
+
+			return R.ok().put("purposeMoney", purposeMoney).put("integral", integral);
+
+		}
+		return R.ok().put("purposeMoney", 0).put("integral", 0);
+	}
+
+	//会员下级列表（会员推荐列表）
+	@Login
+	@RequestMapping("/getRecommender")
+	public R getRecommender(@RequestAttribute("userId") Long userId) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("recommenderId", userId);
+		List<MemberInfoEntity> memberInfoList = memberInfoService.queryList(params);
+		return R.ok().put("memberInfoList", memberInfoList);
+	}
+
+	//会员协议接口
+	@Login
+	@RequestMapping("/getAgreement")
+	public R getAgreement(@RequestParam Map<String, Object> params) {
+		//查询列表数据
+		Query query = new Query(params);
+		params.put("status", 1);
+		List<MemberAgreementEntity> memberAgreementList = memberAgreementService.queryList(query);
+		return R.ok().put("memberAgreement", memberAgreementList);
+	}
+
+}

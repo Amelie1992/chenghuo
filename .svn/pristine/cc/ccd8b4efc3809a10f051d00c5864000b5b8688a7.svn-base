@@ -1,0 +1,42 @@
+package com.wzlue.app.controller.goods;
+
+import java.util.List;
+import java.util.Map;
+
+import com.wzlue.common.base.Query;
+import com.wzlue.goods.entity.GoodsCollectionEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.wzlue.app.common.annotation.Login;
+import com.wzlue.common.base.R;
+import com.wzlue.goods.entity.GoodsEntity;
+import com.wzlue.goods.service.GoodsCollectionService;
+
+@RestController
+@RequestMapping("/app/goodscollection")
+public class ApiGoodsCollectionController {
+
+	@Autowired
+	private GoodsCollectionService goodsCollectionService;
+	
+	@Login
+	@RequestMapping("list")
+	public R list(@RequestAttribute("userId") Long userId,@RequestParam Map<String, Object> params){
+		//查询列表数据
+		params.put("memberId",userId);
+		Query query = new Query(params);
+ 		List<GoodsCollectionEntity> goodsList = goodsCollectionService.getCollectionGoods(query);
+		return R.ok().put("goodsList", goodsList);
+	}
+	
+	@Login
+	@RequestMapping("cancel")
+	public R cancel(@RequestAttribute("userId") Long userId, Long goodsId){
+		goodsCollectionService.deleteByGoodsAndMember(goodsId, userId);
+		return R.ok();
+	}
+}

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>订单</title>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<link rel="stylesheet" href="../../css/bootstrap.min.css">
+<link rel="stylesheet" href="../../css/AdminLTE.min.css">
+<link rel="stylesheet" href="../../css/font-awesome.min.css">
+<link rel="stylesheet" href="../../plugins/jqgrid/ui.jqgrid-bootstrap.css">
+<link rel="stylesheet" href="../../css/bootstrap-table.min.css">
+<link rel="stylesheet" href="../../plugins/bootstrap-validator/css/bootstrap-validator.min.css">
+<link rel="stylesheet" href="../../plugins/ztree/css/metroStyle/metroStyle.css">
+<link rel="stylesheet" href="../../css/main.css">
+<link rel="stylesheet" href="../../plugins/treegrid/jquery.treegrid.css">
+
+</head>
+<body>
+	<div id="rrapp" v-cloak class="content-wrapper wzl-content-wrapper">
+		<section class="content-header">
+			<h1>
+				订单 &nbsp;<small v-if="title!=''">{{title}}</small>
+			</h1>
+		</section>
+		<div v-show="showList">
+			<section class="content">
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="box">
+							<div class="box-header with-border">
+							
+								<div class="col-xs-2">
+									<input type="text" class="form-control" v-model="queryParams.orderNumber" maxlength="200" placeholder="订单编号">
+								</div>
+								<div class="col-xs-1" style="width: 150px">
+									<select class="form-control" name="status" v-model="queryParams.status">
+										<option value="">状态</option>
+										<option v-for="item in statusList" :value="item.value">{{item.label}}</option>
+									</select>
+								</div>
+
+								<button class="btn btn-primary" @click="query">
+									<i class="fa fa-search"></i>&nbsp;查询
+								</button>
+								<button class="btn btn-danger" @click="del">
+									<i class="fa fa-trash-o"></i>&nbsp;删除
+								</button>
+							</div>
+							<div class="box-body">
+								<table id="table"></table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+
+		<div v-show="!showList">
+			<section class="content">
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="box">
+							<div class="box-header with-border">
+								<h3 class="box-title">基础信息</h3>
+							</div>
+
+							<form class="form-horizontal">
+								<div class="row">
+									<div class="form-group">
+										<div class="col-sm-2 control-label">订单编号</div>
+										<div class="col-sm-8">
+											<input type="text" name="orderNumber" class="form-control" v-model="order.orderNumber"/>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="form-group">
+										<div class="col-sm-2 control-label">客户昵称</div>
+										<div class="col-sm-8">
+											<input type="text" name="memberId" class="form-control" v-model="order.memberInfo.nickName" />
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="form-group">
+										<div class="col-sm-2 control-label">订单状态</div>
+										<div class="col-sm-8">
+											<select class="form-control" v-model="order.status" >
+												<option value="0">已取消</option>
+												<option value="1">待付款</option>
+												<option value="2">待发货</option>
+												<option value="3">待收货</option>
+												<option value="4">退款中</option>
+												<option value="5">退款失败</option>
+												<option value="6">退款成功</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="form-group">
+										<div class="col-sm-2 control-label">商品总价格</div>
+										<div class="col-sm-8">
+											<input type="text" name="productAmount" class="form-control" v-model="order.productAmount" />
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="form-group">
+										<div class="col-sm-2 control-label">实付金额</div>
+										<div class="col-sm-8">
+											<input type="text" name="paymentAmount" class="form-control" v-model="order.paymentAmount" />
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="form-group">
+										<div class="col-sm-2 control-label">备注</div>
+										<div class="col-sm-8">
+											<input type="text" name="ramarks" class="form-control" v-model="order.ramarks" />
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="form-group">
+										<div class="col-sm-2 control-label">下单时间</div>
+										<div class="col-sm-8">
+											<input type="text" name="createTime" class="form-control" v-model="order.createTime" />
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+						<div class="box" v-if="order.orderInvoice">
+							<div class="box-header with-border">
+								<h3 class="box-title">发票信息</h3>
+							</div>
+
+							<form class="form-horizontal">
+								<div class="row">
+									<div class="form-group">
+										<div class="col-sm-2 control-label">发票类型</div>
+										<div class="col-sm-8">
+											<input type="text" class="form-control" v-model="OrderInvoiceType" />
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="form-group">
+										<div class="col-sm-2 control-label">抬头</div>
+										<div class="col-sm-8">
+											<input type="text" class="form-control" v-model="order.orderInvoice.invoiceTitle" />
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="form-group">
+										<div class="col-sm-2 control-label">税号</div>
+										<div class="col-sm-8">
+											<input type="text" class="form-control" v-model="order.orderInvoice.taxNumber" />
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+						<div class="box">
+							<div class="box-header with-border">
+								<h3 class="box-title">收货信息</h3>
+							</div>
+
+							<form class="form-horizontal">
+								<div class="row">
+									<div class="form-group">
+										<div class="col-sm-2 control-label">姓名</div>
+										<div class="col-sm-8">
+											<input type="text" class="form-control" v-model="order.orderAddress.customerName" />
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="form-group">
+										<div class="col-sm-2 control-label">手机号</div>
+										<div class="col-sm-8">
+											<input type="text" class="form-control" v-model="order.orderAddress.telephone" />
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="form-group">
+										<div class="col-sm-2 control-label">地址</div>
+										<div class="col-sm-8">
+											<input type="text" class="form-control" v-model="order.orderAddress.detailInfo" />
+										</div>
+									</div>
+								</div>
+
+								<div class="row" v-if="order.status <= 1">
+									<div class="form-group">
+										<div class="col-sm-2 control-label"></div>
+										<input type="button" class="btn btn-warning" @click="reload" value="返回" />
+									</div>
+								</div>
+							</form>
+						</div>
+						
+
+						
+						<div class="box" v-if="order.status > 1">
+							<div class="box-header with-border">
+								<h3 class="box-title">物流信息</h3>
+							</div>
+
+							<form class="form-horizontal">
+								<div class="row">
+									<div class="form-group">
+										<div class="col-sm-2 control-label">物流公司</div>
+										<div class="col-sm-8">
+											<select class="form-control" id="logisticsCompany" name="companyId" v-model="order.orderLogistics.companyId" :disabled="disabledAll">
+												<option value="">--请选择物流公司--</option>
+												<option v-for="item in logisticsCompanyList" :value="item.id">{{item.companyName}}</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="form-group">
+										<div class="col-sm-2 control-label">物流单号</div>
+										<div class="col-sm-8">
+											<input type="text" class="form-control" id="logisticsNumber" v-model="order.orderLogistics.logisticsNumber" />
+										</div>
+									</div>
+								</div>
+
+								<div class="row">
+									<div class="form-group">
+										<div class="col-sm-2 control-label">查询物流信息</div>
+										<div class="col-sm-8">
+											<input type="button" class="btn btn-primary" @click="queryWuLiu" value="实时查询" />
+										</div>
+									</div>
+								</div>
+								<div class="row" v-show="wuLiu">
+									<div class="form-group">
+										<div class="col-sm-2 control-label">物流详情</div>
+										<div class="col-sm-8">
+											<ul class="list-group" v-for='item in content.data'>
+												<li>{{item.ftime}}</li><!--json数组-->
+												<li>{{item.context}}</li><!--json数组-->
+											</ul>
+											</data>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="form-group">
+										<div class="col-sm-2 control-label"></div>
+										<input v-if="order.status == 2" type="button" class="btn btn-primary" @click="sendGoods" value="发货" /> &nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回" />
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+	</div>
+
+	<script src="../../libs/jquery.min.js"></script>
+	<script src="../../plugins/layer/layer.js"></script>
+	<script src="../../libs/bootstrap.min.js"></script>
+	<script src="../../libs/vue.min.js"></script>
+	<!--bootstrap-table-->
+	<script src="../../plugins/bootstrap-table/bootstrap-table.min.js"></script>
+	<script src="../../plugins/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
+	<!--bootstrap-validator-->
+	<script src="../../plugins/bootstrap-validator/js/bootstrap-validator.min.js"></script>
+	<script src="../../plugins/bootstrap-validator/js/zh_CN.min.js"></script>
+	<script src="../../plugins/jqgrid/grid.locale-cn.js"></script>
+	<script src="../../plugins/jqgrid/jquery.jqGrid.min.js"></script>
+	<script src="../../plugins/ztree/jquery.ztree.all.min.js"></script>
+	<script src="../../js/common.js"></script>
+
+	<script src="../../js/modules/order/order.js"></script>
+</body>
+</html>

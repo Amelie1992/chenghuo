@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wzlue.goods.dao.GoodsFootprintDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+	<resultMap type="com.wzlue.goods.entity.GoodsFootprintEntity"
+		id="goodsFootprintMap">
+		<result property="id" column="id" />
+		<result property="memberId" column="member_id" />
+		<result property="goodsId" column="goods_id" />
+		<result property="createTime" column="create_time" />
+	</resultMap>
+
+	<select id="queryObject" resultType="com.wzlue.goods.entity.GoodsFootprintEntity">
+		SELECT * FROM
+		g_goods_footprint WHERE id = #{value}
+	</select>
+	
+	<select id="getFootprintGoods" resultType="com.wzlue.goods.entity.GoodsEntity">
+		select g.* from g_goods_footprint gt left join
+		g_goods g on gt.goods_id = g.id
+		where gt.member_id = #{value} and g.status=1
+		order by gt.create_time desc
+	</select>
+
+	<select id="queryList" resultType="com.wzlue.goods.entity.GoodsFootprintEntity">
+		SELECT * FROM g_goods_footprint
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				ORDER BY ${sidx} ${order}
+			</when>
+			<otherwise>
+				ORDER BY id desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			LIMIT #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryTotal" resultType="int">
+		SELECT count(*) from g_goods_footprint gt left join
+		g_goods g on gt.goods_id = g.id
+		<where>
+			 g.status=1
+			<if test="goodsId != null">
+				and goods_id = #{goodsId}
+			</if>
+			<if test="memberId != null">
+				and gt.member_id = #{memberId}
+			</if>
+		</where>
+
+	</select>
+
+	<insert id="save" parameterType="com.wzlue.goods.entity.GoodsFootprintEntity"
+		useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO g_goods_footprint
+		(
+		`member_id`,
+		`goods_id`,
+		`create_time`
+		)
+		VALUES
+		(
+		#{memberId},
+		#{goodsId},
+		#{createTime}
+		)
+	</insert>
+
+	<update id="update" parameterType="com.wzlue.goods.entity.GoodsFootprintEntity">
+		UPDATE g_goods_footprint
+		<set>
+			<if test="memberId != null">`member_id` = #{memberId}, </if>
+			<if test="goodsId != null">`goods_id` = #{goodsId}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<delete id="delete">
+		DELETE FROM g_goods_footprint WHERE id = #{value}
+	</delete>
+
+	<delete id="deleteBatch">
+		DELETE FROM g_goods_footprint WHERE id IN
+		<foreach item="id" collection="array" open="(" separator=","
+			close=")">
+			#{id}
+		</foreach>
+	</delete>
+	
+	<delete id="deleteByGoodsAndMember">
+		delete from g_goods_footprint where goods_id = #{goodsId} and member_id = #{memberId}
+	</delete>
+
+</mapper>

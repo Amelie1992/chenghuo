@@ -1,0 +1,79 @@
+<view class="page">
+  <!-- search bar -->
+  <view class="weui-search-bar">
+    <view class="weui-search-bar__form">
+      <view class="weui-search-bar__box">
+        <icon class="weui-icon-search_in-box" type="search" size="14"></icon>
+        <input type="text" class="weui-search-bar__input" placeholder="请输入关键词搜索" value="{{inputVal}}" focus="{{inputShowed}}" bindinput="inputTyping" />
+        <view class="weui-icon-clear" wx:if="{{inputVal.length > 0}}" bindtap="clearInput">
+          <icon type="clear" size="14"></icon>
+        </view>
+      </view>
+      <label class="weui-search-bar__label" hidden="{{inputShowed}}" bindtap="toSearch">
+        <icon class="weui-icon-search" type="search" size="14"></icon>
+        <view class="weui-search-bar__text">请输入关键词搜索</view>
+      </label>
+    </view>
+    <view class="weui-search-bar__cancel-btn" hidden="{{!inputShowed}}" bindtap="hideInput">取消</view>
+  </view>
+
+  <!-- banner -->
+  <view class='banner-wrap'>
+    <!--banner  swiper -->
+    <swiper indicator-dots="true" autoplay class='swiper-wrap' indicator-color="#fff" indicator-active-color="#88c5fb">
+      <block wx:for="{{bannerList}}" wx:key="{{index}}">
+        <swiper-item>
+          <image mode="aspectFill" src="{{item.picUrl}}" class="slide-image" />
+        </swiper-item>
+      </block>
+    </swiper>
+  </view>
+
+  <!-- <view class='company weui-flex'>
+    <view class='weui-flex__item'>
+      <view class='company-name'>{{sysShop.shopName}}</view>
+      <view class='company-address' bindtap='getAddress'> <image class='landmark' src='/img/icon_map.png'/>{{sysShop.street}}</view>
+    </view>
+    <view class='tel-phone' bindtap='getPhone'>
+      <image class='phone' src='/img/phone.png'></image>
+      <view class='contact'>联系我们</view>
+    </view>
+  </view> -->
+
+  <view class="type-container">
+    <view class="weui-grids">
+      <block wx:for="{{categoryList}}" wx:key="{{index}}">
+        <navigator url="/pages/goods/goods-list/index?id={{item.id}}" class="weui-grid category">
+          <image class="weui-grid__icon" src="{{item.picUrl}}" />
+          <view class="weui-grid__label">{{item.categoryName}}</view>
+        </navigator>
+      </block>
+    </view>
+  </view>
+
+  <!-- 为您推荐 -->
+  <view class='hot-goods'>
+    <view class='head-hair'>
+      <!-- <text bindtap='goShop'>关于我们</text> -->
+      <text class="hello">精选商品</text>
+      <!-- <text bindtap='goCooperation'>合作伙伴</text> -->
+    </view>
+    <!-- 商品列表 -->
+    <view class='hot-con clear'>
+      <block wx:for="{{goodsListJx}}" wx:key="{{index}}">
+        <navigator hover-class="none" class='box' url="/pages/goods/goods-detail/index?id={{item.id}}">
+          <image class='good-img' mode='aspectFill' src='{{item.picUrl}}'></image>
+          <view class='title'>
+            <text class='brand ellipsis'>{{item.goodsName}}</text>
+            <text class='price'>￥{{item.priceSection}}</text>
+          </view>
+        </navigator>
+      </block>
+    </view>
+  </view>
+
+  <view class='weui-footer'>
+    <view>高端定制小程序</view>
+    <button plain="true" size="mini" bindtap='makeApp'>做一样的小程序</button>
+  </view>
+</view>

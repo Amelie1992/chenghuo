@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wzlue.order.dao.OrderLogisticsDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+	<resultMap type="com.wzlue.order.entity.OrderLogisticsEntity"
+		id="orderLogisticsMap">
+		<result property="id" column="id" />
+		<result property="orderNumber" column="order_number" />
+		<result property="companyId" column="company_id" />
+		<result property="companyName" column="company_name" />
+		<result property="logisticsNumber" column="logistics_number" />
+	</resultMap>
+
+	<select id="queryObject" resultType="com.wzlue.order.entity.OrderLogisticsEntity">
+		SELECT * FROM
+		o_order_logistics WHERE id = #{value}
+	</select>
+	
+	<select id="queryByOrderNumber" resultType="com.wzlue.order.entity.OrderLogisticsEntity">
+		SELECT * FROM
+		o_order_logistics WHERE order_number = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.wzlue.order.entity.OrderLogisticsEntity">
+		SELECT * FROM o_order_logistics
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				ORDER BY ${sidx} ${order}
+			</when>
+			<otherwise>
+				ORDER BY id desc
+			</otherwise>
+		</choose>
+		F
+		<if test="offset != null and limit != null">
+			LIMIT #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryTotal" resultType="int">
+		SELECT count(*) FROM
+		o_order_logistics
+	</select>
+
+	<insert id="save" parameterType="com.wzlue.order.entity.OrderLogisticsEntity"
+		useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO o_order_logistics
+		(
+		`order_number`,
+		`company_id`,
+		`company_name`,
+		`logistics_number`
+		)
+		VALUES
+		(
+		#{orderNumber},
+		#{companyId},
+		#{companyName},
+		#{logisticsNumber}
+		)
+	</insert>
+
+	<update id="update" parameterType="com.wzlue.order.entity.OrderLogisticsEntity">
+		UPDATE o_order_logistics
+		<set>
+			<if test="orderNumber != null">`order_number` = #{orderNumber}, </if>
+			<if test="companyId != null">`company_id` = #{companyId}, </if>
+			<if test="companyName != null">`company_name` = #{companyName}, </if>
+			<if test="logisticsNumber != null">`logistics_number` = #{logisticsNumber}</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<delete id="delete">
+		DELETE FROM o_order_logistics WHERE id = #{value}
+	</delete>
+
+	<delete id="deleteBatch">
+		DELETE FROM o_order_logistics WHERE id IN
+		<foreach item="id" collection="array" open="(" separator=","
+			close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

@@ -1,0 +1,162 @@
+package com.wzlue.app.controller.member;
+
+import java.math.BigDecimal;
+import java.util.*;
+
+import com.wzlue.common.base.Query;
+import com.wzlue.goods.service.GoodsCollectionService;
+import com.wzlue.goods.service.GoodsFootprintService;
+import com.wzlue.member.entity.MemberAgreementEntity;
+import com.wzlue.member.service.MemberAgreementService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.wzlue.app.common.annotation.Login;
+import com.wzlue.common.base.R;
+import com.wzlue.member.entity.MemberInfoEntity;
+import com.wzlue.member.service.MemberInfoService;
+import com.wzlue.sys.common.config.IntegralConfig;
+
+@RestController
+
+@RequestMapping("/app/member")
+public class ApiMemberInfoController {
+	
+	@Autowired
+	private MemberInfoService memberInfoService;
+	@Autowired
+	private IntegralConfig integralConfig;
+	@Autowired
+	private GoodsCollectionService goodsCollectionService;
+	@Autowired
+	private GoodsFootprintService goodsFootprintService;
+	@Autowired
+	private MemberAgreementService memberAgreementService;
+
+	@Login
+	@RequestMapping("/info")
+	public R info(@RequestAttribute("userId") Long userId){
+		MemberInfoEntity memberInfo = memberInfoService.queryObject(userId);
+		Map<String,Object> map = new HashMap<>();
+		map.put("memberId",userId);
+		int saveNum = goodsCollectionService.queryTotal(map);
+		int footNum = goodsFootprintService.queryTotal(map);
+		R r = new R();
+		r.put("saveNum",saveNum);
+		r.put("footNum",footNum);
+		r.put("memberInfo",memberInfo);
+		return r;
+	}
+	
+	@Login
+	@RequestMapping("/updateMobile")
+	public R updateMobile(String mobile, @RequestAttribute("userId") Long userId){
+		MemberInfoEntity memberInfo = new MemberInfoEntity();
+		memberInfo.setId(userId);
+		memberInfo.setMobile(mobile);
+		memberInfoService.update(memberInfo);
+		return R.ok();
+	}
+	
+	
+	@Login
+	@RequestMapping("/updateRealName")
+	public R updateRealName(String realName, @RequestAttribute("userId") Long userId){
+		MemberInfoEntity memberInfo = new MemberInfoEntity();
+		memberInfo.setId(userId);
+		memberInfo.setRealName(realName);
+		memberInfoService.update(memberInfo);
+		return R.ok();
+	}
+
+	/**
+	 * 购买会员
+	 * @param isVip
+	 * @param userId
+	 * @return
+	 */
+	@Login
+	@RequestMapping("/updateIsVip")
+	public R updateIsVip(Integer isVip, @RequestAttribute("userId") Long userId){
+		MemberInfoEntity memberInfo = new MemberInfoEntity();
+		memberInfo.setId(userId);
+		memberInfo.setIsVip(isVip);//1会员
+		memberInfo.setVipAddTime(new Date());
+		Calendar curr = Calendar.getInstance();
+		//会员有效期一年（到期时间一年后）
+		curr.set(Calendar.YEAR,curr.get(Calendar.YEAR)+1);
+		memberInfo.setVipEndTime(curr.getTime());
+		memberInfoService.update(memberInfo);
+		return R.ok();
+	}
+
+
+	@Login
+	@RequestMapping("/getIntegral")
+	public R getIntegral(@RequestAttribute("userId") Long userId){
+		MemberInfoEntity memberInfo = memberInfoService.queryObject(userId);
+		return R.ok().put("integral", memberInfo.getIntegral());
+	}
+	
+	@Login
+	@RequestMapping("/signIn")
+	public R signIn(@RequestAttribute("userId") Long userId){
+		memberInfoService.signIn(userId);
+		return R.ok();
+	}
+	
+	@Login
+	@RequestMapping("/isSignIn")
+	public R isSignIn(@RequestAttribute("userId") Long userId){
+		boolean isSignIn = memberInfoService.isSignIn(userId);
+		return R.ok().put("isSignIn", isSignIn);
+	}
+	
+	@Login
+	@RequestMapping("/getAvailableIntegral")
+	public R getAvailableIntegral(@RequestAttribute("userId") Long userId, BigDecimal paymentAmount){
+		Integer integral = memberInfoService.queryIntegral(userId);
+		if(integral > 0){
+			
+			int lose = integralConfig.config3().getDeduction().getLose(); //失去
+			int get = integralConfig.config3().getDeduction().getGet(); //获得
+			int upLimit = integralConfig.config3().getDeduction().getUpperLimit(); //上限
+			
+			int purposeMoney = integral / lose * get;
+			
+			if (purposeMoney > paymentAmount.intValue() * upLimit / 100){
+				purposeMoney = paymentAmount.intValue() * upLimit / 100;
+				integral = purposeMoney / lose * get;
+			}
+			
+			return R.ok().put("purposeMoney", purposeMoney).put("integral", integral);
+			
+		}
+		return R.ok().put("purposeMoney", 0).put("integral", 0);
+	}
+
+	//会员下级列表（会员推荐列表）
+	@Login
+	@RequestMapping("/getRecommender")
+	public R getRecommender(@RequestAttribute("userId") Long userId){
+		Map<String, Object> params = new HashMap<>();
+		params.put("recommenderId",userId);
+		List<MemberInfoEntity> memberInfoList = memberInfoService.queryList(params);
+		return R.ok().put("memberInfoList", memberInfoList);
+	}
+
+	//会员协议接口
+	@Login
+	@RequestMapping("/getAgreement")
+	public R getAgreement(@RequestParam Map<String, Object> params){
+		//查询列表数据
+		Query query = new Query(params);
+		params.put("status",1);
+		List<MemberAgreementEntity> memberAgreementList = memberAgreementService.queryList(query);
+		return R.ok().put("memberAgreement", memberAgreementList);
+	}
+
+}

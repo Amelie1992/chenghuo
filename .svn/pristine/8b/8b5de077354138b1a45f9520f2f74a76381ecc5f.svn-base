@@ -1,0 +1,107 @@
+
+package com.wzlue.app.controller.menu;
+
+import com.wzlue.common.base.Query;
+import com.wzlue.common.base.R;
+import com.wzlue.menu.entity.CustomMenuEntity;
+import com.wzlue.menu.service.CustomMenuService;
+//import com.wzlue.web.controller.sys.AbstractController;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
+
+
+/**
+ * 自定义菜单
+ * 
+ * @author wzlue
+ * @email wzlue.com
+ * @date 2019-07-01 14:17:34
+ */
+@RestController
+@RequestMapping("/menu/custommenu")
+public class CustomMenuController {
+	@Autowired
+	private CustomMenuService customMenuService;
+	
+	/**
+	 * 列表
+	 */
+	@GetMapping("/list")
+	@ApiImplicitParams({
+            @ApiImplicitParam(name = "classification", dataType = "int",
+                    value = "分类：1会员协议；2积分规则；3积分兑换规则；4联系客服；5会员权益；20自定义菜单", paramType = "query")
+	})
+	public R list(@RequestParam Map<String, Object> params){
+		//查询列表数据
+        Query query = new Query(params);
+        query.put("state",1);//显示状态
+		List<CustomMenuEntity> customMenuList = customMenuService.queryList(query);
+		int total = customMenuService.queryTotal(query);
+		
+		return R.page(customMenuList,total);
+	}
+	
+	
+	/**
+	 * 信息
+	 */
+	@RequestMapping("/info/{id}")
+	@RequiresPermissions("menu:custommenu:info")
+	public R info(@PathVariable("id") Long id){
+		CustomMenuEntity customMenu = customMenuService.queryObject(id);
+		
+		return R.ok().put("customMenu", customMenu);
+	}
+	
+	/**
+	 * 保存
+	 */
+	@RequestMapping("/save")
+	@RequiresPermissions("menu:custommenu:save")
+	public R save(@RequestBody CustomMenuEntity customMenu){
+		customMenuService.save(customMenu);
+		
+		return R.ok();
+	}
+	
+	/**
+	 * 修改
+	 */
+	@RequestMapping("/update")
+	@RequiresPermissions("menu:custommenu:update")
+	public R update(@RequestBody CustomMenuEntity customMenu){
+		customMenuService.update(customMenu);
+		
+		return R.ok();
+	}
+	
+	/**
+	 * 删除
+	 */
+	@RequestMapping("/delete")
+	@RequiresPermissions("menu:custommenu:delete")
+	public R delete(@RequestBody Long[] ids){
+		customMenuService.deleteBatch(ids);
+		
+		return R.ok();
+	}
+
+	/**
+	 * 显示
+	 *
+	 */
+	@RequestMapping("/show/{id}")
+	@RequiresPermissions("menu:custommenu:update")
+	public R show(@PathVariable("id") Long id){
+		customMenuService.show(id);
+
+		return R.ok();
+	}
+
+}

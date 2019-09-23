@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="wzlue-advert" />
+        <module name="wzlue-app" />
+        <module name="wzlue-common" />
+        <module name="wzlue-contact" />
+        <module name="wzlue-generator" />
+        <module name="wzlue-goods" />
+        <module name="wzlue-integral" />
+        <module name="wzlue-marketing" />
+        <module name="wzlue-member" />
+        <module name="wzlue-menu" />
+        <module name="wzlue-order" />
+        <module name="wzlue-schedule" />
+        <module name="wzlue-shop" />
+        <module name="wzlue-sys" />
+        <module name="wzlue-wbiao" />
+        <module name="wzlue-web" />
+        <module name="wzlue-wechat" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="wzlue-advert" target="1.8" />
+      <module name="wzlue-app" target="1.8" />
+      <module name="wzlue-common" target="1.8" />
+      <module name="wzlue-contact" target="1.8" />
+      <module name="wzlue-generator" target="1.8" />
+      <module name="wzlue-goods" target="1.8" />
+      <module name="wzlue-integral" target="6" />
+      <module name="wzlue-marketing" target="1.8" />
+      <module name="wzlue-member" target="1.8" />
+      <module name="wzlue-menu" target="1.8" />
+      <module name="wzlue-order" target="1.8" />
+      <module name="wzlue-rssc" target="1.8" />
+      <module name="wzlue-schedule" target="1.8" />
+      <module name="wzlue-shop" target="1.8" />
+      <module name="wzlue-sys" target="1.8" />
+      <module name="wzlue-wbiao" target="1.8" />
+      <module name="wzlue-web" target="1.8" />
+      <module name="wzlue-wechat" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

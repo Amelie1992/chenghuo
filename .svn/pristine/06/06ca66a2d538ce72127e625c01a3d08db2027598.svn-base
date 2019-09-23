@@ -1,0 +1,47 @@
+<!--pages/order/apply-afterSale/index.wxml-->
+<view class="container">
+  <view class="order-list" hidden="{{orderInfo ? false : true}}">
+    <view class="a-order">
+      <view bindtap="orderDetail" data-id="{{orderInfo.id}}">
+        <scroll-view class="goods-img-container" scroll-x="true" wx:for="{{orderInfo}}" wx:key="{{index}}">
+          <view class="goods-list">
+            <view class="img-box">
+              <image src="{{item.picUrl}}" class="goods-img"></image>
+            </view>
+            <view class="goods-detail">
+              <view class="goods-name">{{item.goodsName}}</view>
+              <view class="goods-num">
+                <view class="property">￥{{item.price}}</view>
+                <view class="number">X{{item.buyNum}}</view>
+              </view>
+            </view>
+          </view>
+        </scroll-view>
+      </view>
+    </view>
+  </view>
+  <navigator url="/pages/order/after-sale/index?orderId={{orderId}}&type=1&orderNumber={{orderNumber}}" class="weui-cell weui-cell_access cell-sale-out" hover-class="weui-cell_active">
+    <view class="weui-cell__hd">
+      <image src="" style="width: 20px;height: 20px;margin-right: 5px" />
+    </view>
+    <view class="weui-cell__bd weui-cell_primary">
+     <view class="weui-media-box weui-media-box_text">
+                    <view class="weui-media-box__title weui-media-box__title_in-text">仅退款</view>
+                    <view class="weui-media-box__desc">未收到货（包含未签收），或者卖家协商同意前提下</view>
+                </view>
+    </view>
+    <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+  </navigator>
+   <navigator url="/pages/order/after-sale/index?orderId={{orderId}}&type=2&orderNumber={{orderNumber}}" class="weui-cell weui-cell_access cell-sale-out" hover-class="weui-cell_active">
+    <view class="weui-cell__hd">
+      <image src="" style="width: 20px;height: 20px;margin-right: 5px" />
+    </view>
+    <view class="weui-cell__bd weui-cell_primary">
+     <view class="weui-media-box weui-media-box_text">
+                    <view class="weui-media-box__title weui-media-box__title_in-text">退货退款</view>
+                    <view class="weui-media-box__desc">已收到货，需要退换已收到的货物</view>
+                </view>
+    </view>
+    <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+  </navigator>
+</view>

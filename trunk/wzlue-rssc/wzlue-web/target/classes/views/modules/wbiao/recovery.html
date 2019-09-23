@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>回收置换</title>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<link rel="stylesheet" href="../../css/bootstrap.min.css">
+<link rel="stylesheet" href="../../css/AdminLTE.min.css">
+<link rel="stylesheet" href="../../css/font-awesome.min.css">
+<link rel="stylesheet" href="../../plugins/jqgrid/ui.jqgrid-bootstrap.css">
+<link rel="stylesheet" href="../../css/bootstrap-table.min.css">
+<link rel="stylesheet" href="../../plugins/bootstrap-validator/css/bootstrap-validator.min.css">
+<link rel="stylesheet" href="../../plugins/ztree/css/metroStyle/metroStyle.css">
+<link rel="stylesheet" href="../../css/main.css">
+<link rel="stylesheet" href="../../plugins/treegrid/jquery.treegrid.css">
+
+</head>
+<body>
+	<div id="rrapp" v-cloak class="content-wrapper wzl-content-wrapper">
+		<section class="content-header">
+			<h1>
+				回收置换 &nbsp;<small v-if="title!=''">{{title}}</small>
+			</h1>
+		</section>
+		<div v-show="showList">
+			<section class="content">
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="box">
+							<div class="box-header with-border">
+								<div class="col-xs-2">
+									<input type="text" class="form-control" v-model="queryParams.recoveryNumber" maxlength="200" placeholder="申请编号">
+								</div>
+								<button class="btn btn-primary" @click="query">
+									<i class="fa fa-search"></i>&nbsp;查询
+								</button>
+								<button v-if="hasPermission('wbiao:recovery:delete')" class="btn btn-danger" @click="del">
+									<i class="fa fa-trash-o"></i>&nbsp;删除
+								</button>
+							</div>
+							<div class="box-body">
+								<table id="table"></table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+
+		<div v-show="!showList">
+			<section class="content">
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="box">
+							<form class="form-horizontal">
+								<div class="row">
+									<div class="form-group">
+										<div class="col-sm-2 control-label">编号</div>
+										<div class="col-sm-8">
+											<input type="text" name="recoveryNumber" class="form-control" v-model="recovery.recoveryNumber" placeholder="编号" />
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="form-group">
+										<div class="col-sm-2 control-label">品牌</div>
+										<div class="col-sm-8">
+											<input type="text" name="brandId" class="form-control" v-model="recovery.brand.brandName" placeholder="品牌" />
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="form-group">
+										<div class="col-sm-2 control-label">成色</div>
+										<div class="col-sm-8" v-if="recovery.condition">
+											<input type="text" name="condition" class="form-control" v-model="recovery.condition.conditionName" placeholder="成色" />
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="form-group">
+										<div class="col-sm-2 control-label">状态：</div>
+										<div class="col-sm-8">
+											<input type="text" name="status" class="form-control" v-if="recovery.status == 1" value="处理中" placeholder="状态" /> 
+											<input type="text" name="status" class="form-control" v-if="recovery.status == 2" value="已处理" placeholder="状态" />
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="form-group">
+										<div class="col-sm-2 control-label">图片</div>
+										<div class="col-sm-8">
+											<div class='row'>
+									    	<div v-for="(pic, key, index) in recovery.picUrls" class="col-sm-4 img-wrap">
+									    		<img alt="" width="200px" :src="pic">
+									    	</div>
+									    	</div>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="form-group">
+										<div class="col-sm-2 control-label">功能状态：</div>
+										<div class="col-sm-8">
+											<input type="text" name="functionStatus" class="form-control" v-model="recovery.functionStatus" placeholder="功能状态" />
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="form-group">
+										<div class="col-sm-2 control-label">申请时间</div>
+										<div class="col-sm-8">
+											<input type="text" name="createTime" class="form-control" v-model="recovery.createTime" placeholder="申请时间" />
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="form-group">
+										<div class="col-sm-2 control-label">处理意见</div>
+										<div class="col-sm-8">
+											<input type="text" name="createTime" class="form-control" v-model="recovery.applyResult" placeholder="处理意见" />
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="form-group">
+										<div class="col-sm-2 control-label"></div>
+										<input type="button" class="btn btn-primary" v-if="recovery.status == 1" @click="handle" value="确定" /> &nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回" />
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+	</div>
+
+	<script src="../../libs/jquery.min.js"></script>
+	<script src="../../plugins/layer/layer.js"></script>
+	<script src="../../libs/bootstrap.min.js"></script>
+	<script src="../../libs/vue.min.js"></script>
+	<!--bootstrap-table-->
+	<script src="../../plugins/bootstrap-table/bootstrap-table.min.js"></script>
+	<script src="../../plugins/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
+	<!--bootstrap-validator-->
+	<script src="../../plugins/bootstrap-validator/js/bootstrap-validator.min.js"></script>
+	<script src="../../plugins/bootstrap-validator/js/zh_CN.min.js"></script>
+	<script src="../../plugins/jqgrid/grid.locale-cn.js"></script>
+	<script src="../../plugins/jqgrid/jquery.jqGrid.min.js"></script>
+	<script src="../../plugins/ztree/jquery.ztree.all.min.js"></script>
+	<script src="../../js/common.js"></script>
+
+	<script src="../../js/modules/wbiao/recovery.js"></script>
+</body>
+</html>

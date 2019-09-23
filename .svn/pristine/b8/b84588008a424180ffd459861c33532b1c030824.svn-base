@@ -1,0 +1,129 @@
+package com.wzlue.member.entity;
+
+import java.io.Serializable;
+import java.util.Date;
+
+
+/**
+ * 积分记录
+ * 
+ * @author wzlue
+ * @email wzlue.com
+ * @date 2018-07-26 11:19:34
+ */
+public class IntegralRecordEntity implements Serializable {
+	private static final long serialVersionUID = 1L;
+	
+	//主键
+	private Long id;
+	//会员id
+	private Long memberId;
+	//备注
+	private String remarks;
+	//积分
+	private Integer integral;
+	//时间
+	private Date createTime;
+	
+	private MemberInfoEntity memberInfo;
+
+	//分类：1推广；2充值；3消费
+	private Integer type;
+	//踪迹id：推广记录id/积分充值卡id/订单id
+	private Long traceId;
+	//踪迹：被推广人/积分充值码/订单编号
+	private String trace;
+
+	public Integer getType() {
+		return type;
+	}
+
+	public void setType(Integer type) {
+		this.type = type;
+	}
+
+	public Long getTraceId() {
+		return traceId;
+	}
+
+	public void setTraceId(Long traceId) {
+		this.traceId = traceId;
+	}
+
+	public String getTrace() {
+		return trace;
+	}
+
+	public void setTrace(String trace) {
+		this.trace = trace;
+	}
+
+	/**
+	 * 设置：主键
+	 */
+	public void setId(Long id) {
+		this.id = id;
+	}
+	/**
+	 * 获取：主键
+	 */
+	public Long getId() {
+		return id;
+	}
+	/**
+	 * 设置：会员id
+	 */
+	public void setMemberId(Long memberId) {
+		this.memberId = memberId;
+	}
+	/**
+	 * 获取：会员id
+	 */
+	public Long getMemberId() {
+		return memberId;
+	}
+	/**
+	 * 设置：备注
+	 */
+	public void setRemarks(String remarks) {
+		this.remarks = remarks;
+	}
+	/**
+	 * 获取：备注
+	 */
+	public String getRemarks() {
+		return remarks;
+	}
+	/**
+	 * 设置：积分
+	 */
+	public void setIntegral(Integer integral) {
+		this.integral = integral;
+	}
+	/**
+	 * 获取：积分
+	 */
+	public Integer getIntegral() {
+		return integral;
+	}
+	/**
+	 * 设置：时间
+	 */
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
+	/**
+	 * 获取：时间
+	 */
+	public Date getCreateTime() {
+		return createTime;
+	}
+	
+	public MemberInfoEntity getMemberInfo() {
+		return memberInfo;
+	}
+	public void setMemberInfo(MemberInfoEntity memberInfo) {
+		this.memberInfo = memberInfo;
+	}
+	
+}

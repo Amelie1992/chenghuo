@@ -1,0 +1,80 @@
+<!--pages/order/after-record/index.wxml-->
+<view class="top-content">
+  <view class="step-container">
+    <view class="list">
+      <text class="arrow active">申请退款</text>
+    </view>
+    <view class="list">
+      <text class="arrow active">商家处理</text>
+    </view>
+    <view class="list {{orderRefund.status == 2 || orderRefund.status == 3?'active':''}}">
+    <!-- 1待处理，2退款成功，3退款失败 -->
+      <text class="arrow" wx:if="{{orderRefund.status == 1}}">处理中</text>
+      <text class="arrow" wx:if="{{orderRefund.status == 2}}">退款成功</text>
+      <text class="arrow" wx:if="{{orderRefund.status == 3}}">退款失败</text>
+    </view>
+  </view>
+
+
+  <view class='weui-cell-third'>
+    <view class="recode-status">
+      <text class="iconfont icon-wait"></text>
+      <text class="title">退款中，请耐心等待</text>
+    </view>
+    <view class="sec-wrap">
+      <view class="details-info">
+        <view class="line-box"></view>
+        <view class="a-row" wx:if="{{orderRefund.status == 2 || orderRefund.status == 3}}">
+          <view class="dot">
+            <view class="active-dot" wx:if="{{orderRefund.status == 2 || orderRefund.status == 3}}">
+              <view class="yuan-red"></view>
+            </view>
+          </view>
+          <view class="info">
+            <view class="date-box col-orange">{{orderRefund.createTime}}</view>
+            <view class="text mb-10" wx:if="{{orderRefund.status == 2}}">退款成功，退款￥{{orderRefund.refundAmount}}，按原支付方式返回，预计需要1-5个工作日到账</view>
+            <view class="text mb-10" wx:if="{{orderRefund.status == 3}}">
+              审核不通过，请检查您是否符合退款条件，如果您有其他情况需要退款，请重新申请
+              <view>商家回复： 丢失物件，不可退</view>
+            </view>
+          </view>
+        </view>
+        <view class="a-row">
+          <view class="dot">
+            <view class="active-dot" wx:if="{{orderRefund.status == 1}}">
+              <view class="yuan-red"></view>
+            </view>
+            <view class="default-dot" hidden="{{orderRefund.status == 1}}"></view>
+          </view>
+          <view class="info">
+            <view class="date-box {{orderRefund.status == 1 ? 'col-orange' : ''}}">{{orderRefund.createTime}}</view>
+            <view class="text mb-10">申请退款，等待客服审核，一般两个工作日审核完毕</view>
+            <view class="text" wx:if="{{orderRefund.status == 1?true:false}}">
+              <view>
+                <text class="col-grey">退款产品：</text>{{orderInfo.orderGoodsList[0].goodsName}}</view>
+              <view>
+                <text class="col-grey">退款金额：</text>￥{{orderRefund.refundAmount}}</view>
+              <view>
+                <text class="col-grey">退款原因：</text>买错服务</view>
+              <view>
+                <text class="col-grey">退款说明：</text>{{orderInfo.orderGoodsList[0].ramarks}}</view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+  <view class="recode-status">
+    <view class="title">退款信息</view>
+    <view class="table">
+      <view>
+        <text class="text-width">订单编号</text> {{orderRefund.orderNumber}}</view>
+      <view>
+        <text class="text-width">退款编号</text> {{orderRefund.refundNumber}}</view>
+      <view>
+        <text class="text-width">联系人</text> {{orderRefund.memberInfo.nickName?orderRefund.memberInfo.nickName:order.orderAddress.customerName}}</view>
+      <view>
+        <text class="text-width">联系方式</text> {{order.orderAddress.telephone}}</view>
+    </view>
+  </view>
+</view>

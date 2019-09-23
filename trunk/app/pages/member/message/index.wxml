@@ -1,0 +1,24 @@
+<view class="container">
+  <template is="{{items.length > 0 ? 'message-list' : 'no-message'}}" data="{{items}}"></template>
+</view>
+
+<template name="no-message">
+  <view class="title-box">
+   <view class="message-icon"> <text class="iconfont icon-meiyouhongbao"></text></view>
+    <text>当前没有消息~</text>
+  </view>
+</template>
+
+<template name="message-list">
+  <view class="touch-item {{item.isTouchMove ? 'touch-move-active' : ''}}" data-index="{{index}}" bindtouchstart="touchstart" bindtouchmove="touchmove" wx:for="{{items}}" wx:key="">
+    <view class="content">
+      <view class="icon">
+        <view class="icon-box">
+          <text class='iconfont icon-tongzhi'></text>
+        </view>
+      </view>
+      <view class="message">{{item.content}}</view>
+    </view>
+    <view class="del" catchtap="del" data-index="{{index}}">删除</view>
+  </view>
+</template>

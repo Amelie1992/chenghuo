@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wzlue.advert.dao.AdvertDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.wzlue.advert.entity.AdvertEntity" id="advertMap">
+        <result property="id" column="id"/>
+        <result property="positionId" column="position_id"/>
+        <result property="title" column="title"/>
+        <result property="picUrl" column="pic_url"/>
+        <result property="link" column="link"/>
+        <result property="status" column="status"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.wzlue.advert.entity.AdvertEntity">
+		SELECT * FROM a_advert WHERE id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.wzlue.advert.entity.AdvertEntity">
+		SELECT * FROM a_advert
+		<where>
+			<if test="positionId != null">
+				AND position_id = #{positionId}
+			</if>
+			<if test="status != null">
+				AND status = #{status}
+			</if>
+		</where>
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                ORDER BY ${sidx} ${order}
+            </when>
+			<otherwise>
+                ORDER BY id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			LIMIT #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		SELECT count(*) FROM a_advert
+	</select>
+	 
+	<insert id="save" parameterType="com.wzlue.advert.entity.AdvertEntity" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO a_advert
+		(
+																				`position_id`, 
+																	`title`, 
+																	`pic_url`, 
+																	`link`, 
+																	`status`
+									)
+		VALUES
+		(
+																				#{positionId}, 
+																	#{title}, 
+																	#{picUrl}, 
+																	#{link}, 
+																	#{status}
+									)
+	</insert>
+	 
+	<update id="update" parameterType="com.wzlue.advert.entity.AdvertEntity">
+		UPDATE a_advert
+		<set>
+																				<if test="positionId != null">`position_id` = #{positionId}, </if>
+																	<if test="title != null">`title` = #{title}, </if>
+																	<if test="picUrl != null">`pic_url` = #{picUrl}, </if>
+																	<if test="link != null">`link` = #{link}, </if>
+																	<if test="status != null">`status` = #{status}</if>
+									</set>
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="delete">
+		DELETE FROM a_advert WHERE id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		DELETE FROM a_advert WHERE id IN
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

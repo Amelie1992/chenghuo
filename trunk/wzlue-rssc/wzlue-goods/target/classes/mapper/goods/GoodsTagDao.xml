@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wzlue.goods.dao.GoodsTagDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+	<resultMap type="com.wzlue.goods.entity.GoodsTagEntity" id="goodsTagMap">
+		<result property="id" column="id" />
+		<result property="goodsId" column="goods_id" />
+		<result property="tagId" column="tag_id" />
+	</resultMap>
+
+	<select id="queryObject" resultType="com.wzlue.goods.entity.GoodsTagEntity">
+		SELECT * FROM g_goods_tag
+		WHERE id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.wzlue.goods.entity.GoodsTagEntity">
+		SELECT * FROM g_goods_tag
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				ORDER BY ${sidx} ${order}
+			</when>
+			<otherwise>
+				ORDER BY id desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			LIMIT #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryTotal" resultType="int">
+		SELECT count(*) FROM
+		g_goods_tag
+	</select>
+
+	<insert id="save" parameterType="com.wzlue.goods.entity.GoodsTagEntity"
+		useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO g_goods_tag
+		(
+		`goods_id`,
+		`tag_id`
+		)
+		VALUES
+		(
+		#{goodsId},
+		#{tagId}
+		)
+	</insert>
+
+	<update id="update" parameterType="com.wzlue.goods.entity.GoodsTagEntity">
+		UPDATE g_goods_tag
+		<set>
+			<if test="goodsId != null">`goods_id` = #{goodsId}, </if>
+			<if test="tagId != null">`tag_id` = #{tagId}</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<delete id="delete">
+		DELETE FROM g_goods_tag WHERE id = #{value}
+	</delete>
+
+	<delete id="deleteBatch">
+		DELETE FROM g_goods_tag WHERE id IN
+		<foreach item="id" collection="array" open="(" separator=","
+			close=")">
+			#{id}
+		</foreach>
+	</delete>
+	
+	<delete id="deleteByGoodsId">
+		DELETE FROM g_goods_tag WHERE goods_id = #{goodsId}
+	</delete>
+
+</mapper>

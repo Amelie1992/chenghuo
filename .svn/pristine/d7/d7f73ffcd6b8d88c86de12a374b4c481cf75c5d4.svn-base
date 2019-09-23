@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wzlue.shop.dao.ShopDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.wzlue.shop.entity.ShopEntity" id="sysShopMap">
+        <result property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="shopName" column="shop_name"/>
+        <result property="tel" column="tel"/>
+        <result property="logo" column="logo"/>
+        <result property="province" column="province"/>
+        <result property="city" column="city"/>
+        <result property="county" column="county"/>
+        <result property="street" column="street"/>
+        <result property="description" column="description"/>
+        <result property="createTime" column="create_time"/>
+        <result property="delFlag" column="del_flag"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.wzlue.shop.entity.ShopEntity">
+		SELECT * FROM sys_shop WHERE id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.wzlue.shop.entity.ShopEntity">
+		SELECT * FROM sys_shop
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                ORDER BY ${sidx} ${order}
+            </when>
+			<otherwise>
+                ORDER BY id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			LIMIT #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		SELECT count(*) FROM sys_shop
+	</select>
+	 
+	<insert id="save" parameterType="com.wzlue.shop.entity.ShopEntity" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO sys_shop
+		(
+																				`user_id`, 
+																	`shop_name`, 
+																	`tel`, 
+																	`logo`, 
+																	`province`, 
+																	`city`, 
+																	`county`, 
+																	`street`, 
+																	`description`,
+																	`cooperation`,
+																	`create_time`, 
+																	`del_flag`
+									)
+		VALUES
+		(
+																				#{userId}, 
+																	#{shopName}, 
+																	#{tel}, 
+																	#{logo}, 
+																	#{province}, 
+																	#{city}, 
+																	#{county}, 
+																	#{street}, 
+																	#{description},
+																	#{cooperation},
+																	#{createTime}, 
+																	#{delFlag}
+									)
+	</insert>
+	 
+	<update id="update" parameterType="com.wzlue.shop.entity.ShopEntity">
+		UPDATE sys_shop
+		<set>
+			<if test="userId != null">`user_id` = #{userId}, </if>
+			<if test="shopName != null">`shop_name` = #{shopName}, </if>
+			<if test="tel != null">`tel` = #{tel}, </if>
+			<if test="logo != null">`logo` = #{logo}, </if>
+			<if test="province != null">`province` = #{province}, </if>
+			<if test="city != null">`city` = #{city}, </if>
+			<if test="county != null">`county` = #{county}, </if>
+			<if test="street != null">`street` = #{street}, </if>
+			<if test="description != null">`description` = #{description}, </if>
+			<if test="cooperation != null">`cooperation` = #{cooperation}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="delFlag != null">`del_flag` = #{delFlag}</if>
+									</set>
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="delete">
+		DELETE FROM sys_shop WHERE id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		DELETE FROM sys_shop WHERE id IN
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

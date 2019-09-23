@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wzlue.goods.dao.MerchantAddressDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.wzlue.goods.entity.MerchantAddressEntity" id="merchantAddressMap">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="phone" column="phone"/>
+        <result property="province" column="province"/>
+        <result property="city" column="city"/>
+        <result property="county" column="county"/>
+        <result property="street" column="street"/>
+        <result property="zipCode" column="zip_code"/>
+        <result property="status" column="status"/>
+
+        <!-- 城市表别名 -->
+        <result property="provinceName" column="provinceName"/>
+        <result property="cityName" column="cityName"/>
+        <result property="countyName" column="countyName"/>
+    </resultMap>
+
+    <select id="queryObject" resultType="com.wzlue.goods.entity.MerchantAddressEntity">
+		SELECT * FROM merchant_address WHERE id = #{value}
+	</select>
+
+    <select id="queryList" resultType="com.wzlue.goods.entity.MerchantAddressEntity">
+        SELECT a.*,
+        pr.city_name AS provinceName,
+        ci.city_name AS cityName,
+        c3.city_name AS countyName
+        FROM merchant_address a
+        LEFT JOIN sys_city_info AS pr ON pr.city_code = a.province
+        LEFT JOIN sys_city_info AS ci ON ci.city_code = a.city
+        LEFT JOIN sys_city_info AS c3 ON c3.city_code = a.county
+        <where>
+            1=1
+            <if test="name != null and name!=''">
+                AND a.name like concat('%', #{name}, '%')
+            </if>
+            <if test="phone != null and phone!=''">
+                AND	a.phone like concat('%', #{phone}, '%')
+            </if>
+            <if test="id != null and id!=''">
+                AND	a.id = #{id}
+            </if>
+            <if test="status != null and status!=''">
+                AND	a.status = #{status}
+            </if>
+        </where>
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                ORDER BY ${sidx} ${order}
+            </when>
+            <otherwise>
+                ORDER BY a.status,a.id desc
+            </otherwise>
+        </choose>
+        <if test="offset != null and limit != null">
+            LIMIT #{offset}, #{limit}
+        </if>
+    </select>
+
+    <select id="queryTotal" resultType="int">
+        SELECT count(*)
+        FROM merchant_address a
+        LEFT JOIN sys_city_info AS pr ON pr.city_code = a.province
+        LEFT JOIN sys_city_info AS ci ON ci.city_code = a.city
+        LEFT JOIN sys_city_info AS c3 ON c3.city_code = a.county
+        <where>
+            1=1
+            <if test="name != null and name!=''">
+                AND a.name like concat('%', #{name}, '%')
+            </if>
+            <if test="phone != null and phone!=''">
+                AND	a.phone like concat('%', #{phone}, '%')
+            </if>
+            <if test="id != null and id!=''">
+                AND	a.id = #{id}
+            </if>
+            <if test="status != null and status!=''">
+                AND	a.status = #{status}
+            </if>
+        </where>
+	</select>
+
+    <insert id="save" parameterType="com.wzlue.goods.entity.MerchantAddressEntity">
+		INSERT INTO merchant_address
+		(
+													`id`, 
+																	`name`, 
+																	`phone`, 
+																	`province`, 
+																	`city`, 
+																	`county`, 
+																	`street`, 
+																	`zip_code`, 
+																	`status`
+									)
+		VALUES
+		(
+													#{id}, 
+																	#{name}, 
+																	#{phone}, 
+																	#{province}, 
+																	#{city}, 
+																	#{county}, 
+																	#{street}, 
+																	#{zipCode}, 
+																	#{status}
+									)
+	</insert>
+
+    <update id="update" parameterType="com.wzlue.goods.entity.MerchantAddressEntity">
+        UPDATE merchant_address
+        <set>
+            <if test="name != null">`name` = #{name},</if>
+            <if test="phone != null">`phone` = #{phone},</if>
+            <if test="province != null">`province` = #{province},</if>
+            <if test="city != null">`city` = #{city},</if>
+            <if test="county != null">`county` = #{county},</if>
+            <if test="street != null">`street` = #{street},</if>
+            <if test="zipCode != null">`zip_code` = #{zipCode},</if>
+            <if test="status != null">`status` = #{status}</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+		DELETE FROM merchant_address WHERE id = #{value}
+	</delete>
+
+    <delete id="deleteBatch">
+        DELETE FROM merchant_address WHERE id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

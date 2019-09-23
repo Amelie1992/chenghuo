@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wzlue.goods.dao.FreightTemplateDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+	<resultMap type="com.wzlue.goods.entity.FreightTemplateEntity"
+		id="freightTemplateMap">
+		<result property="id" column="id" />
+		<result property="templateName" column="template_name" />
+	</resultMap>
+
+	<select id="queryObject" resultType="com.wzlue.goods.entity.FreightTemplateEntity">
+		SELECT * FROM
+		o_freight_template WHERE id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.wzlue.goods.entity.FreightTemplateEntity">
+		SELECT * FROM o_freight_template
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				ORDER BY ${sidx} ${order}
+			</when>
+			<otherwise>
+				ORDER BY id desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			LIMIT #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryTotal" resultType="int">
+		SELECT count(*) FROM
+		o_freight_template
+	</select>
+
+	<insert id="save" parameterType="com.wzlue.goods.entity.FreightTemplateEntity" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO o_freight_template
+		(
+		`id`,
+		`template_name`
+		)
+		VALUES
+		(
+		#{id},
+		#{templateName}
+		)
+	</insert>
+
+	<update id="update" parameterType="com.wzlue.goods.entity.FreightTemplateEntity">
+		UPDATE o_freight_template
+		<set>
+			<if test="templateName != null">`template_name` = #{templateName}</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<delete id="delete">
+		DELETE FROM o_freight_template WHERE id = #{value}
+	</delete>
+
+	<delete id="deleteBatch">
+		DELETE FROM o_freight_template WHERE id IN
+		<foreach item="id" collection="array" open="(" separator=","
+			close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

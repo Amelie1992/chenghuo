@@ -1,0 +1,131 @@
+<!--pages/cricle-detail/index.wxml-->
+<view class="page {{paddingBottom?'paddingBottom':''}}">
+
+  <view class="weui-cells weui-cells_after-title">
+    <view class="weui-cell weui-cell_select input-date">
+      <view class="weui-cell__hd weui-cell__hd_in-select-after">
+        <view class="weui-label">手表品牌</view>
+      </view>
+      <view class="weui-cell__bd">
+        <picker bindchange="bindbrandChange" value="{{brandIndex}}" range="{{brands}}">
+          <view class="weui-select weui-select_in-select-after">{{brands[brandIndex]}}</view>
+        </picker>
+      </view>
+    </view>
+
+    <view class="weui-cell weui-cell_select input-date">
+      <view class="weui-cell__hd weui-cell__hd_in-select-after">
+        <view class="weui-label">手表成色</view>
+      </view>
+      <view class="weui-cell__bd">
+        <picker bindchange="bindqualityChange" value="{{qualityIndex}}" range="{{qualitys}}">
+          <view class="weui-select weui-select_in-select-after">{{qualitys[qualityIndex]}}</view>
+        </picker>
+      </view>
+    </view>
+
+    <view class="weui-cell weui-cell_select input-date">
+      <view class="weui-cell__hd weui-cell__hd_in-select-after">
+        <view class="weui-label">日期</view>
+      </view>
+      <view class="weui-cell__bd">
+        <picker mode="date" value="{{date}}" bindchange="bindDateChange">
+          <view class="weui-select weui-select_in-select-after">{{date}}</view>
+        </picker>
+      </view>
+    </view>
+
+    <view class="weui-cell weui-cell_select input-date">
+      <view class="weui-cell__hd weui-cell__hd_in-select-after">
+        <view class="weui-label">维修保养</view>
+      </view>
+      <view class="weui-cell__bd">
+        <picker bindchange="bindCountryChange" value="{{countryIndex}}" range="{{countries}}">
+          <view class="weui-select weui-select_in-select-after">{{countries[countryIndex]}}</view>
+        </picker>
+      </view>
+    </view>
+
+  </view>
+  <view class="weui-cells__title title">
+    <text>图片详情</text>
+    <text>{{allNumber}}/6</text>
+  </view>
+  <view class="image-box">
+    <view class="image-item">
+      <view>
+        <view class="weui-uploader__input-box">
+          <image class="weui-uploader__img" src="{{files}}" mode="aspectFill" />
+          <view class="weui-uploader__input" bindtap="chooseImage" data-index="1"></view>
+        </view>
+      </view>
+      <view class="image-text">
+        <text>正面图</text>
+      </view>
+    </view>
+    <view class="image-item">
+      <view>
+        <view class="weui-uploader__input-box">
+          <image class="weui-uploader__img" src="{{side}}" mode="aspectFill" />
+          <view class="weui-uploader__input" bindtap="chooseImage" data-index="2"></view>
+        </view>
+      </view>
+      <view class="image-text">
+        <text>侧面图</text>
+      </view>
+    </view>
+    <view class="image-item">
+      <view>
+        <view class="weui-uploader__input-box">
+          <image class="weui-uploader__img" src="{{right}}" mode="aspectFill" />
+          <view class="weui-uploader__input" bindtap="chooseImage" data-index="3"></view>
+        </view>
+      </view>
+      <view class="image-text">
+        <text>右侧图（表冠）</text>
+      </view>
+    </view>
+    <view class="image-item">
+      <view>
+        <view class="weui-uploader__input-box">
+          <image class="weui-uploader__img" src="{{clasp}}" mode="aspectFill" />
+          <view class="weui-uploader__input" bindtap="chooseImage" data-index="4"></view>
+        </view>
+      </view>
+      <view class="image-text">
+        <text>表扣</text>
+      </view>
+    </view>
+    <view class="image-item">
+      <view>
+        <view class="weui-uploader__input-box">
+          <image class="weui-uploader__img" src="{{back}}" mode="aspectFill" />
+          <view class="weui-uploader__input" bindtap="chooseImage" data-index="5"></view>
+        </view>
+      </view>
+      <view class="image-text">
+        <text>背面</text>
+      </view>
+    </view>
+    <view class="image-item">
+      <view>
+        <view class="weui-uploader__input-box">
+          <image class="weui-uploader__img" src="{{parts}}" mode="aspectFill" />
+          <view class="weui-uploader__input" bindtap="chooseImage" data-index="6"></view>
+        </view>
+      </view>
+      <view class="image-text">
+        <view>附件（保卡等）</view>
+      </view>
+    </view>
+    <view class="note">备注：请确保手表后背字母及数字拍摄清晰可见，配件包括手表，盒子，发票，钻卡等</view>
+  </view>
+  <view class="weui-cells__title status">功能状态（无异常可不填）</view>
+  <view class="weui-cell cells-textarea">
+    <view class="weui-cell__bd">
+      <textarea class="weui-textarea"  bindinput="bindTextAreaChange" bindlinechange="textLine" cursor-spacing="{{space}}" bindfocus='textFocus' bindblur="textBlur"  show-confirm-bar="{{confirmBar}}" value="{{info}}" maxlength="300" placeholder="请描述手表存在的功能问题，如日历不能翻转等具体情况" />
+      <view class="weui-textarea-counter">{{noteNowLen}}/300</view>
+    </view>
+  </view>
+  <button class="weui-btn btn-green" bindtap='apply'>申请估值 </button>
+</view>

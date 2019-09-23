@@ -1,0 +1,34 @@
+.page{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+image{
+  width: 160rpx;
+  height: 160rpx;
+  margin-top: 144rpx;
+}
+.text{
+   padding-top: 76rpx;
+  padding-bottom: 88rpx;
+   line-height: 1.2;
+  display: flex;
+  flex-direction: column;
+  
+}
+.big{
+  font-size: 40rpx;
+  color: #333;
+  padding-bottom: 48rpx;
+}
+.small{
+  font-size: 32rpx;
+  color: #999;
+}
+
+button{
+  width: 670rpx;
+  border-radius: 45rpx;
+}

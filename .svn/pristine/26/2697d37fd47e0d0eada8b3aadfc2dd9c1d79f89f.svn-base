@@ -1,0 +1,336 @@
+$(function () {
+    //列表
+    $("#table").BT({
+        url: baseURL + 'integral/integralcard/list',
+        columns: [
+            {checkbox: true},
+            {title: '充值码/卡号', field: 'cardNumber',class:'add-at'},
+            {
+                title: '分类', field: 'type', formatter: function (value, row, index) {
+                    if (value == 1) {
+                        return "实体卡";
+                    } else if (value == 2) {
+                        return "虚拟商品";
+                    }
+                }
+            },
+            {title: '批次号', field: 'batchNumber'},
+            {title: '积分面值', field: 'integral'},
+            {
+                title: '激活状态', field: 'activationState', formatter: function (value, row, index) {
+                    if (value == 1) {
+                        return "已激活";
+                    } else if (value == 2) {
+                        return "未激活";
+                    }
+                }
+            },
+            {title: '激活时间', field: 'activationTime'},
+            {
+                title: '核销状态', field: 'writeOffStatus', formatter: function (value, row, index) {
+                    if (value == 1) {
+                        return "已核销";
+                    } else if (value == 2) {
+                        return "未核销";
+                    }
+                }
+            },
+            {title: '充值人', field: 'rechargeByName'},
+            {title: '充值时间', field: 'rechargeTime'},
+            {title: '建卡时间', field: 'createTime'},
+            {title: '备注', field: 'remarks'}
+        ],
+        //条件查询
+        queryParams: {}
+    });
+    //表单提交
+    $("#batchForm").FM({
+        fields: vm.batchFields,
+        success: vm.batchSave
+    })
+});
+
+var vm = new Vue({
+    el: '#rrapp',
+    data: {
+        showList: true,
+        detailList: false,
+        batchList: false,
+        title: null,
+        integralCard: {},//充值卡
+        integralCardBatch: {},//充值卡批次
+        queryParams:{
+            activationState: '',
+            writeOffStatus: ''
+        },
+        //验证字段
+        fields: {
+            cardNumber: {
+                message: '充值码/卡号验证失败',
+                validators: {
+                    notEmpty: {
+                        message: '充值码/卡号不能为空'
+                    },
+                },
+            }, type: {
+                message: '分类：1实体卡；2虚拟商品验证失败',
+                validators: {
+                    notEmpty: {
+                        message: '分类：1实体卡；2虚拟商品不能为空'
+                    },
+                },
+            }, batchNumber: {
+                message: '批次号(实体卡才有批次号)验证失败',
+                validators: {
+                    notEmpty: {
+                        message: '批次号(实体卡才有批次号)不能为空'
+                    },
+                },
+            }, integral: {
+                message: '积分面值验证失败',
+                validators: {
+                    notEmpty: {
+                        message: '积分面值不能为空'
+                    },
+                },
+            }, activationState: {
+                message: '激活状态：1激活；2未激活验证失败',
+                validators: {
+                    notEmpty: {
+                        message: '激活状态：1激活；2未激活不能为空'
+                    },
+                },
+            }, writeOffStatus: {
+                message: '核销状态：1核销；2未核销验证失败',
+                validators: {
+                    notEmpty: {
+                        message: '核销状态：1核销；2未核销不能为空'
+                    },
+                },
+            }, rechargeBy: {
+                message: '充值人验证失败',
+                validators: {
+                    notEmpty: {
+                        message: '充值人不能为空'
+                    },
+                },
+            }, rechargeTime: {
+                message: '充值时间验证失败',
+                validators: {
+                    notEmpty: {
+                        message: '充值时间不能为空'
+                    },
+                },
+            }, createTime: {
+                message: '创建时间验证失败',
+                validators: {
+                    notEmpty: {
+                        message: '创建时间不能为空'
+                    },
+                },
+            }, remarks: {
+                message: '备注验证失败',
+                validators: {
+                    notEmpty: {
+                        message: '备注不能为空'
+                    },
+                },
+            }
+        },
+        batchFields: {
+            integral: {
+                validators: {
+                    notEmpty: {
+                        message: '积分面值不能为空'
+                    },regexp: {
+                        regexp : /^[1-9]\d{0,8}$/,
+                        message : '请输入小于10位的正整数'
+                    }
+                },
+            },number: {
+                validators: {
+                    notEmpty: {
+                        message: '开卡数不能为空'
+                    },regexp: {
+                        regexp : /^[1-9]\d{0,4}$/,
+                        message : '请输入小于6位的正整数'
+                    }
+                },
+            },remarks: {
+                validators: {
+                   /* notEmpty: {
+                        message: '备注不能为空'
+                    },*/stringLength: {
+                        max: 30,
+                        message: '备注在30个字符以内'
+                    }
+                },
+            }
+        }
+    },
+    methods: {
+        //制卡
+        batchSave: function (event) {
+            $.ajax({
+                type: "POST",
+                url: baseURL + "integral/integralcardbatch/save",
+                contentType: "application/json",
+                data: JSON.stringify(vm.integralCardBatch),
+                success: function (r) {
+                    if (r.code === 0) {
+                        alert('操作成功', function (index) {
+                            vm.reload();
+                        });
+                    } else {
+                        alert(r.msg);
+                    }
+                }
+            });
+        },
+        //激活
+        activate: function (event) {
+            let rows = getSelectedRows();
+            if (rows == null) {
+                return;
+            }
+            let flag = true;
+            let ids= [];
+            rows.forEach(function (item) {
+                if (item.activationState == 1) {
+                    flag = false;
+                }else {
+                   ids.push(item.id);
+                }
+            });
+            if (flag == false) {
+                alert("已激活的积分卡不得重复激活!");
+                return;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: baseURL + "integral/integralcard/activate",
+                contentType: "application/json",
+                data: JSON.stringify(ids),
+                success: function (r) {
+                    if (r.code === 0) {
+                        alert('操作成功', function (index) {
+                            vm.reload();
+                        });
+                    } else {
+                        alert(r.msg);
+                    }
+                }
+            });
+        },
+        //导出为excel
+        excel: function () {
+           let tableData = $('#table').bootstrapTable('getData');
+           let flag = true;
+            tableData.forEach(function (item) {
+                if (item.activationState == 1) {
+                    flag = false;
+                }
+            });
+            if (flag == false) {
+                alert("已激活的积分卡禁止导出!");
+                return;
+            }
+            //数字过长显示科学计数
+            $("td.add-at").attr("data-tableexport-msonumberformat","\\@");
+            //获取要导出Excel的表格对象并设置tableExport方法，设置导出类型type为excel
+            $('#table').tableExport({
+                type:'excel',//导出为excel
+                fileName: new Date().toLocaleDateString() + '积分卡',//文件名
+                worksheetName:'积分卡制卡列表',//sheet表的名字
+                ignoreColumn:[0,2,6,7,8,9],//忽略的列，从0开始算
+                // ignoreRow:[2,4,5],//忽略的行，从0开始算
+                excelstyles:['text-align']//使用样式，不用填值只写属性，值读取的是html中的
+            });
+        },
+        query: function () {
+            vm.reload();
+        },
+        add: function () {
+            vm.showList = false;
+            vm.detailList = false;
+            vm.batchList = true;
+            vm.title = "新增";
+            vm.integralCardBatch = {};
+        },
+        update: function (event) {
+            var id = getSelectedRowId("id");
+            if (id == null) {
+                return;
+            }
+            vm.showList = false;
+            vm.title = "修改";
+
+            vm.getInfo(id)
+        },
+        //表单验证
+        batchValidate: function () {
+            var bl = $('#batchForm').VF();//启用验证
+            if (!bl) {
+                return;
+            }
+        },
+        saveOrUpdate: function (event) {
+            var url = vm.integralCard.id == null ? "integral/integralcard/save" : "integral/integralcard/update";
+            $.ajax({
+                type: "POST",
+                url: baseURL + url,
+                contentType: "application/json",
+                data: JSON.stringify(vm.integralCard),
+                success: function (r) {
+                    if (r.code === 0) {
+                        alert('操作成功', function (index) {
+                            vm.reload();
+                        });
+                    } else {
+                        alert(r.msg);
+                    }
+                }
+            });
+        },
+        del: function (event) {
+            var ids = getSelectedRowsId("id");
+            if (ids == null) {
+                return;
+            }
+
+            confirm('确定要删除选中的记录？', function () {
+                $.ajax({
+                    type: "POST",
+                    url: baseURL + "integral/integralcard/delete",
+                    contentType: "application/json",
+                    data: JSON.stringify(ids),
+                    success: function (r) {
+                        if (r.code == 0) {
+                            alert('操作成功', function (index) {
+                                vm.reload();
+                            });
+                        } else {
+                            alert(r.msg);
+                        }
+                    }
+                });
+            });
+        },
+        getInfo: function (id) {
+            $.get(baseURL + "integral/integralcard/info/" + id, function (r) {
+                vm.integralCard = r.integralCard;
+            });
+        },
+        reload: function (event) {
+            vm.showList = true;
+            vm.detailList = false;
+            vm.batchList = false;
+            vm.title = "";
+            //刷新 如需条件查询common.js
+            $("#table").BTF5(vm.queryParams);
+            //重置表单
+            $("#batchForm").RF();
+        }
+    }
+});

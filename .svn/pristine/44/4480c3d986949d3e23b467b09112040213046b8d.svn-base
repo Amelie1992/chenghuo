@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wzlue.member.dao.IntegralRecordDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+	<resultMap type="com.wzlue.member.entity.IntegralRecordEntity"
+		id="integralRecordMap">
+		<result property="id" column="id" />
+		<result property="memberId" column="member_id" />
+		<result property="remarks" column="remarks" />
+		<result property="integral" column="integral" />
+		<result property="createTime" column="create_time" />
+		<result property="type" column="type" />
+		<result property="traceId" column="trace_id" />
+		<result property="trace" column="trace" />
+	</resultMap>
+
+	<select id="queryObject" resultType="com.wzlue.member.entity.IntegralRecordEntity">
+		SELECT * FROM m_integral_record WHERE id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.wzlue.member.entity.IntegralRecordEntity">
+		SELECT ir.*,
+		mi.nick_name as 'memberInfo.nickName'
+		FROM m_integral_record ir
+		left join m_member_info mi on  ir.member_id = mi.id
+		<where>
+			<if test="memberId != null">
+				ir.member_id = #{memberId}
+			</if>
+			<if test="nickName != null and nickName!=''">
+				AND	 mi.nick_name like concat('%', #{nickName}, '%')
+			</if>
+		</where>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				ORDER BY ${sidx} ${order}
+			</when>
+			<otherwise>
+				ORDER BY id desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			LIMIT #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryTotal" resultType="int">
+		SELECT count(*) FROM m_integral_record ir
+		left join m_member_info mi on  ir.member_id = mi.id
+		<where>
+			<if test="memberId != null">
+				ir.member_id = #{memberId}
+			</if>
+			<if test="nickName != null and nickName!=''">
+				AND	 mi.nick_name like concat('%', #{nickName}, '%')
+			</if>
+		</where>
+	</select>
+
+	<insert id="save" parameterType="com.wzlue.member.entity.IntegralRecordEntity"
+		useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO m_integral_record
+		(
+		`member_id`,
+		`remarks`,
+		`integral`,
+		`create_time`,
+		`type`,
+		`trace_id`,
+		`trace`
+		)
+		VALUES
+		(
+		#{memberId},
+		#{remarks},
+		#{integral},
+		now(),
+		#{type},
+		#{traceId},
+		#{trace}
+		)
+	</insert>
+
+	<update id="update" parameterType="com.wzlue.member.entity.IntegralRecordEntity">
+		UPDATE m_integral_record
+		<set>
+			<if test="memberId != null">`member_id` = #{memberId}, </if>
+			<if test="remarks != null">`remarks` = #{remarks}, </if>
+			<if test="integral != null">`integral` = #{integral}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<delete id="delete">
+		DELETE FROM m_integral_record WHERE id = #{value}
+	</delete>
+
+	<delete id="deleteBatch">
+		DELETE FROM m_integral_record WHERE id IN
+		<foreach item="id" collection="array" open="(" separator=","
+			close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

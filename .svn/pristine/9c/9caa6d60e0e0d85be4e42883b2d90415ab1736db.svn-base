@@ -1,0 +1,78 @@
+package com.wzlue.integral.service.impl;
+
+import com.wzlue.common.utils.DateUtils;
+import com.wzlue.integral.dao.IntegralCardDao;
+import com.wzlue.integral.entity.IntegralCardEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
+import com.wzlue.integral.dao.IntegralCardBatchDao;
+import com.wzlue.integral.entity.IntegralCardBatchEntity;
+import com.wzlue.integral.service.IntegralCardBatchService;
+
+import static com.wzlue.common.utils.DateUtils.DATE_TIME_PATTERN;
+
+
+@Service("integralCardBatchService")
+public class IntegralCardBatchServiceImpl implements IntegralCardBatchService {
+    @Autowired
+    private IntegralCardBatchDao integralCardBatchDao;
+    @Autowired
+    private IntegralCardDao integralCardDao;
+
+    @Override
+    public IntegralCardBatchEntity queryObject(Long id) {
+        return integralCardBatchDao.queryObject(id);
+    }
+
+    @Override
+    public List<IntegralCardBatchEntity> queryList(Map<String, Object> map) {
+        return integralCardBatchDao.queryList(map);
+    }
+
+    @Override
+    public int queryTotal(Map<String, Object> map) {
+        return integralCardBatchDao.queryTotal(map);
+    }
+
+    @Override
+    public void save(IntegralCardBatchEntity integralCardBatch) {
+        //批次号
+        String batchNumber = "PCH"+ DateUtils.format(new Date(),"yyyyMMddHHmm")+String.format("%04d",new Random().nextInt(9999));
+        integralCardBatch.setBatchNumber(batchNumber);
+        integralCardBatchDao.save(integralCardBatch);
+        //制卡
+        for (int i = 0; i < integralCardBatch.getNumber(); i++) {
+            IntegralCardEntity integralCard = new IntegralCardEntity();
+            //充值码
+            String cardNumber = DateUtils.format(new Date(),"yyyyMMddHHmm")+String.format("%04d",new Random().nextInt(9999));
+            integralCard.setCardNumber(cardNumber);
+            integralCard.setType(1);
+            integralCard.setBatchNumber(batchNumber);
+            integralCard.setIntegral(integralCardBatch.getIntegral());
+            integralCard.setRemarks(integralCardBatch.getRemarks());
+            integralCardDao.save(integralCard);
+        }
+    }
+
+    @Override
+    public void update(IntegralCardBatchEntity integralCardBatch) {
+        integralCardBatchDao.update(integralCardBatch);
+    }
+
+    @Override
+    public void delete(Long id) {
+        integralCardBatchDao.delete(id);
+    }
+
+    @Override
+    public void deleteBatch(Long[] ids) {
+        integralCardBatchDao.deleteBatch(ids);
+    }
+
+}

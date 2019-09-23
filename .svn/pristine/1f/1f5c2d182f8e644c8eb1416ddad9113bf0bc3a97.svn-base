@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wzlue.member.dao.MemberInfoDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+	<resultMap type="com.wzlue.member.entity.MemberInfoEntity"
+		id="memberInfoMap">
+		<result property="id" column="id" />
+		<result property="memberId" column="member_id" />
+		<result property="openid" column="openid" />
+		<result property="unionid" column="unionid" />
+		<result property="nickName" column="nick_name" />
+		<result property="avatarUrl" column="avatar_url" />
+		<result property="gender" column="gender" />
+		<result property="city" column="city" />
+		<result property="province" column="province" />
+		<result property="country" column="country" />
+		<result property="language" column="language" />
+		<result property="integral" column="integral" />
+		<result property="createTime" column="create_time" />
+		<result property="updateTime" column="update_time" />
+		<result property="mobile" column="mobile" />
+		<result property="realName" column="real_name" />
+		<result property="isVip" column="is_vip" />
+		<result property="vipAddTime" column="vip_add_time" />
+		<result property="vipEndTime" column="vip_end_time" />
+		<result property="recommenderId" column="recommender_id" />
+	</resultMap>
+
+	<select id="queryObject" resultType="com.wzlue.member.entity.MemberInfoEntity">
+		SELECT * FROM m_member_info
+		WHERE id = #{value}
+	</select>
+	
+	<select id="queryIntegral" resultType="int">
+		SELECT integral FROM m_member_info
+		WHERE id = #{value}
+	</select>
+
+	<select id="queryByOpenid" resultType="com.wzlue.member.entity.MemberInfoEntity">
+		SELECT * FROM
+		m_member_info WHERE openid = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.wzlue.member.entity.MemberInfoEntity">
+		SELECT * FROM m_member_info
+		<where>
+			1=1
+			<if test="nickName!=null and nickName!=''">
+				and nick_name LIKE concat('%',#{nickName},'%')
+			</if>
+			<if test="recommenderId!=null and recommenderId!=''">
+				and recommender_id = #{recommenderId}
+			</if>
+		</where>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				ORDER BY ${sidx} ${order}
+			</when>
+			<otherwise>
+				ORDER BY id desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			LIMIT #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryTotal" resultType="int">
+		SELECT count(*) FROM
+		m_member_info
+		<where>
+			1=1
+			<if test="nickName!=null and nickName!=''">
+				and nick_name LIKE concat('%',#{nickName},'%')
+			</if>
+			<if test="mobile!=null and mobile!=''">
+				and mobile = #{mobile}
+			</if>
+		</where>
+	</select>
+
+	<insert id="save" parameterType="com.wzlue.member.entity.MemberInfoEntity">
+		INSERT INTO m_member_info
+		(
+		`id`,
+		`member_id`,
+		`openid`,
+		`unionid`,
+		`nick_name`,
+		`avatar_url`,
+		`gender`,
+		`city`,
+		`province`,
+		`country`,
+		`language`,
+		`create_time`,
+		`update_time`,
+		`is_vip`,
+		`vip_add_time`,
+		`vip_end_time`,
+		`recommender_id`
+		)
+		VALUES
+		(
+		#{id},
+		#{memberId},
+		#{openid},
+		#{unionid},
+		#{nickName},
+		#{avatarUrl},
+		#{gender},
+		#{city},
+		#{province},
+		#{country},
+		#{language},
+		#{createTime},
+		#{updateTime},
+		#{isVip},
+		null,
+		null,
+		#{recommenderId}
+		)
+	</insert>
+
+	<update id="update" parameterType="com.wzlue.member.entity.MemberInfoEntity">
+		UPDATE m_member_info
+		<set>
+			<if test="memberId != null">`member_id` = #{memberId}, </if>
+			<if test="memberId != null">`openid` = #{openid}, </if>
+			<if test="memberId != null">`unionid` = #{unionid}, </if>
+			<if test="nickName != null">`nick_name` = #{nickName}, </if>
+			<if test="avatarUrl != null">`avatar_url` = #{avatarUrl}, </if>
+			<if test="gender != null">`gender` = #{gender}, </if>
+			<if test="city != null">`city` = #{city}, </if>
+			<if test="province != null">`province` = #{province}, </if>
+			<if test="country != null">`country` = #{country}, </if>
+			<if test="mobile != null">`mobile` = #{mobile}, </if>
+			<if test="realName != null">`real_name` = #{realName}, </if>
+			<if test="language != null">`language` = #{language}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="updateTime != null">`update_time` = #{updateTime},</if>
+			<if test="isVip != null">`is_vip` = #{isVip},</if>
+			<if test="vipAddTime != null">`vip_add_time` = #{vipAddTime},</if>
+			<if test="vipEndTime != null">`vip_end_time` = #{vipEndTime},</if>
+			<if test="recommenderId != null">`recommender_id` = #{recommenderId}</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="addIntegral" parameterType="map">
+		update m_member_info set integral = integral + ${get}, update_time = now() where id = #{id}
+	</update>
+
+	<delete id="delete">
+		DELETE FROM m_member_info WHERE id = #{value}
+	</delete>
+
+	<delete id="deleteBatch">
+		DELETE FROM m_member_info WHERE id IN
+		<foreach item="id" collection="array" open="(" separator=","
+			close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

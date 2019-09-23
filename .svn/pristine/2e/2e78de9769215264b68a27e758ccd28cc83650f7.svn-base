@@ -1,0 +1,292 @@
+/* pages/member/index.wxss */
+
+.page {
+  font-size: 28rpx;
+  background: #fff;
+  color: #333;
+}
+.topimg {
+  margin: 0 auto;
+  margin-top: -60px;
+  width: 100%;
+}
+.userinfo {
+  display: flex;
+  padding: 40rpx 30rpx;
+  align-items: left;
+  margin-top: -164px;
+}
+.info-con {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  height: 141px;
+  background-color: #fff;
+}
+.imgName {
+  width: 100%;
+  display: flex;
+   flex-direction: row;
+}
+.userinfo-avatar {
+  width: 130rpx;
+  height: 130rpx;
+  margin: 15rpx;
+  border-radius: 50%;
+}
+.userinfo-nickname {
+  margin-left:10px;
+  font-size: 32rpx;
+  height: 30px;
+  margin-top:32px;
+}
+.qiandaoimg {
+  margin-left:134px;
+  height: 34px;
+  line-height: 36px;
+  margin-top:32px;
+  background-size: 110%;
+  text-align: center;
+  color: #fff;
+  font-size: 12px;
+}
+.info-about {
+  display: flex;
+  flex-direction: column;
+  padding-top: 13rpx;
+}
+
+.user-save {
+  width: 100%;
+  text-align: center;
+  font-size: 24rpx;
+  display: flex;
+  flex-direction: row;
+}
+
+.user-save .save {
+  width: 110px;
+  margin-right: 10px;
+}
+.save text {
+  font-size: 16px;
+}
+.save navigator {
+  color: #999;
+}
+.my-item navigator {
+  padding-left: 30rpx;
+}
+
+.my-item-bg {
+  width: 100%;
+  border-bottom: 1px solid #eee;
+  height: 85rpx;
+  line-height: 85rpx;
+  background: #fff;
+}
+.pos{
+  position: absolute;
+  width:45rpx;
+  height: 30rpx;
+  top:0;
+  right:-40rpx;
+  text-align: center;
+  overflow: hidden;
+}
+.my-item-bg navigator {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 30rpx;
+}
+.daifuimg {
+  width: 25px;
+  height: 25px;
+}
+.order-list {
+  display: flex;
+  border-bottom: 1px solid #eee;
+}
+
+.order-last {
+  border-left: 1px solid #eee;
+}
+
+.order-item {
+  flex: 1 1 auto;
+  text-align: center;
+  padding: 15rpx 0;
+}
+
+.iconfont {
+  position: relative;
+  width: 48rpx;
+  height: 60rpx;
+  margin: 0 auto 10rpx;
+  background-size: contain;
+}
+
+.icon-order {
+  font-size: 48rpx;
+  color: #666;
+}
+
+.weui-badge {
+  position: absolute;
+  right: -35rpx;
+  background-color: #fff;
+  color: #f40;
+  border: 1px solid #f40;
+  box-sizing: border-box;
+  line-height: 1;
+  padding: 0.1em;
+  padding-left: 0.01em;
+  top: -4px
+}
+
+.my-line {
+  height: 20rpx;
+  background: #f4f5f9;
+  width: 100%;
+}
+
+.more {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.more .iconfont {
+  font-size: 46rpx;
+  display: inline-flex;
+  vertical-align: top;
+  width: 30rpx;
+  margin-left: -5rpx;
+}
+
+.order-item text {
+  font-size: 24rpx;
+}
+
+.weui-button {
+  font-size: 28rpx;
+  width: 100%;
+  text-align: left;
+  padding: 8rpx 30rpx;
+  background: #fff;
+  z-index: 999;
+}
+
+.weui-button.button-hover {
+  color: #333;
+}
+
+button[type=default][plain] {
+  border: 0 none;
+  border-radius: 0;
+  color: #333;
+}
+
+.weui-cell::before {
+  border: 0 none;
+}
+
+.weui-cell.weui-cell_access.cell-contact {
+  padding: 0;
+  border-bottom: 1px solid #eee;
+}
+
+.weui-cell__ft_in-access {
+  padding-right: 0;
+}
+
+.weui-cell__ft {
+  float: right;
+  right: 30rpx;
+}
+
+.pr0 {
+  padding-right: 0;
+  border-bottom: 1px solid #eee;
+}
+
+/* head-hair */
+
+.head-hair {
+  font-size: 30rpx;
+  color: #666;
+  padding: 20rpx 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.head-hair text {
+  padding: 0 20rpx;
+}
+
+.head-hair .line {
+  width: 10%;
+  height: 1rpx;
+  background-color: #999;
+}
+/* 热卖商品 */
+
+.hot-goods {
+  background-color: #fff;
+  display: none;
+}
+
+.hot-goods .hot-con {
+  padding: 0 32rpx;
+}
+
+.hot-goods .hot-con .box {
+  width: 48%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  float: left;
+  margin-right: 4%;
+  margin-bottom: 40rpx;
+}
+
+.hot-goods .hot-con .box:nth-child(2n) {
+  margin-right: 0;
+}
+
+.hot-goods .hot-con .box .good-img {
+  width: 320rpx;
+  height: 320rpx;
+  border-radius: 5rpx;
+}
+
+.hot-goods .hot-con .box .title {
+  padding-top: 15rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  text-align: center;
+}
+
+.hot-goods .hot-con .box .title .brand {
+  font-size: 28rpx;
+  color: #666;
+  width: 100%;
+}
+
+.hot-goods .hot-con .box .title .series {
+  font-size: 24rpx;
+  color: #999;
+  width: 100%;
+}
+
+.hot-goods .hot-con .box .title .price {
+  font-size: 26rpx;
+  color: #f40;
+}
+.head-hair{
+  background-color: #fff;
+}

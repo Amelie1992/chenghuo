@@ -1,0 +1,59 @@
+package com.wzlue.integral.service.impl;
+
+
+import java.util.List;
+import java.util.Map;
+
+import com.wzlue.integral.dao.IntegralCardDao;
+import com.wzlue.integral.entity.IntegralCardEntity;
+import com.wzlue.integral.service.IntegralCardService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+
+@Service("integralCardService")
+public class IntegralCardServiceImpl implements IntegralCardService {
+	@Autowired
+	private IntegralCardDao integralCardDao;
+	
+	@Override
+	public IntegralCardEntity queryObject(Long id){
+		return integralCardDao.queryObject(id);
+	}
+	
+	@Override
+	public List<IntegralCardEntity> queryList(Map<String, Object> map){
+		return integralCardDao.queryList(map);
+	}
+	
+	@Override
+	public int queryTotal(Map<String, Object> map){
+		return integralCardDao.queryTotal(map);
+	}
+	
+	@Override
+	public void save(IntegralCardEntity integralCard){
+		integralCardDao.save(integralCard);
+	}
+	
+	@Override
+	public void update(IntegralCardEntity integralCard){
+		integralCardDao.update(integralCard);
+	}
+	
+	@Override
+	public void delete(Long id){
+		integralCardDao.delete(id);
+	}
+	
+	@Override
+	public void deleteBatch(Long[] ids){
+		integralCardDao.deleteBatch(ids);
+	}
+
+	@Override
+    public void activateBatch(Long[] ids){
+        integralCardDao.activateBatch(ids);
+	}
+	
+}

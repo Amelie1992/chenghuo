@@ -1,0 +1,73 @@
+<!--pages/shop-cart/cart/index.wxml-->
+
+<view class="container">
+  <template is="{{goodsList.list.length > 0 ? 'cart-goods-list' : 'no-goods'}}" data="{{...goodsList}}"></template>
+
+  <template name="no-goods">
+    <view class="title-box">
+      <image src="/img/icon-cart.png"></image>
+      购物车空空如也～
+    </view>
+    <view class="to-index-btn" bindtap="toIndexPage">
+      去逛逛
+    </view>
+  </template>
+
+  <template name="cart-goods-list">
+    <view class="list-top">
+      <view class="label">
+        <text class="iconfont icon-shop"></text>
+        <text class="shopName">南京三味鱼文化传媒</text>
+      </view>
+      <view class="edit-btn" hidden="{{!saveHidden}}" bindtap="editTap">编辑</view>
+      <view class="edit-btn" hidden="{{saveHidden}}" bindtap="saveTap">完成</view>
+    </view>
+    <view class="goodsList">
+      <view class="a-gooods" wx:for="{{list}}" wx:key="{{index}}">
+        <view class="a-goods-conts {{item.active? 'active':''}}" bindtouchstart="touchS" bindtouchmove="touchM" bindtouchend="touchE" data-index="{{index}}" style="{{item.left}}">
+          <view class="goods-info">
+            <view class="select-goods" bindtap="selectTap" data-index="{{index}}">
+              <text class="icon-circle" wx:if="{{!item.active}}"></text>
+              <icon class="icon-circle-active" type="success" size="20" wx:if="{{item.active}}" color="#ff4400" />
+            </view>
+
+            <view class="goods-con" bindtap="toGoodsDetail" data-index="{{item}}">
+              <view class="img-box">
+                <image src="{{item.pic}}" class="img" />
+              </view>
+              <view class="text-box">
+                <view class="goods-title">{{item.name}}</view>
+                <view class="goods-specName" wx:if="{{item.specsprice}}">{{item.specName}}</view>
+                <view class="goods-price"wx:if="{{item.specsprice}}">¥ {{item.specsprice}}</view>
+                <view class="goods-price"wx:if="{{item.specsprice==null}}">¥ {{item.payPrice}}</view>
+                <view class="buy-num">
+                  <view class="jian-btn {{item.number==1? 'disabled' : ''}}" catchtap="jianBtnTap" data-index="{{index}}">-</view>
+                  <input type="number" value="{{item.number}}" disabled/>
+                  <view class="jia-btn {{item.number==curTouchGoodStore? 'disabled' : ''}}" catchtap="jiaBtnTap" data-index="{{index}}">+</view>
+                </view>
+              </view>
+            </view>
+
+          </view>
+          <view class="delete-btn" data-index="{{index}}" catchtap="delItem">
+            删除
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="jiesuan-box">
+      <view class="left-price">
+        <view class="all-selected  {{allSelect?'active':''}}" bindtap="bindAllSelect">
+          <text class="icon-circle" wx:if="{{!allSelect}}"></text>
+          <icon class="icon-circle-active" type="success" size="20" wx:if="{{allSelect}}" color="#ff4400" />
+          <text class="text-select"> 全选</text>
+        </view>
+        <view class="total" hidden="{{noSelect}}"><text style='color:black'>合计：</text>¥ {{totalPrice}}</view>
+      </view>
+      <view class="to-pay-btn {{noSelect?'no-select':''}}" hidden="{{!saveHidden}}" bindtap="toPayOrder">去结算
+        <view class="to-pay-allNum">({{shopNum}}件)</view>
+      </view>
+      <view class="to-pay-btn {{noSelect?'no-select':''}}" hidden="{{saveHidden}}" bindtap="deleteSelected">删除</view>
+    </view>
+  </template>
+</view>

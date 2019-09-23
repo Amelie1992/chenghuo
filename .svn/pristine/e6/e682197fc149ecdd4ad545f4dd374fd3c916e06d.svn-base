@@ -1,0 +1,136 @@
+<!--pages/order/order-detail/index.wxml-->
+<view class="container">
+  <view class="sec-wrap">
+    <view class="order-status">
+      <view class="icon-box">
+
+        <icon type="clear" style="font-size:54rpx;" color="#ff4400" wx:if="{{orderInfo.status==0}}" />
+        <text wx:elif="{{orderInfo.status==1}}" class="iconfont icon-daifukuan order-daifukuan"></text>
+        <text wx:elif="{{orderInfo.status==2}}" class="iconfont icon-daifahuo order-daifahuo"></text>
+        <text wx:elif="{{orderInfo.status==3}}" class="iconfont icon-daishouhuo-copy  order-daishouhuo"></text>
+        <text wx:if="{{orderInfo.status==4}}" class="iconfont icon-dingdanguanbi order-gb"></text>
+        <icon type="success" style="font-size:54rpx;" color="#08eb53" wx:if="{{orderInfo.status==5}}" />
+        <icon type="clear" style="font-size:54rpx;" color="#ff4400" wx:if="{{orderInfo.status==6}}" />
+        <icon type="success" style="font-size:54rpx;" color="#08eb53" wx:if="{{orderInfo.status==7}}" />
+        
+      </view>
+      <view class="right-text">
+        <view class="status red">
+          <text wx:if="{{orderInfo.status==0}}">已取消</text>
+          <text wx:if="{{orderInfo.status==1}}">待支付</text>
+          <text wx:if="{{orderInfo.status==2}}">待发货</text>
+          <text wx:if="{{orderInfo.status==3}}">待收货</text>
+          <text wx:if="{{orderInfo.status==4}}">退款中</text>
+          <text wx:if="{{orderInfo.status==5}}" class="col-green">退款成功</text>
+          <text wx:if="{{orderInfo.status==6}}">退款失败</text>
+          <text wx:if="{{orderInfo.status==7}}" class="col-green">已完成</text>
+        </view>
+        <!-- <view class="des" wx:if="{{orderInfo.status==1}}">请于{{durationTime}}内付款，超时订单将自动关闭</view> -->
+      </view>
+    </view>
+    <block wx:if="{{orderInfo.orderAddress}}">
+      <view class="address-sec">
+        <view class="icon-box">
+          <text class="iconfont icon-address"></text>
+        </view>
+        <view class="right-box">
+          <view class="name-tel">收货人：{{orderInfo.orderAddress.customerName}}
+            <text class="text-ml">{{orderInfo.orderAddress.telephone}}</text>
+          </view>
+          <view class="text">收货地址： {{orderInfo.orderAddress.province}}{{orderInfo.orderAddress.city}}{{orderInfo.orderAddress.county}}{{orderInfo.orderAddress.street}}
+          </view>
+        </view>
+      </view>
+    </block>
+  </view>
+  <view class="goods-list">
+    <view class="list-title">商品信息</view>
+    <form bindsubmit="submitReputation" report-submit="true">
+      <block wx:for-items="{{orderInfo.orderGoodsList}}" wx:key="{{index}}">
+        <view class="a-goods">
+          <view class="img-box">
+            <image src="{{item.picUrl}}" class="img" />
+          </view>
+          <view class="text-box">
+            <view class="arow arow01">
+              <view class="goods-name">{{item.goodsName}}</view>
+              <view class="goods-price">¥ {{item.price}}</view>
+            </view>
+            <view class="arow">
+              <view class="goods-label">{{item.property}}</view>
+              <view class="goods-num">x {{item.buyNum}}</view>
+            </view>
+          </view>
+        </view>
+      </block>
+    </form>
+    <form bindsubmit="confirmBtnTap" report-submit="true">
+      <view class="arow btn-row sale-after-arow" wx:if="{{orderInfo.status>=3}}">
+        <text></text>
+        <button class="sale-after confirm-btn" bindtap="afterSale" wx:if="{{orderInfo.status==3 || orderInfo.status==7}}" data-id="{{orderInfo.id}}" data-ordernumber="{{orderInfo.orderNumber}}">申请售后</button>
+        <button class="sale-after confirm-btn" bindtap="after_record" wx:if="{{orderInfo.status < 7&& orderInfo.status>=4}}" data-id="{{orderInfo.id}}" data-ordernumber="{{orderInfo.orderNumber}}">退款记录</button>
+
+        <button class="confirm-btn" formType="submit" wx:if="{{orderInfo.status==3}}">确认收货</button>
+      </view>
+    </form>
+  </view>
+  <view class="peisong-way" hidden="true">
+    <view class="row-box">
+      <view class="row-label">配送方式</view>
+      <view class="right-text">顺丰快递</view>
+    </view>
+    <view class="row-box">
+      <view class="row-label">留言</view>
+      <view class="right-text">
+        <input name="remark" type="text" class="liuyan" placeholder="如需留言请输入" />
+      </view>
+    </view>
+  </view>
+  <view class="goods-info">
+    <view class="row-box">
+      <view class="row-label">商品金额</view>
+      <view class="right-text">¥ {{orderInfo.paymentAmount}}</view>
+    </view>
+    <view class="row-box">
+      <view class="row-label">运费(快递)</view>
+      <view class="right-text"> ¥ {{orderInfo.amountLogistics?orderInfo.amountLogistics:0}}</view>
+    </view>
+    <view class="row-box">
+      <view class="row-label">应付总额</view>
+      <view class="right-text">¥ {{orderInfo.paymentAmount}}</view>
+    </view>
+  </view>
+  <view class="order-info goods-info">
+    <view class="row-box">
+      <view class="row-label">下单编号：</view>
+      <view class="right-text">{{orderInfo.orderNumber}}</view>
+    </view>
+    <view class="row-box">
+      <view class="row-label">下单时间：</view>
+      <view class="right-text">{{orderInfo.createTime}}</view>
+    </view>
+    <view class="row-box">
+      <view class="row-label">支付方式：</view>
+      <view class="right-text">微信</view>
+    </view>
+    <view class="row-box" wx:if="{{orderInfo.status != 1}}">
+      <view class="row-label">付款时间：</view>
+      <view class="right-text">{{date}} </view>
+    </view>
+    <view class="row-box" wx:if="{{orderInfo.status != 1}}">
+      <view class="row-label">发货时间：</view>
+      <view class="right-text">{{orderInfo.deliveryTime?orderInfo.deliveryTime:''}}</view>
+    </view>
+  </view>
+
+  <view class="wuliu-detail" wx:if="{{orderInfo.status==3 || orderInfo.status==4}}">
+    <view class="wuliu-info">物流信息</view>
+    <view class="wuliu-box" bindtap="wuliuDetailsTap">
+      <view class="right-text">
+        <view class="order-number">快递公司：{{orderInfo.orderLogistics.companyName?orderInfo.orderLogistics.companyName:''}}</view>
+        <view class="order-number">快递单号：{{orderInfo.orderLogistics.logisticsNumber?orderInfo.orderLogistics.logisticsNumber:''}}</view>
+        <!-- <view class="wuliu-text">暂无物流信息</view> -->
+      </view>
+    </view>
+  </view>
+</view>

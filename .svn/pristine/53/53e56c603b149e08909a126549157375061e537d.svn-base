@@ -1,0 +1,180 @@
+package com.wzlue.app.controller.order;
+
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+import com.wzlue.AppApplication;
+import com.wzlue.member.entity.MemberInfoEntity;
+import com.wzlue.member.service.MemberInfoService;
+import io.swagger.models.auth.In;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.wzlue.app.common.annotation.Login;
+import com.wzlue.common.base.R;
+import com.wzlue.order.entity.OrderEntity;
+import com.wzlue.order.entity.OrderGoodsEntity;
+import com.wzlue.order.service.OrderGoodsService;
+import com.wzlue.order.service.OrderService;
+
+@RestController
+@RequestMapping("/app/order")
+public class ApiOrderController {
+	
+	@Autowired
+	private OrderService orderService;
+	@Autowired
+	private OrderGoodsService orderGoodsService;
+	@Autowired
+	private MemberInfoService memberInfoService;
+	
+	@Login
+	@RequestMapping("/list")
+	public R list(@RequestParam Map<String, Object> params, @RequestAttribute("userId") Long userId){
+		params.put("memberId", userId);
+		if(params.get("status") != null){
+			//params.put("status", params.get("status").toString().split(","));
+			params.put("status", params.get("status"));
+		}
+		List<OrderEntity> orderList = orderService.queryList(params);
+		return R.ok().put("orderList", orderList);
+	}
+
+	/**
+	 * 创建订单（积分支付，混合支付，微信支付）
+	 * @param order
+	 * @param userId
+	 * @return
+	 */
+	@Login
+	@RequestMapping("/create")
+	@Transactional
+	public R create(@RequestBody OrderEntity order, @RequestAttribute("userId") Long userId){
+		order.setMemberId(userId);
+		order.setCreateTime(new Date());
+		order.setStatus(1);
+		orderService.create(order);//创建订单
+
+		MemberInfoEntity memberInfo = memberInfoService.queryObject(userId);
+		int integral = memberInfo.getIntegral();
+		int orderUse = order.getUseIntegral();
+		//判断支付类型
+		if("integral".equals(order.getPayType())){//积分
+			if (integral>=orderUse) {//积分够
+				memberInfo.setIntegral(integral-orderUse);
+			} else {
+				return R.error("积分不够");
+			}
+			memberInfoService.update(memberInfo);
+			//订单支付成功--待发货
+			order.setStatus(2);
+			order.setPayTime(new Date());
+			orderService.payNotify(order);//积分扣除记录(缺接口)
+		} else if ("mix".equals(order.getPayType())){//混合
+			if (integral>=orderUse) {//积分够
+				memberInfo.setIntegral(integral-orderUse);
+			} else {
+				memberInfo.setIntegral(0);
+				BigDecimal number = new BigDecimal(0);
+				number=BigDecimal.valueOf((int)integral);
+				//应付-积分
+				BigDecimal wechatPay = order.getPaymentAmount().subtract(number);
+				order.setWechatAmount(wechatPay);
+				return R.ok().put("orderNumber", order.getOrderNumber()).put("paymentAmount", order.getWechatAmount());
+			}
+			memberInfoService.update(memberInfo);
+			//订单支付成功--待发货
+			order.setStatus(2);
+			order.setPayTime(new Date());
+			orderService.payNotify(order);//积分扣除记录(缺接口)
+		}
+		return R.ok().put("orderNumber", order.getOrderNumber()).put("paymentAmount", order.getWechatAmount());
+	}
+
+	/**
+	 * 测试用接口，接收支付状态
+	 * @param order
+	 * @param userId
+	 * @return
+	 */
+	@Login
+	@RequestMapping("/testModify")
+	public R complete(@RequestBody OrderEntity order){
+		order.setStatus(2);
+		orderService.payNotify(order);
+		return R.ok();
+	}
+
+	@Login
+	@RequestMapping("/statistics")
+	public R statistics(@RequestAttribute("userId") Long userId){
+		Map<String, Object> statistics = orderService.statistics(userId);
+		return R.ok(statistics);
+	}
+
+	@Login
+	@RequestMapping("/detail")
+	public R detail(Long id, @RequestAttribute("userId") Long userId){
+		OrderEntity order = orderService.queryObject(id);
+		return R.ok().put("order", order);
+	}
+	
+	@Login
+	@RequestMapping("/orderGoods")
+	public R orderGoods(String orderNumber, @RequestAttribute("userId") Long userId){
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("orderNumber", orderNumber);
+		map.put("memberId", userId);
+		List<OrderGoodsEntity> orderGoodsList = orderGoodsService.queryList(map);
+		return R.ok().put("orderGoodsList", orderGoodsList);
+	}
+	
+	@Login
+	@RequestMapping("/cancel")
+	public R cancel(Long id, @RequestAttribute("userId") Long userId){
+		OrderEntity order = new OrderEntity();
+		order.setId(id);
+		order.setStatus(0);
+		orderService.update(order);
+		return R.ok();
+	}
+	
+	@Login
+	@RequestMapping("/complete")
+	public R complete(Long id, @RequestAttribute("userId") Long userId){
+		OrderEntity order = new OrderEntity();
+		order.setId(id);
+		order.setStatus(7);
+		orderService.update(order);
+		return R.ok();
+	}
+
+	/**
+	 * 延长收货
+	 * @param id
+	 * @param userId
+	 * @return
+	 */
+	@Login
+	@RequestMapping("/lengthenReceive")
+	public R lengthenReceive(String orderNumber){
+		OrderEntity order = orderService.queryByOrderNumber(orderNumber);
+		Date date = order.getConfirmTime();
+		Calendar c = Calendar.getInstance();
+		c.setTime(date);
+		int day=c.get(Calendar.DATE);
+		c.set(Calendar.DATE,day+3);
+		order.setConfirmTime(c.getTime());
+		orderService.update(order);
+		return R.ok();
+	}
+
+}

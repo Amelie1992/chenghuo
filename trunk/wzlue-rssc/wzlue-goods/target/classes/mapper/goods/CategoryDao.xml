@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wzlue.goods.dao.CategoryDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.wzlue.goods.entity.CategoryEntity" id="categoryMap">
+        <result property="id" column="id"/>
+        <result property="categoryName" column="category_name"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="sort" column="sort"/>
+        <result property="remarks" column="remarks"/>
+    </resultMap>
+
+    <select id="queryObject" resultType="com.wzlue.goods.entity.CategoryEntity">
+		SELECT * FROM g_category
+		WHERE id = #{value}
+	</select>
+
+    <select id="queryList" resultType="com.wzlue.goods.entity.CategoryEntity">
+        SELECT * FROM g_category
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                ORDER BY ${sidx} ${order}
+            </when>
+            <otherwise>
+                ORDER BY id desc
+            </otherwise>
+        </choose>
+        <if test="offset != null and limit != null">
+            LIMIT #{offset}, #{limit}
+        </if>
+    </select>
+
+    <select id="queryTotal" resultType="int">
+		SELECT count(*) FROM
+		g_category
+	</select>
+    <!--判断类名不能重复-->
+    <select id="queryTotalName" resultType="int">
+        SELECT count(*) FROM
+        g_category WHERE category_name=#{categoryName}
+    </select>
+
+    <insert id="save" parameterType="com.wzlue.goods.entity.CategoryEntity"
+            useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO g_category
+		(
+		`category_name`,
+		`pic_url`,
+		`sort`,
+		`remarks`
+		)
+		VALUES
+		(
+		#{categoryName},
+		#{picUrl},
+		#{sort},
+		#{remarks}
+		)
+	</insert>
+
+    <update id="update" parameterType="com.wzlue.goods.entity.CategoryEntity">
+        UPDATE g_category
+        <set>
+            <if test="categoryName != null">`category_name` = #{categoryName},</if>
+            <if test="parentId != null">`parent_id` = #{parentId},</if>
+            <if test="sort != null">`sort` = #{sort},</if>
+            <if test="picUrl != null">`pic_url` = #{picUrl},</if>
+            <if test="remarks != null">`remarks` = #{remarks}</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+		DELETE FROM g_category WHERE id = #{value}
+	</delete>
+
+    <delete id="deleteBatch">
+        DELETE FROM g_category WHERE id IN
+        <foreach item="id" collection="array" open="(" separator=","
+                 close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+
+
+</mapper>

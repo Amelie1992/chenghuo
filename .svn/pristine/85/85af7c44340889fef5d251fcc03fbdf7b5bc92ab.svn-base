@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>推荐商品模块表</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="../../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../css/AdminLTE.min.css">
+    <link rel="stylesheet" href="../../css/font-awesome.min.css">
+    <link rel="stylesheet" href="../../plugins/jqgrid/ui.jqgrid-bootstrap.css">
+    <link rel="stylesheet" href="../../css/bootstrap-table.min.css">
+    <link rel="stylesheet" href="../../plugins/bootstrap-validator/css/bootstrap-validator.min.css">
+    <link rel="stylesheet" href="../../plugins/ztree/css/metroStyle/metroStyle.css">
+    <link rel="stylesheet" href="../../css/main.css">
+    <link rel="stylesheet" href="../../plugins/treegrid/jquery.treegrid.css">
+
+</head>
+<body>
+<div id="rrapp" v-cloak class="content-wrapper wzl-content-wrapper">
+    <section class="content-header">
+        <h1>
+            推荐商品模块表 &nbsp;<small v-if="title!=''">{{title}}</small>
+        </h1>
+    </section>
+    <!--一级列表页-->
+    <div v-show="showList">
+        <section class="content">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="box">
+                        <div class="box-header with-border">
+                            <div class="col-xs-2">
+                                <input type="text" name="moduleName" class="form-control" v-model="queryParams.moduleName" placeholder="模块名" />
+                            </div>
+                            <button class="btn btn-primary" @click="query"><i class="fa fa-search"></i>&nbsp;查询</button>
+                            <button v-if="hasPermission('goods:recommendModule:save')" class="btn btn-primary"
+                                    @click="add">
+                                <i class="fa fa-plus"></i>&nbsp;新增
+                            </button>
+                            <button v-if="hasPermission('goods:recommendModule:update')" class="btn btn-warning"
+                                    @click="update">
+                                <i class="fa fa-trash-o"></i>&nbsp;修改
+                            </button>
+                            <button v-if="hasPermission('goods:recommendModule:delete')" class="btn btn-danger"
+                                    @click="del">
+                                <i class="fa fa-trash-o"></i>&nbsp;删除
+                            </button>
+                        </div>
+                        <div class="box-body">
+                            <table id="table"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <!--一级列表编辑页-->
+    <div v-show="edit">
+        <section class="content">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="box">
+                        <form class="form-horizontal" id="form">
+                            <div class="row">
+                                <div class="form-group">
+                                    <div class="col-sm-2 control-label">模块名</div>
+                                    <div class="col-sm-8">
+                                        <input type="text" name="moduleName" class="form-control"
+                                               v-model="recommendModule.moduleName" placeholder="模块名"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group">
+                                    <div class="col-sm-2 control-label">排序</div>
+                                    <div class="col-sm-8">
+                                        <input type="text" name="sort" class="form-control"
+                                               v-model="recommendModule.sort" placeholder="排序"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group">
+                                    <div class="col-sm-2 control-label">状态</div>
+                                    <div class="col-sm-8">
+                                        <div class="form-group">
+                                            <label class="radio-inline"> <input name="status" type="radio" value="1" v-model="recommendModule.status">正常</label>
+                                            <label class="radio-inline"> <input name="status" type="radio" value="2" v-model="recommendModule.status">禁用</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group">
+                                    <div class="col-sm-2 control-label"></div>
+                                    <input type="button" class="btn btn-primary" @click="validate" value="确定"/>
+                                    &nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload"
+                                                       value="返回"/>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!--二级列表页-->
+    <div v-show="showList2">
+        <section class="content">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="box">
+                        <div class="box-header with-border">
+                            <div class="col-xs-2">
+                                <input type="text" name="goodsName" class="form-control" v-model="queryParams2.goodsName" placeholder="商品名" />
+                            </div>
+                            <button class="btn btn-primary" @click="query2"><i class="fa fa-search"></i>&nbsp;查询</button>
+                            <button v-if="hasPermission('goods:recommendGoods:save')" class="btn btn-primary"
+                                    @click="adds">
+                                <i class="fa fa-plus"></i>&nbsp;新增
+                            </button>
+                            <button v-if="hasPermission('goods:recommendGoods:delete')" class="btn btn-danger"
+                                    @click="delData">
+                                <i class="fa fa-trash-o"></i>&nbsp;删除
+                            </button>
+                            &nbsp;&nbsp; <input type="button" class="btn btn-warning" @click="reloadTwo" value="返回"/>
+                        </div>
+                        <div class="box-body">
+                            <table id="table2"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!--二级列表编辑页-->
+    <div v-show="edit2">
+        <section class="content">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="box">
+                        <form class="form-horizontal" id="formOne">
+                            <div class="form-group" style="transform:translateY(10px)">
+                                <div class="col-sm-2 control-label">商品</div>
+                                <div class="col-sm-8" v-show="showProList">
+                                    <!--<input type="hidden" name="moduleId" id="ids" class="form-control"-->
+                                           <!--v-model="recommendGoods.ids"/>-->
+                                    <a class="btn btn-primary" @click="chooseProduct()" v-show="chooseGoods">选择商品</a>
+                                    <table class="table table-bordered" v-show="proTable">
+                                        <thead>
+                                        <tr>
+                                            <th>商品名</th>
+                                            <th>商品图片</th>
+                                            <th>商品价格</th>
+                                            <th>排序</th>
+                                            <th>操作</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr v-for="(item,index) in recommendGoods.recommendGoodsList">
+                                            <td>
+                                                <input type="text" class="form-control" v-model="item.goodsName"
+                                                       :value="item.goodsName" readonly>
+                                            </td>
+                                            <td>
+                                                <img v-if="item.picUrl!=''" id="picUrl" name="picUrl" alt="商品图片"
+                                                     width="50px" :src="item.picUrl" readonly>
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control" v-model="item.payPrice"
+                                                       :value="item.payPrice" readonly>
+                                            </td>
+                                            <td>
+                                                <input type="number" class="form-control"  v-model="item.sort" min="0">
+                                            </td>
+                                            <td><a class="fa fa-trash-o" href="javascript:void(0)"
+                                                   @click="removeSpu(index)"></a></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="table table-bordered" v-show="goodTable">
+                                        <thead>
+                                        <tr>
+                                            <th>商品名</th>
+                                            <th>商品图片</th>
+                                            <th>商品价格</th>
+                                            <th>排序</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td>
+                                                <input type="text" class="form-control" v-model="recommendGoods.goodsName"
+                                                       :value="recommendGoods.goodsName" readonly>
+                                            </td>
+                                            <td>
+                                                <img v-if="recommendGoods.picUrl!=''" name="picUrl" alt="产品图片"
+                                                     width="50px" :src="recommendGoods.picUrl" readonly>
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control" v-model="recommendGoods.payPrice"
+                                                       :value="recommendGoods.payPrice" readonly>
+                                            </td>
+                                            <td>
+                                                <input type="number" class="form-control"  v-model="recommendGoods.sort" min="0">
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group">
+                                    <div class="col-sm-2 control-label"></div>
+                                    <input type="button" class="btn btn-primary" @click="formOneValidate" value="确定"/>
+                                    &nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="dataBack"
+                                                       value="返回"/>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- 选择商品弹出层 -->
+    <div class="modal fade bd-example-modal-lg" id="chooseProductModal" tabindex="-1" role="dialog" data-backdrop="false"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog model-bp">
+            <div class="modal-content" style="width:900px;margin-left:-40%">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h5 class="modal-title">选择商品</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-xs-2">
+                            <input type="text" class="form-control" v-model="goodsParams.productName" name="productName"
+                                   placeholder="请输入商品名"/>
+                        </div>
+                        <button class="btn btn-default m-left-5" @click="queryGoods"><i class="fa fa-search"></i>&nbsp;查询
+                        </button>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <table id="table1"></table>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" @click="selectProduct()">确定
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="../../libs/jquery.min.js"></script>
+<script src="../../plugins/layer/layer.js"></script>
+<script src="../../libs/bootstrap.min.js"></script>
+<script src="../../libs/vue.min.js"></script>
+<!--bootstrap-table-->
+<script src="../../plugins/bootstrap-table/bootstrap-table.min.js"></script>
+<script src="../../plugins/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
+<!--bootstrap-validator-->
+<script src="../../plugins/bootstrap-validator/js/bootstrap-validator.min.js"></script>
+<script src="../../plugins/bootstrap-validator/js/zh_CN.min.js"></script>
+<script src="../../plugins/jqgrid/grid.locale-cn.js"></script>
+<script src="../../plugins/jqgrid/jquery.jqGrid.min.js"></script>
+<script src="../../plugins/jqgrid/grid.locale-cn.js"></script>
+<script src="../../plugins/ztree/jquery.ztree.all.min.js"></script>
+<script src="../../js/common.js"></script>
+
+<script src="../../js/modules/goods/recommendmodule.js"></script>
+</body>
+</html>

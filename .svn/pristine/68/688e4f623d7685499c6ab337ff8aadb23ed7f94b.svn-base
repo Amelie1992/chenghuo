@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wzlue.order.dao.OrderRefundDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+	<resultMap type="com.wzlue.order.entity.OrderRefundEntity"
+		id="orderRefundMap">
+		<result property="id" column="id" />
+		<result property="orderNumber" column="order_number" />
+		<result property="refundNumber" column="refund_number" />
+		<result property="memberId" column="member_id" />
+		<result property="refundAmount" column="refund_amount" />
+		<result property="createTime" column="create_time" />
+		<result property="processTime" column="process_time" />
+		<result property="goodsStatus" column="goods_status" />
+		<result property="reason" column="reason" />
+		<result property="status" column="status" />
+		<result property="type" column="type" />
+		<result property="explain" column="explain" />
+		<result property="remarks" column="remarks" />
+		<result property="nickName" column="nickName" />
+		<association property="memberInfo" javaType="com.wzlue.member.entity.MemberInfoEntity">
+			<result property="nickName" column="nick_name"/>
+		</association>
+		<collection property="picUrls" select="queryPicUrls" column="refund_number"></collection>
+	</resultMap>
+	
+	<select id="queryPicUrls" resultType="string">
+		select pic_url from o_order_refund_pic where refund_number = #{value}
+	</select>
+
+	<select id="queryObject" resultMap="orderRefundMap">
+		SELECT r.*, mi.nick_name FROM o_order_refund r left join m_member_info mi on r.member_id = mi.id
+		WHERE r.id = #{value}
+	</select>
+	
+	<select id="queryByOrderNumber" resultMap="orderRefundMap">
+		SELECT r.*, mi.nick_name FROM o_order_refund r left join m_member_info mi on r.member_id = mi.id
+		WHERE r.order_number = #{value}
+	</select>
+
+	<select id="queryList" resultMap="orderRefundMap">
+		SELECT refund.*,info.nick_name AS nickName FROM o_order_refund refund LEFT  JOIN m_member_info info ON refund.member_id=info.id
+		<where>
+			<if test="refundNumber!=null and refundNumber!=''">
+				refund_number = #{refundNumber}
+			</if>
+		</where>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				ORDER BY ${sidx} ${order}
+			</when>
+			<otherwise>
+				ORDER BY refund.id desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			LIMIT #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryTotal" resultType="int">
+		SELECT count(*) FROM
+		o_order_refund
+		<where>
+			<if test="refundNumber!=null and refundNumber!=''">
+				refund_number = #{refundNumber}
+			</if>
+		</where>
+	</select>
+
+	<insert id="save" parameterType="com.wzlue.order.entity.OrderRefundEntity"
+		useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO o_order_refund
+		(
+		`order_number`,
+		`refund_number`,
+		`member_id`,
+		`refund_amount`,
+		`create_time`,
+		`status`,
+		`type`,
+		`explain`,
+		`process_time`
+		)
+		VALUES
+		(
+		#{orderNumber},
+		#{refundNumber},
+		#{memberId},
+		#{refundAmount},
+		#{createTime},
+		#{status},
+		#{type},
+		#{explain},
+		#{processTime}
+		)
+	</insert>
+
+	<update id="update" parameterType="com.wzlue.order.entity.OrderRefundEntity">
+		UPDATE o_order_refund
+		<set>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="remarks != null">`remarks` = #{remarks}, </if>
+			<if test="processTime != null">`process_time` = #{processTime}</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<delete id="delete">
+		DELETE FROM o_order_refund WHERE id = #{value}
+	</delete>
+
+	<delete id="deleteBatch">
+		DELETE FROM o_order_refund WHERE id IN
+		<foreach item="id" collection="array" open="(" separator=","
+			close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wzlue.contact.dao.RefundLogisticsDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.wzlue.contact.entity.RefundLogisticsEntity" id="refundLogisticsMap">
+        <result property="id" column="id"/>
+        <result property="orderRefund" column="order_refund"/>
+        <result property="logisticsId" column="logistics_id"/>
+        <result property="logisticsName" column="logistics_name"/>
+        <result property="logisticsNumber" column="logistics_number"/>
+        <result property="logisticsPrice" column="logistics_price"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.wzlue.contact.entity.RefundLogisticsEntity">
+		SELECT * FROM refund_logistics WHERE id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.wzlue.contact.entity.RefundLogisticsEntity">
+		SELECT * FROM refund_logistics
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                ORDER BY ${sidx} ${order}
+            </when>
+			<otherwise>
+                ORDER BY id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			LIMIT #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		SELECT count(*) FROM refund_logistics
+	</select>
+	 
+	<insert id="save" parameterType="com.wzlue.contact.entity.RefundLogisticsEntity" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO refund_logistics
+		(
+																				`order_refund`, 
+																	`logistics_id`, 
+																	`logistics_name`, 
+																	`logistics_number`, 
+																	`logistics_price`
+									)
+		VALUES
+		(
+																				#{orderRefund}, 
+																	#{logisticsId}, 
+																	#{logisticsName}, 
+																	#{logisticsNumber}, 
+																	#{logisticsPrice}
+									)
+	</insert>
+	 
+	<update id="update" parameterType="com.wzlue.contact.entity.RefundLogisticsEntity">
+		UPDATE refund_logistics
+		<set>
+																				<if test="orderRefund != null">`order_refund` = #{orderRefund}, </if>
+																	<if test="logisticsId != null">`logistics_id` = #{logisticsId}, </if>
+																	<if test="logisticsName != null">`logistics_name` = #{logisticsName}, </if>
+																	<if test="logisticsNumber != null">`logistics_number` = #{logisticsNumber}, </if>
+																	<if test="logisticsPrice != null">`logistics_price` = #{logisticsPrice}</if>
+									</set>
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="delete">
+		DELETE FROM refund_logistics WHERE id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		DELETE FROM refund_logistics WHERE id IN
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

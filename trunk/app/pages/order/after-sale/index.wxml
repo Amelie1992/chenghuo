@@ -1,0 +1,91 @@
+<!--pages/order/order-list/index.wxml-->
+<view class="container">
+  <view class="order-list" hidden="{{orderInfo ? false : true}}">
+    <view class="a-order">
+      <view bindtap="orderDetail" data-id="{{orderInfo.id}}">
+        <scroll-view class="goods-img-container" scroll-x="true" wx:for="{{orderInfo}}" wx:key="{{index}}">
+          <view class="goods-list">
+            <view class="img-box">
+              <image src="{{item.picUrl}}" class="goods-img"></image>
+            </view>
+            <view class="goods-detail">
+              <view class="goods-name">{{item.goodsName}}</view>
+              <view class="goods-num">
+                <view class="property">￥{{item.price}}</view>
+                <view class="number">X{{item.buyNum}}</view>
+              </view>
+            </view>
+          </view>
+        </scroll-view>
+      </view>
+    </view>
+  </view>
+  <view class="weui-cell weui-cell_select" hidden='{{type != 1?true:false}}'>
+    <view class="weui-cell__hd weui-cell__hd_in-select-after">
+      <view class="weui-label">货物状态</view>
+    </view>
+    <view class="weui-cell__bd">
+      <picker bindchange="bindStatusChange" value="{{statusIndex}}" range="{{status}}">
+        <view class="weui-select weui-select_in-select-after">{{status[statusIndex]}}</view>
+      </picker>
+    </view>
+  </view>
+  <view class="weui-cell weui-cell_select">
+    <view class="weui-cell__hd weui-cell__hd_in-select-after">
+      <view class="weui-label">退款原因</view>
+    </view>
+    <view class="weui-cell__bd">
+      <picker bindchange="bindReasonChange" value="{{reasonIndex}}" range="{{reason}}">
+        <view class="weui-select weui-select_in-select-after">{{reason[reasonIndex]}}</view>
+      </picker>
+    </view>
+  </view>
+  <view class="weui-cell weui-cell_input">
+    <view class="weui-cell__hd">
+      <view class="weui-label">退款金额：</view>
+    </view>
+    <view class="weui-cell__bd col-red">
+      <text class="col-pos">￥</text>
+      <input class="weui-input" value="{{paymentAmount}}" bindinput="inputPayment" placeholder-class="col-red" placeholder="请输入退款金额" />
+    </view>
+  </view>
+  <view class="weui-cells__title">最多￥{{order.productAmount}}元</view>
+  <view class="weui-cell weui-cell_input">
+    <view class="weui-cell__hd">
+      <view class="weui-label">退款说明：</view>
+    </view>
+    <view class="weui-cell__bd">
+      <input class="weui-input" value="{{remakes}}" data-name="remakes" bindinput="inputgetRemakes" placeholder="选填" />
+    </view>
+  </view>
+  <view class="upload">
+    <view class="weui-cell">
+      <view class="weui-cell__bd">
+        <view class="weui-uploader">
+          <view class="weui-uploader__hd">
+            <view class="weui-uploader__title">上传凭证</view>
+            <view class="weui-uploader__info">{{files.length}}/3</view>
+          </view>
+          <view class="weui-uploader__bd">
+            <view class="weui-uploader__files" id="uploaderFiles">
+              <block wx:for="{{files}}" wx:key="*this">
+                <view class="weui-uploader__file" bindtap="previewImage" id="{{item}}">
+                  <image class="weui-uploader__img" src="{{item}}" mode="aspectFill" />
+                  <view class="delete-btn" data-index="{{index}}" catchtap="deleteImg">
+                    <icon type="clear" size="20" color="#ff4400" />
+                  </view>
+                </view>
+              </block>
+            </view>
+            <view class="weui-uploader__input-box">
+              <view class="weui-uploader__input" bindtap="chooseImage"></view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+  <view class="fixed-btn">
+    <button class="weui-button" bindtap="submit">提交</button>
+  </view>
+</view>

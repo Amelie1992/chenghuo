@@ -1,0 +1,22 @@
+package com.wzlue.goods.dao;
+
+import com.wzlue.goods.entity.GoodsEntity;
+import com.wzlue.common.base.BaseDao;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+/**
+ * 商品
+ * 
+ * @author wzlue
+ * @email wzlue.com
+ * @date 2018-07-25 19:59:39
+ */
+@Mapper
+public interface GoodsDao extends BaseDao<GoodsEntity> {
+
+	void updateStatus(@Param("ids") Long[] ids, @Param("status") Integer status);
+
+	void addSaleNum(Long goodsId);
+
+}

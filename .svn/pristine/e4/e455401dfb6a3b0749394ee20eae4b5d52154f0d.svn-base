@@ -1,0 +1,60 @@
+<!--pages/order/order-list/index.wxml-->
+<view class="container">
+  <view class="status-box">
+    <view bindtap="statusTap" class="status-label {{index == currentType ? 'active' : ''}}" wx:for-items="{{statusType}}" wx:key="{{index}}" data-index="{{index}}">
+      {{item}}
+      <view class="{{tabClass[index]}}"></view>
+    </view>
+  </view>
+  <view class="no-order" hidden="{{orderList.length>0 ? true : false}}">
+    <image src="/img/u3028.png" class="no-order-img"></image>
+    <view class="text">暂无订单</view>
+  </view>
+  <view class="order-list" hidden="{{orderList.length>0  ? false : true}}">
+    <view class="a-order" wx:for-items="{{orderList}}" wx:key="{{index}}">
+      <view class="order-date">
+        <view class="date-box">下单时间：{{item.createTime}}</view>
+        <!-- 订单的状态 0已取消 1待付款  2 待发货  3待收货  4退款中 5退款成功 6退款失败 7已完成 -->
+        <view class="status {{item.status==-1 ? '':'red'}}">
+          <text wx:if="{{item.status==0}}">已取消</text>
+          <text wx:if="{{item.status==1}}">待支付</text>
+          <text wx:if="{{item.status==2}}">待发货</text>
+          <text wx:if="{{item.status==3}}">待收货</text>
+          <text wx:if="{{item.status==4}}">退款中</text>
+          <text wx:if="{{item.status==5}}">退款成功</text>
+          <text wx:if="{{item.status==6}}">退款失败</text>
+          <text wx:if="{{item.status==7}}">已完成</text>
+        </view>
+      </view>
+
+      <view bindtap="orderDetail" data-id="{{item.id}}">
+        <scroll-view class="goods-img-container" scroll-x="true">
+          <view class="goods-list" wx:for-items="{{item.orderGoodsList}}" wx:key="{{index}}">
+            <view class="img-box">
+              <image src="{{item.picUrl}}" class="goods-img"></image>
+            </view>
+            <view class="goods-detail">
+              <view class="goods-name">
+              <view>{{item.goodsName}}</view>
+               <view>{{item.specName}}</view>
+              </view>
+              <view class="goods-num">
+                <view class="property">{{item.property}}</view>
+                <view class="number">x {{item.buyNum}}</view>
+              </view>
+            </view>
+          </view>
+        </scroll-view>
+      </view>
+      <view class="price-box">
+        <view class="total-price">订单金额：¥ {{item.paymentAmount}}</view>
+        <!-- <view class="total-price" wx:if="{{item.score > 0}}">合计：¥ {{item.paymentAmount}}</view> -->
+        <view class="btn-box">
+          <view class="btn cancel-btn" hidden="{{item.status==1? fslse : true}}" bindtap="cancelOrderTap" data-id="{{item.id}}">取消订单</view>
+          <view class="btn topay-btn" hidden="{{item.status==1? fslse : true}}" bindtap="toPayTap" data-paymentamount="{{item.paymentAmount}}" data-ordernumber="{{item.orderNumber}}" data-id="{{item.id}}" data-money="{{item.paymentAmount}}">马上付款</view>
+        </view>
+      </view>
+    </view>
+
+  </view>
+</view>

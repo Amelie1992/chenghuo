@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wzlue.goods.dao.RecommendGoodsDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.wzlue.goods.entity.RecommendGoodsEntity" id="gRecommendGoodsMap">
+        <result property="id" column="id"/>
+        <result property="moduleId" column="module_id"/>
+        <result property="goodsId" column="goods_id"/>
+        <result property="sort" column="sort"/>
+        <result property="addTime" column="add_time"/>
+        <result property="updateTime" column="update_time"/>
+
+        <result property="goodsName" column="goods_name"/>
+        <result property="moduleName" column="module_name"/>
+        <result property="picUrl" column="pic_url"/>
+        <result property="payPrice" column="pay_price"/>
+    </resultMap>
+
+    <select id="queryObject" resultType="com.wzlue.goods.entity.RecommendGoodsEntity">
+		SELECT * FROM g_recommend_goods grg
+		LEFT JOIN g_goods g on grg.goods_id = g.id
+        LEFT JOIN g_recommend_module grm ON grg.module_id = grm.id
+		WHERE grg.id = #{value}
+	</select>
+
+    <select id="queryListApi" resultType="com.wzlue.goods.entity.RecommendGoodsEntity">
+        SELECT * FROM g_recommend_goods grg
+        LEFT JOIN g_goods g on grg.goods_id = g.id
+        WHERE grg.module_id = #{id}
+        ORDER BY grg.sort
+    </select>
+
+    <select id="queryList" resultType="com.wzlue.goods.entity.RecommendGoodsEntity">
+        SELECT * FROM g_recommend_goods grg
+        LEFT JOIN g_goods g on grg.goods_id = g.id
+        LEFT JOIN g_recommend_module grm ON grg.module_id = grm.id
+        <where>
+            1=1
+            <if test="moduleId != null and moduleId !=''">
+                and grg.module_id = #{moduleId}
+            </if>
+            <if test="goodsName != null and goodsName !=''">
+                and g.goods_name like CONCAT('%',#{goodsName},'%')
+            </if>
+        </where>
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                ORDER BY ${sidx} ${order}
+            </when>
+            <otherwise>
+                ORDER BY grg.update_time desc
+            </otherwise>
+        </choose>
+        <if test="offset != null and limit != null">
+            LIMIT #{offset}, #{limit}
+        </if>
+    </select>
+
+    <select id="queryTotal" resultType="int">
+		SELECT count(*) FROM g_recommend_goods grg
+        LEFT JOIN g_goods g on grg.goods_id = g.id
+        LEFT JOIN g_recommend_module grm ON grg.module_id = grm.id
+        <where>
+            1=1
+            <if test="moduleId != null and moduleId !=''">
+                and grg.module_id = #{moduleId}
+            </if>
+            <if test="goodsId != null and goodsId !=''">
+                and grg.goods_id = #{goodsId}
+            </if>
+        </where>
+	</select>
+
+    <insert id="save" parameterType="com.wzlue.goods.entity.RecommendGoodsEntity">
+		INSERT INTO g_recommend_goods
+		(
+													`id`, 
+																	`module_id`, 
+																	`goods_id`, 
+																	`sort`, 
+																	`add_time`, 
+																	`update_time`
+									)
+		VALUES
+		(
+													#{id}, 
+																	#{moduleId}, 
+																	#{goodsId}, 
+																	#{sort}, 
+																	now(),
+																	now()
+									)
+	</insert>
+
+    <update id="update" parameterType="com.wzlue.goods.entity.RecommendGoodsEntity">
+        UPDATE g_recommend_goods
+        <set>
+            <if test="moduleId != null">`module_id` = #{moduleId},</if>
+            <if test="goodsId != null">`goods_id` = #{goodsId},</if>
+            <if test="sort != null">`sort` = #{sort},</if>
+            <if test="addTime != null">`add_time` = #{addTime},</if>
+            <if test="updateTime != null">`update_time` = #{updateTime}</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+		DELETE FROM g_recommend_goods WHERE id = #{value}
+	</delete>
+
+    <delete id="deleteBatch">
+        DELETE FROM g_recommend_goods WHERE id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

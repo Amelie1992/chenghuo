@@ -1,0 +1,84 @@
+<!--pages/cricle-detail/index.wxml-->
+<view class="page">
+
+  <view class="weui-cells weui-cells_after-title">
+    <view class="weui-cell">
+      <view class="weui-cell__bd">手表品牌</view>
+      <view class="weui-cell__ft">{{recovery.brand.brandName}}</view>
+    </view>
+
+    <view class="weui-cell">
+      <view class="weui-cell__bd">手表成色</view>
+      <view class="weui-cell__ft">{{recovery.condition.conditionName}}</view>
+    </view>
+
+    <view class="weui-cell">
+      <view class="weui-cell__bd">购买时间</view>
+      <view class="weui-cell__ft">{{recovery.buyTime}}</view>
+    </view>
+
+    <view class="weui-cell">
+      <view class="weui-cell__bd">维修保养</view>
+      <view class="weui-cell__ft">无</view>
+    </view>
+  </view>
+  <view class="weui-cells__title title">
+    <text>图片详情</text>
+    <text>6/6</text>
+  </view>
+  <view class="image-box">
+    <view class="image-item">
+      <view class="image-con" bindtap="previewImage" id="{{recovery.picUrls[0]}}">
+        <image src='{{recovery.picUrls[0]}}'></image>
+      </view>
+      <view class="image-text">
+        <text>正面图</text>
+      </view>
+    </view>
+    <view class="image-item">
+      <view class="image-con" bindtap="previewImage" id="{{recovery.picUrls[1]}}">
+        <image src='{{recovery.picUrls[1]}}'></image>
+      </view>
+      <view class="image-text">
+        <text>侧面图</text>
+      </view>
+    </view>
+    <view class="image-item">
+      <view class="image-con" bindtap="previewImage" id="{{recovery.picUrls[2]}}">
+        <image src='{{recovery.picUrls[2]}}'></image>
+      </view>
+      <view class="image-text">
+        <text>右侧图（表冠）</text>
+      </view>
+    </view>
+    <view class="image-item">
+      <view class="image-con" bindtap="previewImage" id="{{recovery.picUrls[3]}}">
+        <image src='{{recovery.picUrls[3]}}'></image>
+      </view>
+      <view class="image-text">
+        <text>表扣</text>
+      </view>
+    </view>
+    <view class="image-item">
+      <view class="image-con" bindtap="previewImage" id="{{recovery.picUrls[4]}}">
+        <image src='{{recovery.picUrls[4]}}'></image>
+      </view>
+      <view class="image-text">
+        <text>背面</text>
+      </view>
+    </view>
+    <view class="image-item">
+      <view class="image-con" bindtap="previewImage" id="{{recovery.picUrls[5]}}">
+        <image src='{{recovery.picUrls[5]}}'></image>
+      </view>
+      <view class="image-text">
+        <text>配件</text>
+      </view>
+    </view>
+    <view class="note">备注：请确保手表后背字母及数字拍摄清晰可见，配件包括手表，盒子，发票，钻卡等</view>
+  </view>
+  <view class="weui-cells__title status">功能状态</view>
+  <view class="status-info">{{recovery.functionStatus}}</view>
+  <view class="weui-cells__title status">处理意见</view>
+  <view class="status-info">{{recovery.applyResult}}</view>
+</view>

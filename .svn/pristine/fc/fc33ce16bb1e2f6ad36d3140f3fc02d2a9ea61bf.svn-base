@@ -1,0 +1,37 @@
+package com.wzlue.goods.service;
+
+import java.util.List;
+import java.util.Map;
+
+import com.wzlue.goods.entity.GoodsEntity;
+import com.wzlue.goods.entity.GoodsFootprintEntity;
+
+/**
+ * 商品足迹
+ * 
+ * @author wzlue
+ * @email wzlue.com
+ * @date 2018-07-30 15:03:21
+ */
+public interface GoodsFootprintService {
+	
+	GoodsFootprintEntity queryObject(Long id);
+	
+	List<GoodsFootprintEntity> queryList(Map<String, Object> map);
+	
+	int queryTotal(Map<String, Object> map);
+	
+	void save(GoodsFootprintEntity goodsFootprint);
+	
+	void update(GoodsFootprintEntity goodsFootprint);
+	
+	void delete(Long id);
+	
+	void deleteBatch(Long[] ids);
+
+	void footprint(Long id, Long userId);
+	
+	List<GoodsEntity> getFootprintGoods(Map<String, Object> map);
+
+	void deleteByGoodsAndMember(Long goodsId, Long memberId);
+}

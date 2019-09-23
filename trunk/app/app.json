@@ -1,0 +1,79 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/auth/index",
+    "pages/category/index",
+    "pages/recovery/cricle/index",
+    "pages/recovery/cricle-detail/index",
+    "pages/shop-cart/index",
+    "pages/my/index",
+    "pages/goods/goods-detail/index",
+    "pages/pay/index",
+    "pages/member/address/address-add/index",
+    "pages/member/address/address-list/index",
+    "pages/order/order-list/index",
+    "pages/order/order-detail/index",
+    "pages/order/after-sale/index",
+    "pages/order/apply-afterSale/index",
+    "pages/order/wuliu/index",
+    "pages/order/after-record/index",
+    "pages/member/user/index",
+    "pages/member/jifen/index",
+    "pages/member/invoice/index",
+    "pages/member/message/index",
+    "pages/member/save/index",
+    "pages/member/tracks/index",
+    "pages/recovery/apply/index",
+    "pages/index/search/index",
+    "pages/makeapp/index",
+    "pages/goods/goods-list/index",
+    "pages/company/about/index",
+    "pages/company/cooperation/index",
+    "pages/goods/goods-poster/index"
+  ],
+  "permission": {
+    "scope.userLocation": {
+      "desc": "你的位置信息将用于小程序位置接口的效果展示"
+    }
+  },
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#21C5B4",
+    "navigationBarTitleText": "南京三味鱼文化传媒",
+    "navigationBarTextStyle": "white"
+  },
+  "tabBar": {
+    "color": "#BDBDBD",
+    "selectedColor": "#21C5B4",
+    "backgroundColor": "#fff",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "img/home.png",
+        "selectedIconPath": "img/home_sel.png"
+      },
+      {
+        "pagePath": "pages/category/index",
+        "text": "分类",
+        "iconPath": "img/category.png",
+        "selectedIconPath": "img/category_sel.png"
+      },
+      {
+        "pagePath": "pages/shop-cart/index",
+        "text": "购物车",
+        "iconPath": "img/cart.png",
+        "selectedIconPath": "img/cart_sel.png"
+      },
+      {
+        "pagePath": "pages/my/index",
+        "text": "我的",
+        "iconPath": "img/my.png",
+        "selectedIconPath": "img/my_sel.png"
+      }
+    ]
+  },
+  "debug": true,
+  "sitemapLocation": "sitemap.json"
+}

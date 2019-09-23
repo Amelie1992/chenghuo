@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wzlue.order.dao.OrderGoodsDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+	<resultMap type="com.wzlue.order.entity.OrderGoodsEntity" id="orderGoodsMap">
+		<result property="id" column="id" />
+		<result property="orderNumber" column="order_number" />
+		<result property="goodsId" column="goods_id" />
+		<result property="goodsName" column="goods_name" />
+		<result property="picUrl" column="pic_url" />
+		<result property="buyNum" column="buy_num" />
+		<result property="price" column="price" />
+		<result property="costPrice" column="cost_price" />
+		<result property="vipPrice" column="vip_price" />
+		<result property="specId" column="spec_id" />
+		<result property="specIdTwo" column="spec_id_two" />
+		<result property="specName" column="spec_name" />
+		<result property="specNameTwo" column="spec_name_two" />
+		<result property="goodsSpecId" column="goods_Spec_id" />
+
+
+	</resultMap>
+
+<!--申请售后的订单商品详情-->
+	<resultMap type="com.wzlue.order.entity.OrderGoodsEntity" id="orderGoodsMapTwo">
+		<result property="id" column="id" />
+		<result property="orderNumber" column="order_number" />
+		<result property="goodsId" column="goods_id" />
+		<result property="goodsName" column="goods_name" />
+		<result property="picUrl" column="pic_url" />
+		<result property="buyNum" column="buy_num" />
+		<result property="price" column="price" />
+		<result property="costPrice" column="cost_price" />
+		<result property="vipPrice" column="vip_price" />
+		<result property="specId" column="spec_id" />
+		<result property="specIdTwo" column="spec_id_two" />
+		<result property="specName" column="spec_name" />
+		<result property="specNameTwo" column="spec_name_two" />
+		<association property="orderEntity" javaType="com.wzlue.order.entity.OrderEntity">
+			<result property="id" column="id" />
+			<result property="orderNumber" column="order_number" />
+			<result property="orderType" column="order_type" />
+			<result property="memberId" column="member_id" />
+			<result property="status" column="status" />
+			<result property="payType" column="pay_type" />
+			<result property="logisticsAmount" column="logistics_amount" />
+			<result property="productAmount" column="product_amount" />
+			<result property="paymentAmount" column="payment_amount" />
+			<result property="wechatAmount" column="wechat_amount" />
+			<result property="ramarks" column="ramarks" />
+			<result property="createTime" column="create_time" />
+			<result property="delFlag" column="del_flag" />
+			<result property="payTime" column="pay_time" />
+			<result property="deliveryTime" column="delivery_time" />
+			<result property="confirmTime" column="confirm_time" />
+			<result property="transactionId" column="transaction_id" />
+			<result property="timeEnd" column="time_end" />
+			<result property="useIntegral" column="use_integral" />
+		</association>
+	</resultMap>
+<!--售后订单商品详情-->
+	<select id="queryListOrderGood" resultMap="orderGoodsMapTwo">
+		SELECT * FROM o_order_goods goods LEFT JOIN o_order o ON goods.order_number=o.order_number
+		<where>
+			<if test="goodsId!=null and goodsId!=''">
+				AND goods.goods_id = #{goodsId}
+			</if>
+			<if test="orderNumber!=null and orderNumber!=''">
+				and goods.order_number=#{orderNumber}
+			</if>
+			<if test="memberId!=null and memberId!=''">
+				and o.member_id=#{memberId}
+			</if>
+		</where>
+	</select>
+
+	<select id="queryObject" resultType="com.wzlue.order.entity.OrderGoodsEntity">
+		SELECT * FROM o_order_goods
+		WHERE id = #{value}
+	</select>
+
+	<select id="queryByOrderNumber" resultType="com.wzlue.order.entity.OrderGoodsEntity">
+		SELECT * FROM
+		o_order_goods where order_number = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.wzlue.order.entity.OrderGoodsEntity">
+		SELECT * FROM o_order_goods
+		<where>
+			<if test="orderNumber != null">
+				order_number = #{orderNumber}
+			</if>
+		</where>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				ORDER BY ${sidx} ${order}
+			</when>
+			<otherwise>
+				ORDER BY id desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			LIMIT #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryTotal" resultType="int">
+		SELECT count(*) FROM
+		o_order_goods
+	</select>
+
+	<select id="buyNumOrder" resultType="int">
+		SELECT sum(buy_num) FROM
+		o_order_goods
+	   where order_number = #{orderNumber}
+	</select>
+
+	<insert id="save" parameterType="com.wzlue.order.entity.OrderGoodsEntity"
+		useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO o_order_goods
+		(
+		`order_number`,
+		`goods_id`,
+		`goods_name`,
+		`pic_url`,
+		`buy_num`,
+		`price`,
+		`vip_price`,
+		`cost_price`,
+		`spec_id`,
+		`spec_id_two`,
+		`spec_name`,
+		`spec_name_two`,
+		`goods_spec_id`
+		)
+		VALUES
+		(
+		#{orderNumber},
+		#{goodsId},
+		#{goodsName},
+		#{picUrl},
+		#{buyNum},
+		#{price},
+		#{vipPrice},
+		#{costPrice},
+		#{specId},
+		#{specIdTwo},
+		#{specName},
+		#{specNameTwo},
+		#{goodsSpecId}
+		)
+	</insert>
+
+	<update id="update" parameterType="com.wzlue.order.entity.OrderGoodsEntity">
+		UPDATE o_order_goods
+		<set>
+			<if test="orderNumber != null">`order_number` = #{orderNumber}, </if>
+			<if test="goodsId != null">`goods_id` = #{goodsId}, </if>
+			<if test="goodsName != null">`goods_name` = #{goodsName}, </if>
+			<if test="picUrl != null">`pic_url` = #{picUrl}, </if>
+			<if test="buyNum != null">`buy_num` = #{buyNum}, </if>
+			<if test="costPrice != null">`cost_price` = #{costPrice}, </if>
+			<if test="vipPrice != null">`vip_price` = #{vipPrice}, </if>
+			<if test="price != null">`price` = #{price},</if>
+			<if test="specId != null">`spec_id` = #{specId},</if>
+			<if test="specIdTwo != null">`spec_id_two` = #{specIdTwo},</if>
+			<if test="specName != null">`spec_name` = #{specName},</if>
+			<if test="specNameTwo != null">`spec_name_two` = #{specNameTwo},</if>
+			<if test="goodsSpecId != null">`goods_spec_id` = #{goodsSpecId}</if>
+
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<delete id="delete">
+		DELETE FROM o_order_goods WHERE id = #{value}
+	</delete>
+
+	<delete id="deleteBatch">
+		DELETE FROM o_order_goods WHERE id IN
+		<foreach item="id" collection="array" open="(" separator=","
+			close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

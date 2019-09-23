@@ -1,0 +1,102 @@
+.form-box {
+  width: 100%;
+  background-color: #fff;
+  margin-top: 20rpx;
+}
+
+.row-wrap {
+  width: 720rpx;
+  height: 88rpx;
+  line-height: 88rpx;
+  padding-left: 30rpx;
+  border-bottom: 1rpx solid #eee;
+  display: flex;
+  font-size: 28rpx;
+  /*justify-content: space-between;*/
+}
+
+.row-wrap .label {
+  width: 160rpx;
+  line-height: 140rpx;
+  color: #000;
+}
+
+.row-wrap .label-right {
+  flex: 1;
+  height: 88rpx;
+  line-height: 88rpx;
+}
+
+.row-wrap .label-right input {
+  height: 100%;
+  font-size: 28rpx;
+  padding-right: 30rpx;
+}
+
+.row-wrap .right-box {
+  margin-right: 30rpx;
+}
+
+.arrow-right {
+  width: 15rpx;
+  height: 24rpx;
+}
+
+.right-switch {
+  text-align: right;
+  padding-right: 30rpx;
+}
+
+.right-switch .userinfo-avatar {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  margin-top: 20rpx;
+}
+
+.order-item {
+  font-size: 28rpx;
+  width: 750rpx;
+  display: flex;
+  color: #333;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 24rpx 30rpx;
+  border-bottom: 1rpx solid #eee;
+}
+
+.right {
+  padding-right: 50rpx;
+  background: url(https://cdn.it120.cc/images/weappshop/arrow-right.png) no-repeat 710rpx center;
+  background-size: 20rpx auto, 750rpx auto;
+}
+
+.weui-cells {
+  font-size: 28rpx;
+  background-color: transparent;
+}
+
+.weui-label {
+  width: 120rpx;
+}
+
+.weui-vcode-btn {
+  font-size: 28rpx;
+  border: 0 none;
+}
+
+.getPhoneNumber {
+  background-color: #fff;
+  display: inline-block;
+  margin: 0;
+  padding-right: 0;
+  height: 45rpx;
+  line-height: 45rpx;
+  font-size: 28rpx;
+  color: #333;
+}
+
+button::after {
+  border: none;
+}

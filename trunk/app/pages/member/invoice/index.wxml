@@ -1,0 +1,45 @@
+<!--pages/invoice/index.wxml-->
+<view class="pages">
+<view class="line"></view>
+  <view class="weui-cells weui-cells_after-title">
+    <view class="weui-cell">
+      <view class="weui-cell__bd">发票类型</view>
+      <view class="weui-cell__ft">纸质发票</view>
+    </view>
+    <view class="weui-cell weui-cell_select">
+      <view class="weui-cell__hd weui-cell__hd_in-select-after">
+        <view class="weui-label">发票抬头类型</view>
+      </view>
+      <view class="weui-cell__bd">
+      <view class="weui-select weui-select_in-select-after"  bindtap="bindCountryChange" >{{countries[countryIndex]}}</view>
+        <!-- <picker bindchange="bindCountryChange" value="{{countryIndex}}" range="{{countries}}">
+          <view class="weui-select weui-select_in-select-after">{{countries[countryIndex]}}</view>
+        </picker> -->
+      </view>
+    </view>
+    <view wx:if="{{countryIndex == 1}}" class="weui-cell weui-cell_input">
+      <view class="weui-cell__hd">
+        <view class="weui-label">发票抬头</view>
+      </view>
+      <view class="weui-cell__bd">
+        <input class="weui-input" disabled value="{{invoiceInfo.title}}" placeholder="请填写发票抬头" />
+      </view>
+    </view>
+    <view wx:if="{{countryIndex == 0}}" class="weui-cell weui-cell_input">
+      <view class="weui-cell__hd">
+        <view class="weui-label">发票抬头</view>
+      </view>
+      <view class="weui-cell__bd">
+        <input class="weui-input" value="{{invoiceInfo.title}}" disabled  placeholder="请填写企业名称" />
+      </view>
+    </view>
+    <view wx:if="{{countryIndex == 0}}" class="weui-cell weui-cell_input">
+      <view class="weui-cell__hd">
+        <view class="weui-label">税号</view>
+      </view>
+      <view class="weui-cell__bd">
+        <input class="weui-input" value="{{invoiceInfo.taxNumber}}" disabled  placeholder="请填写纳税人识别号" />
+      </view>
+    </view>
+  </view>
+</view>

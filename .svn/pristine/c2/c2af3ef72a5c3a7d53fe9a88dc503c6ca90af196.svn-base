@@ -1,0 +1,24 @@
+<!--pages/address-list/index.wxml-->
+<view class="container">
+
+   <view wx:if="{{addressList.length <=0}}" class="no-address">
+   <view><text class="iconfont icon-meiyoudizhi"></text></view>
+   <view><text class="text-con">您还没有收货地址哟~</text></view>
+   </view>
+    <view class="address-list" wx:else>
+        <view class="a-address"  wx:for-items="{{addressList}}" wx:key="{{index}}">
+             <view class="left-text {{item.defaultAddress? 'active':''}}" bindtap="selectTap" data-id="{{item.id}}">
+                 <view class="name-tel">
+                    {{item.userName}}  {{item.telNumber}}
+                 </view>
+                 <view class="address-box">
+                    {{item.street}}
+                 </view>     
+             </view>   
+             <view class="right-edit" bindtap="editAddess" data-id="{{item.id}}"></view> 
+        </view>
+    </view>
+    <view class="bottom-box">
+        <view class="add-btn" bindtap="addAddess" style="background:url('/img/addbtn.png') no-repeat left center;background-size:7%">新增收货地址</view>
+    </view>
+</view>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wzlue.order.dao.LogisticsDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.wzlue.order.entity.LogisticsEntity" id="logisticsMap">
+        <result property="id" column="id"/>
+        <result property="companyName" column="company_name"/>
+        <result property="companyCode" column="company_code"/>
+        <result property="url" column="url"/>
+        <result property="companyPhone" column="company_phone"/>
+        <result property="status" column="status"/>
+        <result property="usable" column="usable"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <select id="queryObject" resultType="com.wzlue.order.entity.LogisticsEntity">
+		SELECT * FROM o_logistics WHERE id = #{value}
+	</select>
+
+    <select id="queryList" resultType="com.wzlue.order.entity.LogisticsEntity">
+        SELECT * FROM o_logistics
+        <where>
+            1=1
+            <if test="companyName!=null and companyName!=''">
+                and company_name like concat('%', #{companyName}, '%')
+            </if>
+            <if test="status!=null and status!=''">
+                and status = #{status}
+            </if>
+        </where>
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                ORDER BY ${sidx} ${order}
+            </when>
+            <otherwise>
+                ORDER BY usable desc
+            </otherwise>
+        </choose>
+        <if test="offset != null and limit != null">
+            LIMIT #{offset}, #{limit}
+        </if>
+    </select>
+
+    <select id="queryTotal" resultType="int">
+		SELECT count(*) FROM o_logistics
+        <where>
+            1=1
+            <if test="companyName!=null and companyName!=''">
+                and company_name like concat('%', #{companyName}, '%')
+            </if>
+        </where>
+	</select>
+
+    <insert id="save" parameterType="com.wzlue.order.entity.LogisticsEntity" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO o_logistics
+		(
+																				`company_name`,
+																	`company_code`,
+																	`url`,
+																	`company_phone`,
+																	`status`,
+																	`usable`,
+																	`create_time`,
+																	`update_time`
+									)
+		VALUES
+		(
+																				#{companyName},
+																	#{companyCode},
+																	#{url},
+																	#{companyPhone},
+																	#{status},
+																	#{usable},
+																	now(),
+																	now()
+									)
+	</insert>
+
+    <update id="update" parameterType="com.wzlue.order.entity.LogisticsEntity">
+        UPDATE o_logistics
+        <set>
+            <if test="companyName != null">`company_name` = #{companyName},</if>
+            <if test="companyCode != null">`company_code` = #{companyCode},</if>
+            <if test="url != null">`url` = #{url},</if>
+            <if test="companyPhone != null">`company_phone` = #{companyPhone},</if>
+            <if test="status != null">`status` = #{status},</if>
+            <if test="usable != null">`usable` = #{usable},</if>
+            <if test="createTime != null">`create_time` = #{createTime},</if>
+            <if test="updateTime != null">`update_time` = #{updateTime}</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+		DELETE FROM o_logistics WHERE id = #{value}
+	</delete>
+
+    <delete id="deleteBatch">
+        DELETE FROM o_logistics WHERE id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

@@ -1,0 +1,150 @@
+$(function () {
+    //列表
+    $("#table").BT({
+        url: baseURL + 'integral/integralcardbatch/list',
+        columns: [
+            {checkbox: true},
+			{ title: '批次号', field: 'batchNumber'}, 			
+			{ title: '积分面值', field: 'integral'}, 			
+			{ title: '开卡数', field: 'number'}, 			
+			{ title: '创建时间', field: 'createTime'}, 			
+			{ title: '备注', field: 'remarks'}			
+        ],
+		//条件查询
+        queryParams:{}
+    });
+    //表单提交
+	$("form").FM({
+        fields : vm.fields,
+        success : vm.saveOrUpdate
+
+	})
+
+});
+
+var vm = new Vue({
+	el:'#rrapp',
+	data:{
+		showList: true,
+		title: null,
+		integralCardBatch: {},
+		//验证字段
+		fields :{
+																							batchNumber : {
+						message :'批次号验证失败',
+						validators: {
+							notEmpty: {
+								message: '批次号不能为空'
+							},
+						},
+					}, 																integral : {
+						message :'积分面值验证失败',
+						validators: {
+							notEmpty: {
+								message: '积分面值不能为空'
+							},
+						},
+					}, 																number : {
+						message :'开卡数验证失败',
+						validators: {
+							notEmpty: {
+								message: '开卡数不能为空'
+							},
+						},
+					}, 																createTime : {
+						message :'创建时间验证失败',
+						validators: {
+							notEmpty: {
+								message: '创建时间不能为空'
+							},
+						},
+					}, 																remarks : {
+						message :'备注验证失败',
+						validators: {
+							notEmpty: {
+								message: '备注不能为空'
+							},
+						},
+					}									}
+	},
+	methods: {
+		query: function () {
+			vm.reload();
+		},
+		add: function(){
+			vm.showList = false;
+			vm.title = "新增";
+			vm.integralCardBatch = {};
+		},
+		update: function (event) {
+           	var id = getSelectedRowId("id");
+			if(id == null){
+				return ;
+			}
+			vm.showList = false;
+            vm.title = "修改";
+            
+            vm.getInfo(id)
+		},
+		//表单验证
+        validate: function () {
+            var bl = $('form').VF();//启用验证
+            if (!bl) {
+                return;
+            }
+        },
+		saveOrUpdate: function (event) {
+			var url = vm.integralCardBatch.id == null ? "integral/integralcardbatch/save" : "integral/integralcardbatch/update";
+			$.ajax({
+				type: "POST",
+			    url: baseURL + url,
+                contentType: "application/json",
+			    data: JSON.stringify(vm.integralCardBatch),
+			    success: function(r){
+			    	if(r.code === 0){
+						alert('操作成功', function(index){
+							vm.reload();
+						});
+					}else{
+						alert(r.msg);
+					}
+				}
+			});
+		},
+		del: function (event) {
+			var ids = getSelectedRowsId("id");
+			if(ids == null){
+				return ;
+			}
+			
+			confirm('确定要删除选中的记录？', function(){
+				$.ajax({
+					type: "POST",
+				    url: baseURL + "integral/integralcardbatch/delete",
+                    contentType: "application/json",
+				    data: JSON.stringify(ids),
+				    success: function(r){
+						if(r.code == 0){
+							alert('操作成功', function(index){
+                                vm.reload();
+							});
+						}else{
+							alert(r.msg);
+						}
+					}
+				});
+			});
+		},
+		getInfo: function(id){
+			$.get(baseURL + "integral/integralcardbatch/info/"+id, function(r){
+                vm.integralCardBatch = r.integralCardBatch;
+            });
+		},
+		reload: function (event) {
+			vm.showList = true;
+			vm.title = "";
+			//刷新 如需条件查询common.js
+            $("#table").BTF5();
+		}
+	}
+});

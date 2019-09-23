@@ -1,0 +1,204 @@
+.top-content {
+  padding: 0 30rpx 30rpx 30rpx;
+  background: #fff;
+}
+
+.step-container .list {
+  list-style: none;
+  width: 33.4%;
+  font-size: 26rpx;
+  display: inline-table;
+  vertical-align: top;
+}
+
+.step-container .list .arrow {
+  display: block;
+  float: left;
+  height: 80rpx;
+  line-height: 80rpx;
+  width: 70%;
+  background: #ccc;
+  text-align: center;
+  padding: 0 10rpx 0 60rpx;
+  position: relative;
+  margin: 0 10rpx 0 0;
+  /* font-size: 20rpx; */
+  text-decoration: none;
+  color: #333;
+}
+
+.step-container .list .arrow:after {
+  content: "";
+  border-top: 40rpx solid transparent;
+  border-bottom: 40rpx solid transparent;
+  border-left: 40rpx solid #ccc;
+  position: absolute;
+  right: -38rpx;
+  top: 0;
+  z-index: 1;
+}
+
+.step-container .list .arrow:before {
+  content: "";
+  border-top: 40rpx solid transparent;
+  border-bottom: 40rpx solid transparent;
+  border-left: 40rpx solid #fff;
+  position: absolute;
+  left: 6rpx;
+  top: 0;
+}
+
+.step-container .list:first-child .arrow {
+  padding-left: 50rpx;
+  padding-right: 20rpx;
+}
+
+.step-container .list:first-child .arrow:before {
+  display: none;
+}
+
+.step-container .list:last-child .arrow {
+  padding-right: 20rpx;
+}
+
+.step-container .list:last-child .arrow:after {
+  display: none;
+}
+
+.step-container .list .arrow.active {
+  background: #306ba8;
+  color: #fff;
+}
+
+.step-container .list .arrow.active:after {
+  border-left: 40rpx solid #306ba8;
+}
+
+.recode-status {
+  margin-top: 30rpx;
+}
+
+.recode-status .iconfont {
+  color: #306ba8;
+  margin-right: 30rpx;
+  font-size: 40rpx;
+}
+
+.recode-status  .title {
+  font-size: 36rpx;
+  font-weight: 500;
+}
+
+.weui-cell-third {
+  background: #fff;
+}
+
+.sec-wrap {
+  width: 100%;
+  background-color: #fff;
+  margin-top: 20rpx;
+}
+
+.details-info {
+  position: relative;
+  width: 100%;
+  margin-top: 20rpx;
+  padding-top: 20rpx;
+  overflow: hidden;
+}
+
+.details-info .a-row {
+  display: flex;
+  margin-right: 30rpx;
+  margin-bottom: 25rpx;
+  position: relative;
+  z-index: 4;
+}
+
+.details-info .a-row .info {
+  font-size: 28rpx;
+  width: 560rpx;
+}
+
+.date-box {
+  font-size: 26rpx;
+  color: #999;
+}
+
+.col-orange {
+  color: orange;
+}
+
+.col-grey {
+  color: #999;
+}
+
+.info .text {
+  color: #000;
+  width: 660rpx;
+  line-height: 42rpx;
+  
+}
+
+.dot {
+  width: 30rpx;
+  height: 30rpx;
+  margin-right: 10rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.default-dot {
+  background: #ddd;
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 100%;
+}
+
+.active-dot {
+  border: 2rpx solid #fff;
+  width: 26rpx;
+  height: 26rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+}
+
+.active-dot .yuan-red {
+  background: orange;
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+}
+
+.line-box {
+  position: absolute;
+  bottom: 260rpx;
+  left: 14rpx;
+  background: #ddd;
+  width: 2rpx;
+  height: 100%;
+}
+.table{
+  margin-top: 10rpx;
+  border: 1rpx solid #eee;
+  border-bottom: 0 none;
+}
+.table view{
+  font-size: 26rpx;
+  line-height: 64rpx;
+  padding-left: 20rpx;
+  border-bottom: 1rpx solid #eee;
+}
+.text-width{
+  display: inline-block;
+  width: 120rpx;
+  color: #999;
+}
+.text.mb-10{
+  margin-bottom: 10rpx;
+}

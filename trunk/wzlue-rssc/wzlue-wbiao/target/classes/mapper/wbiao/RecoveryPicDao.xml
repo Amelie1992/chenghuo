@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wzlue.wbiao.dao.RecoveryPicDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+	<resultMap type="com.wzlue.wbiao.entity.RecoveryPicEntity"
+		id="recoveryPicMap">
+		<result property="id" column="id" />
+		<result property="recoveryId" column="recovery_id" />
+		<result property="picUrl" column="pic_url" />
+	</resultMap>
+
+	<select id="queryObject" resultType="com.wzlue.wbiao.entity.RecoveryPicEntity">
+		SELECT * FROM z_recovery_pic
+		WHERE id = #{value}
+	</select>
+	
+	<select id="queryByRecoveryId" resultType="string">
+		SELECT pic_url FROM z_recovery_pic
+		WHERE recovery_id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.wzlue.wbiao.entity.RecoveryPicEntity">
+		SELECT * FROM z_recovery_pic
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				ORDER BY ${sidx} ${order}
+			</when>
+			<otherwise>
+				ORDER BY id desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			LIMIT #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryTotal" resultType="int">
+		SELECT count(*) FROM
+		z_recovery_pic
+	</select>
+
+	<insert id="save" parameterType="com.wzlue.wbiao.entity.RecoveryPicEntity"
+		useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO z_recovery_pic
+		(
+		`recovery_id`,
+		`pic_url`
+		)
+		VALUES
+		(
+		#{recoveryId},
+		#{picUrl}
+		)
+	</insert>
+
+	<update id="update" parameterType="com.wzlue.wbiao.entity.RecoveryPicEntity">
+		UPDATE z_recovery_pic
+		<set>
+			<if test="recoveryId != null">`recovery_id` = #{recoveryId}, </if>
+			<if test="picUrl != null">`pic_url` = #{picUrl}</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<delete id="delete">
+		DELETE FROM z_recovery_pic WHERE id = #{value}
+	</delete>
+
+	<delete id="deleteBatch">
+		DELETE FROM z_recovery_pic WHERE id IN
+		<foreach item="id" collection="array" open="(" separator=","
+			close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

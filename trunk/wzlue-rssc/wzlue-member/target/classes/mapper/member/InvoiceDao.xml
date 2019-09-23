@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wzlue.member.dao.InvoiceDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.wzlue.member.entity.InvoiceEntity" id="invoiceMap">
+        <result property="id" column="id"/>
+        <result property="memberId" column="member_id"/>
+        <result property="invoiceType" column="invoice_type"/>
+        <result property="invoiceTitle" column="invoice_title"/>
+        <result property="taxNumber" column="tax_number"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.wzlue.member.entity.InvoiceEntity">
+		SELECT * FROM m_invoice WHERE id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.wzlue.member.entity.InvoiceEntity">
+		SELECT * FROM m_invoice
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                ORDER BY ${sidx} ${order}
+            </when>
+			<otherwise>
+                ORDER BY id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			LIMIT #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		SELECT count(*) FROM m_invoice
+	</select>
+	 
+	<insert id="save" parameterType="com.wzlue.member.entity.InvoiceEntity">
+		INSERT INTO m_invoice
+		(
+													`id`, 
+																	`member_id`, 
+																	`invoice_type`, 
+																	`invoice_title`, 
+																	`tax_number`
+									)
+		VALUES
+		(
+													#{id}, 
+																	#{memberId}, 
+																	#{invoiceType}, 
+																	#{invoiceTitle}, 
+																	#{taxNumber}
+									)
+	</insert>
+	 
+	<update id="update" parameterType="com.wzlue.member.entity.InvoiceEntity">
+		UPDATE m_invoice
+		<set>
+																				<if test="memberId != null">`member_id` = #{memberId}, </if>
+																	<if test="invoiceType != null">`invoice_type` = #{invoiceType}, </if>
+																	<if test="invoiceTitle != null">`invoice_title` = #{invoiceTitle}, </if>
+																	<if test="taxNumber != null">`tax_number` = #{taxNumber}</if>
+									</set>
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="delete">
+		DELETE FROM m_invoice WHERE id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		DELETE FROM m_invoice WHERE id IN
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

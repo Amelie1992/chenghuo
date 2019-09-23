@@ -1,0 +1,330 @@
+$(function () {
+    // 列表
+    $("#table").BT({
+        url: baseURL + 'order/orderrefund/list',
+        columns: [{
+            checkbox: true
+        }, {
+            title: '退款编号',
+            field: 'refundNumber',
+            formatter: function (value, row, index) {
+                return '<a onclick="vm.detail(' + row.id + ')">' + value + '</a>';
+            }
+        }, {
+            title: '订单编号',
+            field: 'orderNumber'
+        }, {
+            title: '类型',
+            field: 'type',
+            formatter: function (value, row, index) {
+                if (value == 1) {
+                    return '<span class="label label-primary">退款</span>';
+                } else if (value == 2) {
+                    return '<span class="label label-info">退货退款</span>';
+                }
+            }
+        }, {
+            title: '会员昵称',
+            field: 'nickName'
+        }, {
+            title: '退款金额',
+            field: 'refundAmount'
+        }, {
+            title: '退款说明',
+            field: 'explain',
+            /*formatter:function (value,row,index) {
+                if (value == 1) {
+                    return '拍错/不喜欢/效果不好';
+                } else if (value == 2) {
+                    return '材质与商品描叙不符';
+                } else if (value == 3) {
+                    return '大小尺寸与商品描叙不符';
+                }
+                return '';
+            }*/
+        }, {
+            title: '申请时间',
+            field: 'createTime'
+        }, {
+            title: '状态',
+            field: 'status',
+            formatter: function (value, row, index) {
+                if (value == 1) {
+                    return '<span class="label label-primary">待处理</span>';
+                } else if (value == 2) {
+                    return '<span class="label label-info">待取件</span>';
+                } else if (value == 3) {
+                    return '<span class="label label-success">已取件</span>';
+                } else if (value == 4) {
+                    return '<span class="label label-warning">已收件</span>';
+                } else if (value == 5) {
+                    return '<span class="label label-danger">退款成功</span>';
+                } else if (value == 6) {
+                    return '<span class="label label-default">退款失败</span>';
+                }
+                return '';
+            }
+        }, {
+            title: '处理时间',
+            field: 'processTime'
+        }],
+        // 条件查询
+        queryParams: {}
+    });
+    // 表单提交
+    $("form").FM({
+        fields: vm.fields,
+        success: vm.saveOrUpdate
+    })
+});
+
+var vm = new Vue({
+    el: '#rrapp',
+    data: {
+        showList: true,
+        disabled: true,
+        disabledAll: true,
+        wuLiu: false,//默认物流信息隐藏
+        title: null,
+        orderRefund: {
+            memberInfo: {},
+            picUrls: [],
+            orderLogistics: {}
+        },
+        logisticsCompanyList: [],//物流公司list
+        //类型
+        typeList: [
+            {'value': 1, 'label': '仅退款'},
+            {'value': 2, 'label': '退货退款'}
+        ],
+        //状态
+        statusList: [
+            {'value': 1, 'label': '待处理'},
+            {'value': 2, 'label': '待取件'},
+            {'value': 3, 'label': '已取件'},
+            {'value': 4, 'label': '商家已收件'},
+            {'value': 5, 'label': '退款成功'},
+            {'value': 6, 'label': '退款失败'}//(1待处理  2待取件  3已取件  4已收件  5退款成功  6退款失败)
+        ],
+        queryParams: {
+            type: '',
+            status: ''
+        },
+        // 验证字段
+        fields: {
+            orderNumber: {
+                message: '订单编号验证失败',
+                validators: {
+                    notEmpty: {
+                        message: '订单编号不能为空'
+                    },
+                },
+            },
+            refundNumber: {
+                message: '退款编号验证失败',
+                validators: {
+                    notEmpty: {
+                        message: '退款编号不能为空'
+                    },
+                },
+            },
+            memberId: {
+                message: '会员id验证失败',
+                validators: {
+                    notEmpty: {
+                        message: '会员id不能为空'
+                    },
+                },
+            },
+            refundAmount: {
+                message: '退款金额验证失败',
+                validators: {
+                    notEmpty: {
+                        message: '退款金额不能为空'
+                    },
+                },
+            },
+            createTime: {
+                message: '申请时间验证失败',
+                validators: {
+                    notEmpty: {
+                        message: '申请时间不能为空'
+                    },
+                },
+            },
+            processTime: {
+                message: '处理时间验证失败',
+                validators: {
+                    notEmpty: {
+                        message: '处理时间不能为空'
+                    },
+                },
+            }
+        }
+    },
+    methods: {
+        query: function () {
+            vm.reload();
+        },
+        queryWuLiu: function () {
+            var companyId = vm.orderRefund.orderLogistics.companyId;
+            var nu = vm.orderRefund.orderLogistics.logisticsNumber;
+            $.get(baseURL + "order/orderrefund/queryLogistics", {companyId: companyId, nu: nu}, function (r) {
+                vm.wuLiu = true;
+                vm.reload();
+            });
+        },
+        queryWuLiu2: function () {
+            /*var companyId = vm.orderRefund.orderLogistics.companyId;
+            var nu = vm.orderRefund.orderLogistics.logisticsNumber;
+*/
+            var companyId = "shentong";
+            var nu = "3716648293516";
+            window.location.href = "https://www.kuaidi100.com/chaxun?"+"com="+companyId+"&nu="+nu;
+        },
+        add: function () {
+            vm.showList = false;
+            vm.title = "新增";
+            vm.orderRefund = {
+                orderLogistics: {
+                    companyId: ''
+                }
+            };
+        },
+        detail: function (id) {
+            vm.showList = false;
+            vm.title = "详情";
+
+            vm.getInfo(id)
+        },
+        update: function (event) {
+            var id = getSelectedRowId("id");
+            if (id == null) {
+                return;
+            }
+            vm.showList = false;
+            vm.title = "修改";
+            vm.getInfo(id)
+        },
+        // 表单验证
+        validate: function () {
+            var bl = $('form').VF();// 启用验证
+            if (!bl) {
+                return;
+            }
+        },
+        saveOrUpdate: function (event) {
+            var url = vm.orderRefund.id == null ? "order/orderrefund/save"
+                : "order/orderrefund/update";
+            $.ajax({
+                type: "POST",
+                url: baseURL + url,
+                contentType: "application/json",
+                data: JSON.stringify(vm.orderRefund),
+                success: function (r) {
+                    if (r.code === 0) {
+                        alert('操作成功', function (index) {
+                            vm.reload();
+                        });
+                    } else {
+                        alert(r.msg);
+                    }
+                }
+            });
+        },
+        del: function (event) {
+            var ids = getSelectedRowsId("id");
+            if (ids == null) {
+                return;
+            }
+
+            confirm('确定要删除选中的记录？', function () {
+                $.ajax({
+                    type: "POST",
+                    url: baseURL + "order/orderrefund/delete",
+                    contentType: "application/json",
+                    data: JSON.stringify(ids),
+                    success: function (r) {
+                        if (r.code == 0) {
+                            alert('操作成功', function (index) {
+                                vm.reload();
+                            });
+                        } else {
+                            alert(r.msg);
+                        }
+                    }
+                });
+            });
+        },
+        getInfo: function (id) {
+            $.get(baseURL + "order/orderrefund/info/" + id, function (r) {
+                vm.orderRefund = r.orderRefund;
+                vm.orderRefund.picUrls = r.orderRefund.picUrls;//图片凭证
+            });
+        },
+        //发货
+        sendGoods: function () {
+            var companyName = $("#logisticsCompany").find("option:selected").text();
+            var companyId = $("#logisticsCompany").find("option:selected").val();
+            if (companyId == "" || companyId == null) {
+                alert("请选择物流公司");
+                return false;
+            }
+            var logisticsNumber = vm.orderRefund.orderLogistics.logisticsNumber;
+            if (logisticsNumber == "") {
+                alert("请填写物流单号");
+                return false;
+            }
+            $.get(baseURL + "order/orderrefund/sendGoods", {
+                companyId: companyId,
+                companyName: companyName,
+                logisticsNumber: logisticsNumber,
+                refundNumber: vm.orderRefund.refundNumber
+            }, function (r) {
+                vm.reload();
+            });
+        },
+
+        reload: function (event) {
+            vm.showList = true;
+            vm.title = "";
+            // 刷新 如需条件查询common.js
+            $("#table").BTF5(vm.queryParams);
+            $("form").RF();
+        },
+        //同意退款
+        refundOk: function () {
+            var id = vm.orderRefund.id;
+            var remarks = vm.orderRefund.remarks;
+            $.get(baseURL + "order/orderrefund/handle", {id: id, remarks: remarks, status: 5}, function (r) {
+                vm.reload();
+            });
+        },
+        //拒绝退款
+        refundError: function () {
+            var id = vm.orderRefund.id;
+            var remarks = vm.orderRefund.remarks;
+            $.get(baseURL + "order/orderrefund/handle", {id: id, remarks: remarks, status: 6}, function (r) {
+                vm.reload();
+            });
+        },
+        //确认收到退货4---退款5
+        refundReceipt: function () {
+            var id = vm.orderRefund.id;
+            var expressFee = vm.orderRefund.expressFee;
+            $.get(baseURL + "order/orderrefund/refundReceipt", {id: id, status: 4,expressFee:expressFee}, function (r) {
+                vm.reload();
+            });
+        },
+        //查询物流公司（status=1）
+        getLogisticsCompany: function () {
+            $.get(baseURL + "order/logistics/list2?status=" + 1, function (r) {
+                vm.logisticsCompanyList = r.logisticsList;
+            });
+        },
+    },
+    created: function () {
+        //初始化物流公司
+        this.getLogisticsCompany();
+    }
+});

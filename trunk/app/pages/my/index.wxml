@@ -1,0 +1,109 @@
+<view class="page">
+  <image src='/img/topbc.png' class='topimg'></image>
+  <view class="userinfo">
+    <view class="info-con">
+    <view class='imgName'>
+      <image wx:if="{{userInfo && userInfo.avatarUrl}}" class="userinfo-avatar" src="{{ userInfo.avatarUrl }}" background-size="cover" bindtap="toUser"></image>
+      <image wx:else class="userinfo-avatar" src="/img/user.png" background-size="cover" bindtap="toUser"></image>
+      <text class="userinfo-nickname">{{ userInfo.nickName }}</text>
+      <navigator class='qiandaoimg'hover-class="navigator-hover" url="/pages/member/jifen/index" style="width:83px;background-image: url('/img/qiandao.png');right:4%;position:absolute">签到领积分</navigator>
+    </view>
+      <view class='info-about'>
+        <view class="user-save">
+          <view class="save">
+          <navigator url="/pages/member/save/index">
+            <text>{{ saveNum }}</text>
+            </navigator>
+            <navigator url="/pages/member/save/index"  hover-class="navigator-hover">收藏</navigator>
+          </view>
+          <view class="save">
+          <navigator url="/pages/member/tracks/index">
+            <text>{{ footNum }}</text>
+            </navigator>
+            <navigator url="/pages/member/tracks/index" hover-class="navigator-hover">足迹</navigator>
+          </view>
+          <view class="save">
+          <navigator url="/pages/member/jifen/index">
+            <text>{{ userInfo.integral }}</text></navigator>
+            <navigator url="/pages/member/jifen/index" hover-class="navigator-hover">积分</navigator>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+  <view class="my-line"></view>
+  <view class="my-item-bg">
+    <navigator url="/pages/order/order-list/index" hover-class="navigator-hover">
+      <text>我的订单</text>
+      <view class="more">查看更多订单
+        <text class="iconfont icon-arrow-r"></text>
+      </view>
+    </navigator>
+  </view>
+  <view class="order-list">
+    <view class="order-item" bindtap="toDaifu" data-id="2">
+      <view class="iconfont icon-order">
+        <image src="/img/daifukuan.png" class="daifuimg"></image>
+        <view class="weui-badge  pos" style='border:1px solid rgb(33,197,180);color:rgb(33,197,180)'>{{orderNumber.pendingPayment?orderNumber.pendingPayment:0}}</view>
+      </view>
+      <text>待付款</text>
+    </view>
+    <view class="order-item" bindtap="toDaifu" data-id="3">
+      <view class="iconfont icon-order">
+        <image src="/img/daifahuo.png" class="daifuimg"></image>
+        <view class="weui-badge pos" style='border:1px solid rgb(33,197,180);color:rgb(33,197,180)'>{{orderNumber.pendingDelivery?orderNumber.pendingDelivery:0}}</view>
+      </view>
+      <text>待发货</text>
+    </view>
+    <view class="order-item" bindtap="toDaifu" data-id="4">
+      <view class="iconfont icon-order">
+        <image src="/img/daishouhuo.png" class="daifuimg"></image>
+        <view class="weui-badge  pos" style='border:1px solid rgb(33,197,180);color:rgb(33,197,180)'>{{orderNumber.pendingReceive?orderNumber.pendingReceive:0}}</view>
+      </view>
+      <text>待收货</text>
+    </view>
+    <view class="order-item" bindtap="toDaifu" data-id="5">
+      <view class="iconfont icon-order">
+        <image src="/img/tuikuan.png" class="daifuimg"></image>
+        <view class="weui-badge  pos" style='border:1px solid rgb(33,197,180);color:rgb(33,197,180)'>{{orderNumber.refund?orderNumber.refund:0}}</view>
+      </view>
+      <text>退款</text>
+    </view>
+  </view>
+  <view class="weui-cell weui-cell_access cell-contact">
+    <view class="weui-cell__bd">
+      <button class="weui-button" open-type="contact" plain type="default">联系客服</button>
+    </view>
+    <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+  </view>
+  <navigator url="/pages/member/address/address-list/index" class="weui-cell weui-cell_access pr0" hover-class="weui-cell_active">
+    <view class="weui-cell__bd">收货地址</view>
+    <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+  </navigator>
+  <navigator url="/pages/member/jifen/index" class="weui-cell weui-cell_access pr0" hover-class="navigator-hover">
+    <view class="weui-cell__bd">积分中心</view>
+    <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+  </navigator>
+  <view class="my-line"></view>
+    <!-- 为您推荐 -->
+  <view class='hot-goods'>
+    <view class='head-hair'>
+      <view class='line'></view>
+      <text>会员精选</text>
+      <view class='line'></view>
+    </view>
+    <!-- 商品列表 -->
+    <view class='hot-con clear'>
+      <block wx:for="{{goodsListTj}}" wx:key="{{index}}">
+        <navigator hover-class="none" class='box' url="/pages/goods/goods-detail/index?id={{item.id}}">
+          <image class='good-img' mode='aspectFill' src='{{item.picUrl}}'></image>
+          <view class='title'>
+            <text class='brand ellipsis'>{{item.brand.brandName}} {{item.goodsName}}</text>
+            <text class='series ellipsis'>{{item.synopsis}}</text>
+            <text class='price'>￥{{item.payPrice}}</text>
+          </view>
+        </navigator>
+      </block>
+    </view>
+  </view>
+</view>

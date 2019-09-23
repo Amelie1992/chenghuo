@@ -1,0 +1,139 @@
+package com.wzlue.order.entity;
+
+import java.io.Serializable;
+import java.util.Date;
+
+
+/**
+ * 物流公司
+ *
+ * @author wzlue
+ * @email wzlue.com
+ * @date 2019-07-11 11:23:04
+ */
+public class LogisticsEntity implements Serializable {
+	private static final long serialVersionUID = 1L;
+
+	//主键
+	private Long id;
+	//公司名称
+	private String companyName;
+	//物流公司编码
+	private String companyCode;
+	//网址
+	private String url;
+	//物流电话
+	private String companyPhone;
+	//是否禁用
+	private Integer status;
+	private int usable;
+	//创建时间
+	private Date createTime;
+	//更新时间
+	private Date updateTime;
+
+	public int getUsable() {
+		return usable;
+	}
+
+	public void setUsable(int usable) {
+		this.usable = usable;
+	}
+
+	/**
+	 * 设置：主键
+	 */
+	public void setId(Long id) {
+		this.id = id;
+	}
+	/**
+	 * 获取：主键
+	 */
+	public Long getId() {
+		return id;
+	}
+	/**
+	 * 设置：公司名称
+	 */
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
+	}
+	/**
+	 * 获取：公司名称
+	 */
+	public String getCompanyName() {
+		return companyName;
+	}
+	/**
+	 * 设置：物流公司编码
+	 */
+	public void setCompanyCode(String companyCode) {
+		this.companyCode = companyCode;
+	}
+	/**
+	 * 获取：物流公司编码
+	 */
+	public String getCompanyCode() {
+		return companyCode;
+	}
+	/**
+	 * 设置：网址
+	 */
+	public void setUrl(String url) {
+		this.url = url;
+	}
+	/**
+	 * 获取：网址
+	 */
+	public String getUrl() {
+		return url;
+	}
+	/**
+	 * 设置：物流电话
+	 */
+	public void setCompanyPhone(String companyPhone) {
+		this.companyPhone = companyPhone;
+	}
+	/**
+	 * 获取：物流电话
+	 */
+	public String getCompanyPhone() {
+		return companyPhone;
+	}
+	/**
+	 * 设置：
+	 */
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+	/**
+	 * 获取：
+	 */
+	public Integer getStatus() {
+		return status;
+	}
+	/**
+	 * 设置：创建时间
+	 */
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
+	/**
+	 * 获取：创建时间
+	 */
+	public Date getCreateTime() {
+		return createTime;
+	}
+	/**
+	 * 设置：更新时间
+	 */
+	public void setUpdateTime(Date updateTime) {
+		this.updateTime = updateTime;
+	}
+	/**
+	 * 获取：更新时间
+	 */
+	public Date getUpdateTime() {
+		return updateTime;
+	}
+}

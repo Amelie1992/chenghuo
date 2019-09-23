@@ -1,0 +1,497 @@
+package com.wzlue.goods.entity;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
+
+
+/**
+ * 商品
+ * 
+ * @author wzlue
+ * @email wzlue.com
+ * @date 2018-07-25 19:59:39
+ */
+public class GoodsEntity implements Serializable {
+	private static final long serialVersionUID = 1L;
+	
+	//主键
+	private Long id;
+	//商品名称
+	private String goodsName;
+	//商品关键字
+	private String keywords;
+	//商品分类id
+	private Long categoryId;
+	//店铺id
+	private Long shopId;
+	//商品原价(非会员价)
+	private BigDecimal price;
+	//会员价
+	private BigDecimal vipPrice;
+	//图片
+	private String picUrl;
+	//库存量
+	private Long stock;
+	//库存警告
+	private Long warningStock;
+	//状态 0：下架，1：上架
+	private Integer status;
+	//排序
+	private Long sort;
+	//描述
+	private String description;
+	//创建人
+	private Long createBy;
+	//创建时间
+	private Date createTime;
+	//修改人
+	private Long updateBy;
+	//修改时间
+	private Date updateTime;
+	//品牌id
+	private Long brandId;
+	//实际交易价格
+	private BigDecimal payPrice;
+	//是否充值卡
+	private int isCard;
+	//图片
+	private String[] picUrls;
+	//分类
+	private CategoryEntity category;
+    //规格总览
+
+	public List<GoodsSpecEntity> getSpecEntity() {
+		return specEntity;
+	}
+
+	public void setSpecEntity(List<GoodsSpecEntity> specEntity) {
+		this.specEntity = specEntity;
+	}
+
+	private List<SpecEntity> specList;
+	//规格详情
+	private List<GoodsSpecEntity> specEntity;
+	//supplier  supplier_contact unit_cost item_no
+	//供货商名称
+	private String supplier;
+	//供货商联系方式
+	private String supplierContact;
+	//成本单价
+	private String unitCost;
+	//货号
+	private String itemNo;
+
+	public String getSupplier() {
+		return supplier;
+	}
+
+	public void setSupplier(String supplier) {
+		this.supplier = supplier;
+	}
+
+	public String getSupplierContact() {
+		return supplierContact;
+	}
+
+	public void setSupplierContact(String supplierContact) {
+		this.supplierContact = supplierContact;
+	}
+
+	public String getUnitCost() {
+		return unitCost;
+	}
+
+	public void setUnitCost(String unitCost) {
+		this.unitCost = unitCost;
+	}
+
+	public String getItemNo() {
+		return itemNo;
+	}
+
+	public void setItemNo(String itemNo) {
+		this.itemNo = itemNo;
+	}
+
+
+	private List<TagEntity> tagList;
+	
+	private BrandEntity brand;
+	
+	private Integer sign;
+	
+	//简介
+	private String synopsis;
+	
+	private Integer salesNum;
+	
+	private List<GoodsPropertyEntity> goodsPropertyList;
+	
+	private Boolean collection = false;
+	
+	private Long freightTemplateId;
+	
+	private FreightTemplateEntity freightTemplate;
+
+	//价格区间
+	private String priceSection;
+
+	//发货地址id
+	private Long addressId;
+
+	private MerchantAddressEntity merchantAddressEntity;
+
+	public MerchantAddressEntity getMerchantAddressEntity() {
+		return merchantAddressEntity;
+	}
+
+	public void setMerchantAddressEntity(MerchantAddressEntity merchantAddressEntity) {
+		this.merchantAddressEntity = merchantAddressEntity;
+	}
+
+	//发货地址
+	private List<MerchantAddressEntity> merchantAddress;
+
+	public int getIsCard() {
+		return isCard;
+	}
+
+	public void setIsCard(int isCard) {
+		this.isCard = isCard;
+	}
+
+	public BigDecimal getVipPrice() {
+		return vipPrice;
+	}
+
+	public void setVipPrice(BigDecimal vipPrice) {
+		this.vipPrice = vipPrice;
+	}
+
+	public List<MerchantAddressEntity> getMerchantAddress() {
+		return merchantAddress;
+	}
+
+	public void setMerchantAddress(List<MerchantAddressEntity> merchantAddress) {
+		this.merchantAddress = merchantAddress;
+	}
+
+	public Long getAddressId() {
+		return addressId;
+	}
+
+	public void setAddressId(Long addressId) {
+		this.addressId = addressId;
+	}
+
+	public String getPriceSection() {
+		return priceSection;
+	}
+
+	public void setPriceSection(String priceSection) {
+		this.priceSection = priceSection;
+	}
+
+	public BigDecimal getPayPrice() {
+		return payPrice;
+	}
+
+	public void setPayPrice(BigDecimal payPrice) {
+		this.payPrice = payPrice;
+	}
+
+	/**
+	 * 设置：主键
+	 */
+	public void setId(Long id) {
+		this.id = id;
+	}
+	/**
+	 * 获取：主键
+	 */
+	public Long getId() {
+		return id;
+	}
+	/**
+	 * 设置：商品名称
+	 */
+	public void setGoodsName(String goodsName) {
+		this.goodsName = goodsName;
+	}
+	/**
+	 * 获取：商品名称
+	 */
+	public String getGoodsName() {
+		return goodsName;
+	}
+	/**
+	 * 设置：商品关键字
+	 */
+	public void setKeywords(String keywords) {
+		this.keywords = keywords;
+	}
+	/**
+	 * 获取：商品关键字
+	 */
+	public String getKeywords() {
+		return keywords;
+	}
+	/**
+	 * 设置：商品分类id
+	 */
+	public void setCategoryId(Long categoryId) {
+		this.categoryId = categoryId;
+	}
+	/**
+	 * 获取：商品分类id
+	 */
+	public Long getCategoryId() {
+		return categoryId;
+	}
+	/**
+	 * 设置：店铺id
+	 */
+	public void setShopId(Long shopId) {
+		this.shopId = shopId;
+	}
+	/**
+	 * 获取：店铺id
+	 */
+	public Long getShopId() {
+		return shopId;
+	}
+	/**
+	 * 设置：商品原价
+	 */
+	public void setPrice(BigDecimal price) {
+		this.price = price;
+	}
+	/**
+	 * 获取：商品原价
+	 */
+	public BigDecimal getPrice() {
+		return price;
+	}
+	/**
+	 * 设置：图片
+	 */
+	public void setPicUrl(String picUrl) {
+		this.picUrl = picUrl;
+	}
+	/**
+	 * 获取：图片
+	 */
+	public String getPicUrl() {
+		return picUrl;
+	}
+	/**
+	 * 设置：库存量
+	 */
+	public void setStock(Long stock) {
+		this.stock = stock;
+	}
+	/**
+	 * 获取：库存量
+	 */
+	public Long getStock() {
+		return stock;
+	}
+	/**
+	 * 设置：库存警告
+	 */
+	public void setWarningStock(Long warningStock) {
+		this.warningStock = warningStock;
+	}
+	/**
+	 * 获取：库存警告
+	 */
+	public Long getWarningStock() {
+		return warningStock;
+	}
+	/**
+	 * 设置：状态 0：下架，1：上架
+	 */
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+	/**
+	 * 获取：状态 0：下架，1：上架
+	 */
+	public Integer getStatus() {
+		return status;
+	}
+	/**
+	 * 设置：排序
+	 */
+	public void setSort(Long sort) {
+		this.sort = sort;
+	}
+	/**
+	 * 获取：排序
+	 */
+	public Long getSort() {
+		return sort;
+	}
+	/**
+	 * 设置：描述
+	 */
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	/**
+	 * 获取：描述
+	 */
+	public String getDescription() {
+		return description;
+	}
+	/**
+	 * 设置：创建人
+	 */
+	public void setCreateBy(Long createBy) {
+		this.createBy = createBy;
+	}
+	/**
+	 * 获取：创建人
+	 */
+	public Long getCreateBy() {
+		return createBy;
+	}
+	/**
+	 * 设置：创建时间
+	 */
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
+	/**
+	 * 获取：创建时间
+	 */
+	public Date getCreateTime() {
+		return createTime;
+	}
+	/**
+	 * 设置：修改人
+	 */
+	public void setUpdateBy(Long updateBy) {
+		this.updateBy = updateBy;
+	}
+	/**
+	 * 获取：修改人
+	 */
+	public Long getUpdateBy() {
+		return updateBy;
+	}
+	/**
+	 * 设置：修改时间
+	 */
+	public void setUpdateTime(Date updateTime) {
+		this.updateTime = updateTime;
+	}
+	/**
+	 * 获取：修改时间
+	 */
+	public Date getUpdateTime() {
+		return updateTime;
+	}
+	
+	public Long getBrandId() {
+		return brandId;
+	}
+	public void setBrandId(Long brandId) {
+		this.brandId = brandId;
+	}
+	public String[] getPicUrls() {
+		return picUrls;
+	}
+	public void setPicUrls(String[] picUrls) {
+		this.picUrls = picUrls;
+	}
+	public List<SpecEntity> getSpecList() {
+		return specList;
+	}
+	public void setSpecList(List<SpecEntity> specList) {
+		this.specList = specList;
+	}
+
+	public CategoryEntity getCategory() {
+		return category;
+	}
+
+	public void setCategory(CategoryEntity category) {
+		this.category = category;
+	}
+
+	public BrandEntity getBrand() {
+		return brand;
+	}
+
+	public void setBrand(BrandEntity brand) {
+		this.brand = brand;
+	}
+
+	public Integer getSign() {
+		return sign;
+	}
+
+	public void setSign(Integer sign) {
+		this.sign = sign;
+	}
+
+	public String getSynopsis() {
+		return synopsis;
+	}
+
+	public void setSynopsis(String synopsis) {
+		this.synopsis = synopsis;
+	}
+
+	public List<GoodsPropertyEntity> getGoodsPropertyList() {
+		return goodsPropertyList;
+	}
+
+	public void setGoodsPropertyList(List<GoodsPropertyEntity> goodsPropertyList) {
+		this.goodsPropertyList = goodsPropertyList;
+	}
+
+	public Integer getSalesNum() {
+		return salesNum;
+	}
+
+	public void setSalesNum(Integer salesNum) {
+		this.salesNum = salesNum;
+	}
+
+	public Boolean getCollection() {
+		return collection;
+	}
+
+	public void setCollection(Boolean collection) {
+		this.collection = collection;
+	}
+
+	public List<TagEntity> getTagList() {
+		return tagList;
+	}
+
+	public void setTagList(List<TagEntity> tagList) {
+		this.tagList = tagList;
+	}
+
+	public Long getFreightTemplateId() {
+		return freightTemplateId;
+	}
+
+	public void setFreightTemplateId(Long freightTemplateId) {
+		this.freightTemplateId = freightTemplateId;
+	}
+
+	public FreightTemplateEntity getFreightTemplate() {
+		return freightTemplate;
+	}
+
+	public void setFreightTemplate(FreightTemplateEntity freightTemplate) {
+		this.freightTemplate = freightTemplate;
+	}
+	
+}

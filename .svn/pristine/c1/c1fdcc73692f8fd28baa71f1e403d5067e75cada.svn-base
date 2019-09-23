@@ -1,0 +1,41 @@
+<!--pages/save/index.wxml-->
+<view class="container">
+  <template is="{{items.length > 0 ? 'message-list' : 'no-message'}}" data="{{items}}"></template>
+</view>
+
+<template name="no-message">
+  <view class="title-box">
+    <view class="message-icon">
+      <text class="iconfont icon-meiyouneirong"></text>
+    </view>
+    <view>
+      <text>您还没有任何收藏哦~</text>
+    </view>
+    <view>
+      <text>赶紧去逛逛吧</text>
+    </view>
+    <view class="to-index-btn" bindtap="toIndex">
+      去逛逛
+    </view>
+  </view>
+</template>
+
+<template name="message-list">
+  <view class="touch-item {{item.isTouchMove ? 'touch-move-active' : ''}}" data-index="{{index}}" bindtouchstart="touchstart" bindtouchmove="touchmove" bindtap="toDetail" data-id="{{item.id}}" wx:for="{{items}}" wx:key="">
+    <view class="content">
+      <view class="icon">
+        <view class="icon-box">
+          <image src="{{item.picUrl}}"></image>
+        </view>
+      </view>
+      <view>
+        <view  class="message">{{item.goodsName}}</view>
+        <view class="price">
+          <text>￥{{item.payPrice}}</text>
+          <text class="goods-price">￥{{item.price}}</text>
+        </view>
+      </view>
+    </view>
+    <view class="del" catchtap="del" data-id="{{item.id}}" data-index="{{index}}">删除</view>
+  </view>
+</template>

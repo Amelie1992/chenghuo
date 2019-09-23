@@ -1,0 +1,263 @@
+.searchbar-result {
+  margin-top: 0;
+  font-size: 14px;
+}
+
+.searchbar-result:before {
+  display: none;
+}
+
+.weui-cell {
+  padding: 12px 15px 12px 35px;
+}
+
+.weui-search-bar__text {
+  vertical-align: top;
+}
+
+.weui-icon-search {
+  vertical-align: top;
+}
+
+/* banner swiper */
+
+.banner-wrap {
+  height: 350rpx;
+  padding: 0 20rpx 0 20rpx;
+}
+
+.swiper-wrap {
+  height: 350rpx;
+}
+
+.swiper-wrap image {
+  width: 100% !important;
+  height: 350rpx;
+  border-radius: 10rpx;
+}
+
+/* head-hair */
+
+.head-hair {
+  font-size: 30rpx;
+  color: #666;
+  padding: 20rpx 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.head-hair text {
+  padding: 20rpx;
+  flex: 1;
+  text-align: center;
+}
+
+.head-hair .line {
+  width: 10%;
+  height: 1rpx;
+  background-color: #999;
+}
+
+/* 精选 */
+
+.jx-goods {
+  background-color: #fff;
+}
+
+.jx-goods scroll-view {
+  white-space: nowrap;
+}
+
+.jx-goods .scroll-item {
+  display: inline-block;
+  padding-bottom: 20rpx;
+  margin-right: 20rpx;
+}
+
+.jx-goods .scroll-item:first-child {
+  margin-left: 45rpx;
+}
+
+.jx-goods .scroll-item:last-child {
+  margin-right: 45rpx;
+}
+
+.jx-goods .scroll-item image {
+  width: 260rpx;
+  height: 260rpx;
+}
+
+.jx-goods .scroll-item .info {
+  display: flex;
+  flex-direction: column;
+  max-width: 260rpx;
+}
+
+.jx-goods .scroll-item .brand {
+  font-size: 28rpx;
+  color: #666;
+  text-align: center;
+}
+
+.jx-goods .scroll-item .slogan {
+  font-size: 24rpx;
+  color: #999;
+  text-align: center;
+}
+
+/* 热卖商品 */
+
+.hot-goods {
+  background-color: #fff;
+}
+
+.hot-goods .hot-con {
+  padding: 0 32rpx;
+}
+
+.hot-goods .hot-con .box {
+  width: 48%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  float: left;
+  margin-right: 4%;
+  margin-bottom: 40rpx;
+}
+
+.hot-goods .hot-con .box:nth-child(2n) {
+  margin-right: 0;
+}
+
+.hot-goods .hot-con .box .good-img {
+  width: 320rpx;
+  height: 320rpx;
+  border-radius: 5rpx;
+}
+
+.hot-goods .hot-con .box .title {
+  padding-top: 15rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  text-align: center;
+}
+
+.hot-goods .hot-con .box .title .brand {
+  font-size: 28rpx;
+  color: #666;
+  width: 100%;
+}
+
+.hot-goods .hot-con .box .title .series {
+  font-size: 24rpx;
+  color: #999;
+  width: 100%;
+}
+
+.hot-goods .hot-con .box .title .price {
+  font-size: 26rpx;
+  color: #f40;
+}
+
+.weui-grids {
+  border: none;
+}
+
+.weui-grid {
+  border: none;
+}
+
+.weui-grid.category {
+  width: 25%;
+  padding: 20rpx 0rpx;
+}
+
+.company {
+  background: #fff;
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+  align-items: center;
+}
+
+.company-name {
+  font-size: 28rpx;
+  font-weight: bold;
+}
+
+.company-address {
+  font-size: 24rpx;
+  color: rgb(173, 171, 171);
+}
+
+.phone {
+  width: 30rpx;
+  height: 30rpx;
+}
+
+.landmark {
+  width: 20rpx;
+  height: 24rpx;
+  justify-content: center;
+  margin-right: 6rpx;
+  vertical-align: middle;
+}
+
+.hello {
+  color: #21c5b4;
+}
+
+.contact {
+  font-size: 24rpx;
+  color: #21c5b4;
+}
+
+.tel-phone {
+  text-align: center;
+}
+
+.banner-wrap {
+  background: #fff;
+}
+
+.weui-search-bar {
+  background: #fff;
+  border: none;
+}
+
+.weui-search-bar__label {
+  background: #f5f5f5;
+}
+
+.weui-footer {
+  padding: 30rpx;
+}
+
+.weui-footer view {
+  margin-bottom: 30rpx;
+}
+
+.weui-footer button {
+  border: 1rpx solid #21c5b4;
+  border-radius: 50rpx;
+  color: #21c5b4;
+  padding: 10rpx 20rpx 10rpx 20rpx;
+}
+
+.type-container {
+  background: #fff;
+  margin-bottom: 20rpx;
+}
+
+.weui-grid__icon {
+  width: 100rpx;
+  height: 100rpx;
+}
+
+.weui-grid__label {
+  color: #999;
+  font-size: 28rpx;
+  margin-top: 0;
+}

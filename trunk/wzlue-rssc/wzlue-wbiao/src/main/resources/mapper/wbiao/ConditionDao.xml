@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wzlue.wbiao.dao.ConditionDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.wzlue.wbiao.entity.ConditionEntity" id="conditionMap">
+        <result property="id" column="id"/>
+        <result property="conditionName" column="condition_name"/>
+        <result property="description" column="description"/>
+        <result property="sort" column="sort"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.wzlue.wbiao.entity.ConditionEntity">
+		SELECT * FROM z_condition WHERE id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.wzlue.wbiao.entity.ConditionEntity">
+		SELECT * FROM z_condition
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                ORDER BY ${sidx} ${order}
+            </when>
+			<otherwise>
+                ORDER BY id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			LIMIT #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		SELECT count(*) FROM z_condition
+	</select>
+	 
+	<insert id="save" parameterType="com.wzlue.wbiao.entity.ConditionEntity" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO z_condition
+		(
+																				`condition_name`, 
+																	`description`, 
+																	`sort`
+									)
+		VALUES
+		(
+																				#{conditionName}, 
+																	#{description}, 
+																	#{sort}
+									)
+	</insert>
+	 
+	<update id="update" parameterType="com.wzlue.wbiao.entity.ConditionEntity">
+		UPDATE z_condition
+		<set>
+																				<if test="conditionName != null">`condition_name` = #{conditionName}, </if>
+																	<if test="description != null">`description` = #{description}, </if>
+																	<if test="sort != null">`sort` = #{sort}</if>
+									</set>
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="delete">
+		DELETE FROM z_condition WHERE id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		DELETE FROM z_condition WHERE id IN
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

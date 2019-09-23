@@ -1,0 +1,65 @@
+<!--pages/jifen/index.wxml-->
+<view class="pages">
+  <view class="jifen">
+    <view class="title">
+      <view class="ruler">
+        <text bindtap="bindGuiGeTap">
+          <text class="iconfont icon-ask"></text>积分规则</text>
+      </view>
+      <view class="info">
+        <text class="iconfont icon-integral"></text>{{integral}}
+      </view>
+      <view class="sign">
+        <text class="button {{signInBtn?'red-btn':''}}" bindtap='signIn'>
+        <text class="iconfont icon-sign"></text>
+        <text wx:if="{{!signInBtn}}">签到</text>
+        <text wx:else>已签到</text>
+        </text>
+        <view class="bottom">签到送{{rule.signIn.get}}积分</view>
+      </view>
+    </view>
+  </view>
+  <view style="height:20rpx;background: #f4f5f9;width:100%;"></view>
+  <view class="weui-cell-group">
+    <view class="cell" wx:for-items="{{integralRecordList}}" wx:key="{{index}}">
+      <view class="cell-left">
+        <view>{{item.remarks}}</view>
+        <view>{{item.createTime}}</view>
+      </view>
+      <view class="cell-right" wx:if="{{item.integral >= 0}}">+{{item.integral}}</view>
+      <view class="cell-right" wx:if="{{item.integral < 0}}">{{item.integral}}</view>
+    </view>
+    <view class="loading-view">
+      <text wx:if="{{!noData}}">加载中，请稍候...</text>
+      <text wx:else class="no-data">没有更多内容了</text>
+    </view>
+  </view>
+</view>
+<view class="show-popup" hidden="{{hideShopPopup}}">
+  <view class="popup-mask" bindtap="closePopupTap"></view>
+  <view class="popup-contents">
+    <view class="pop-goods-info">
+      <view class="pop-title">积分规则</view>
+      <view class="pop-goods-des pop-title-top">
+        <view class="pop-goods-title left">积分获取方法</view>
+        <view class="pop-goods-title">获取规则</view>
+      </view>
+      <view class="pop-goods-des">
+        <view class="pop-goods-title left">购物积分奖励</view>
+        <view class="pop-goods-title">订单交易成功后可获得积分，{{rule.consume.lose}}元={{rule.consume.get}}积分</view>
+      </view>
+      <view class="pop-goods-des">
+        <view class="pop-goods-title left">签到积分奖励</view>
+        <view class="pop-goods-title">每日签到可获取{{rule.signIn.get}}积分，每日只可签到一次</view>
+      </view>
+      <view class="info-bot">
+        <view class="font-size">积分使用：</view>
+        <text class="font-size">积分可在购物时抵扣使用，{{rule.deduction.lose}}积分抵扣{{rule.deduction.get}}元。积分支付不得超过每笔订单结算金额的{{rule.deduction.upperLimit}}%。 </text>
+      </view>
+    </view>
+    <view class="popup-join-btn" bindtap="closePopupTap">
+      我知道了
+    </view>
+  </view>
+
+</view>

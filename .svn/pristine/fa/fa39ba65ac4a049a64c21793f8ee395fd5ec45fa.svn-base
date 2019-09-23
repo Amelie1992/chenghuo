@@ -1,0 +1,222 @@
+package com.wzlue.order.service.impl;
+
+import java.util.*;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.wzlue.common.utils.NumberUtils;
+import com.wzlue.goods.dao.GoodsDao;
+import com.wzlue.goods.entity.GoodsEntity;
+import com.wzlue.member.dao.IntegralRecordDao;
+import com.wzlue.member.dao.MemberInfoDao;
+import com.wzlue.member.entity.IntegralRecordEntity;
+import com.wzlue.member.entity.MemberInfoEntity;
+import com.wzlue.order.dao.OrderAddressDao;
+import com.wzlue.order.dao.OrderDao;
+import com.wzlue.order.dao.OrderGoodsDao;
+import com.wzlue.order.dao.OrderInvoiceDao;
+import com.wzlue.order.dao.OrderLogisticsDao;
+import com.wzlue.order.entity.OrderAddressEntity;
+import com.wzlue.order.entity.OrderEntity;
+import com.wzlue.order.entity.OrderGoodsEntity;
+import com.wzlue.order.entity.OrderLogisticsEntity;
+import com.wzlue.order.service.OrderService;
+
+
+
+@Service("orderService")
+public class OrderServiceImpl implements OrderService {
+	@Autowired
+	private OrderDao orderDao;
+	@Autowired
+	private OrderGoodsDao orderGoodsDao;
+	@Autowired
+	private OrderLogisticsDao orderLogisticsDao;
+	@Autowired
+	private OrderAddressDao orderAddressDao;
+	@Autowired
+	private OrderInvoiceDao orderInvoiceDao;
+	@Autowired
+	private IntegralRecordDao integralRecordDao;
+	@Autowired
+	private MemberInfoDao memberInfoDao;
+	@Autowired
+	private GoodsDao goodsDao;
+	
+	@Override
+	public OrderEntity queryObject(Long id){
+		OrderEntity order = orderDao.queryObject(id);
+		if(order.getStatus() == 3 || order.getStatus() == 4 || order.getStatus() == 5 || order.getStatus() == 6 || order.getStatus() == 7){
+			OrderLogisticsEntity orderLogistics = orderLogisticsDao.queryByOrderNumber(order.getOrderNumber());
+			order.setOrderLogistics(orderLogistics);
+		}
+		return order;
+	}
+	
+	@Override
+	public List<OrderEntity> queryList(Map<String, Object> map){
+		return orderDao.queryList(map);
+	}
+	
+	@Override
+	public int queryTotal(Map<String, Object> map){
+		return orderDao.queryTotal(map);
+	}
+	
+	@Override
+	public void save(OrderEntity order){
+		orderDao.save(order);
+	}
+	
+	@Override
+	public void update(OrderEntity order){
+		orderDao.update(order);
+	}
+	
+	@Override
+	public void delete(Long id){
+		orderDao.delete(id);
+	}
+	
+	@Override
+	public void deleteBatch(Long[] ids){
+		orderDao.deleteBatch(ids);
+	}
+
+	@Transactional
+	@Override
+	public void create(OrderEntity order) {
+		String orderNumber = NumberUtils.getOrderNumder();
+		order.setOrderNumber(orderNumber);
+		order.setOrderType("1");
+		orderDao.save(order);
+		List<OrderGoodsEntity> orderGoodsList = order.getOrderGoodsList();
+		for (OrderGoodsEntity orderGoods : orderGoodsList) {
+			orderGoods.setOrderNumber(orderNumber);
+			orderGoodsDao.save(orderGoods);
+		}
+		
+		OrderAddressEntity orderAddress = order.getOrderAddress();
+		orderAddress.setOrderNumber(orderNumber);
+		orderAddressDao.save(orderAddress);
+		
+		if(order.getOrderInvoice() != null){
+			orderInvoiceDao.save(order.getOrderInvoice());
+		}
+	}
+
+	@Override
+	public Map<String, Object> statistics(Long memberId) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("memberId", memberId);
+		map.put("status", 1); //待付款
+		Integer pendingPayment = orderDao.queryTotal(map);
+		
+		map.put("status", 2); //待发货
+		Integer pendingDelivery = orderDao.queryTotal(map);
+		
+		map.put("status", 3); //待发货
+		Integer pendingReceive = orderDao.queryTotal(map);
+		
+		map.put("status", 4); //退款
+		Integer refund = orderDao.queryTotal(map);
+		
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("pendingPayment", pendingPayment);
+		result.put("pendingDelivery", pendingDelivery);
+		result.put("pendingReceive", pendingReceive);
+		result.put("refund", refund);
+		return result;
+	}
+
+	@Override
+	public void sendGoods(String orderNumber, Long companyId, String companyName, String logisticsNumber) {
+		OrderEntity order = new OrderEntity();
+		order.setOrderNumber(orderNumber);
+		order.setStatus(3);//----3待收货
+		order.setDeliveryTime(new Date());//发货时间
+		GregorianCalendar cal=new GregorianCalendar();
+		cal.add(GregorianCalendar.DATE,10);
+		order.setConfirmTime(cal.getTime());//系统确认收货时间=发货时间+10
+		orderDao.updateByOrderNumber(order);//--根据订单号修改状态
+		OrderLogisticsEntity orderLogistics = new OrderLogisticsEntity();//-----订单物流
+		orderLogistics.setFlag(1);//发货订单物流
+		orderLogistics.setCompanyId(companyId);
+		orderLogistics.setCompanyName(companyName);
+		orderLogistics.setOrderNumber(orderNumber);
+		orderLogistics.setLogisticsNumber(logisticsNumber);
+		orderLogisticsDao.save(orderLogistics);
+	}
+
+	@Override
+	@Transactional
+	public void payNotify(OrderEntity order) {
+		OrderEntity orderEntity = orderDao.queryByOrderNumber(order.getOrderNumber());
+		orderDao.updateByOrderNumber(order);
+		//积分使用记录
+		/*IntegralRecordEntity integralRecord = new IntegralRecordEntity();
+		integralRecord.setCreateTime(new Date());
+		integralRecord.setIntegral(orderEntity.getPaymentAmount().intValue() * 100);
+		integralRecord.setMemberId(orderEntity.getMemberId());
+		integralRecord.setRemarks("消费获得");
+		integralRecordDao.save(integralRecord);*/
+		
+		/*if(orderEntity.getUseIntegral() != null && orderEntity.getUseIntegral() > 0){
+			IntegralRecordEntity ir = new IntegralRecordEntity();
+			ir.setCreateTime(new Date());
+			ir.setIntegral(orderEntity.getUseIntegral());
+			ir.setMemberId(orderEntity.getMemberId());
+			integralRecord.setRemarks("消费使用");
+			
+			MemberInfoEntity memberInfo = new MemberInfoEntity();
+			memberInfo.setId(orderEntity.getMemberId());
+			memberInfo.setIntegral(memberInfo.getIntegral() - orderEntity.getUseIntegral());
+			memberInfoDao.update(memberInfo);
+		}*/
+		//订单商品销量加1
+		List<OrderGoodsEntity> orderGoodsList = orderEntity.getOrderGoodsList();
+		for (OrderGoodsEntity orderGoodsEntity : orderGoodsList) {
+			goodsDao.addSaleNum(orderGoodsEntity.getGoodsId());
+		}
+
+	}
+
+	@Override
+	public OrderEntity queryByOrderNumber(String orderNumber) {
+		return orderDao.queryByOrderNumber(orderNumber);
+	}
+
+	@Override
+	public Map<String, Object> statistics() {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("status", 1); //待付款
+		Integer pendingPayment = orderDao.queryTotal(map);
+		
+		map.put("status", 2); //待发货
+		Integer pendingDelivery = orderDao.queryTotal(map);
+		
+		map.put("status", 3); //待发货
+		Integer pendingReceive = orderDao.queryTotal(map);
+		
+		map.put("status", 4); //退款
+		Integer refund = orderDao.queryTotal(map);
+		
+		Integer orderCount = orderDao.queryOrderCount(map);
+		
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("pendingPayment", pendingPayment);
+		result.put("pendingDelivery", pendingDelivery);
+		result.put("pendingReceive", pendingReceive);
+		result.put("refund", refund);
+		result.put("orderCount", orderCount);
+		return result;
+	}
+
+	@Override
+	public List<Map<String, Object>> queryOrderChart() {
+		return orderDao.queryOrderChart();
+	}
+	
+}

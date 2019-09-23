@@ -1,0 +1,92 @@
+package com.wzlue.app.controller.order;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import com.wzlue.order.entity.ServiceEvaluateEntity;
+import com.wzlue.order.service.ServiceEvaluateService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.wzlue.app.common.annotation.Login;
+import com.wzlue.common.base.R;
+import com.wzlue.order.entity.OrderEntity;
+import com.wzlue.order.entity.OrderRefundEntity;
+import com.wzlue.order.service.OrderRefundService;
+import com.wzlue.order.service.OrderService;
+
+@RestController
+@RequestMapping("/app/orderrefund")
+public class ApiRefundController {
+
+	@Autowired
+	private OrderRefundService orderRefundService;
+	
+	@Autowired
+	private OrderService orderService;
+
+	@Autowired
+	private ServiceEvaluateService serviceEvaluateService;
+
+	/**
+	 * 退款退货列表
+	 * @param params
+	 * @param userId
+	 * @return
+	 */
+	@Login
+	@RequestMapping("list")
+	public R list(@RequestParam Map<String, Object> params,Long userId){
+		
+		params.put("memberId", userId);
+		List<OrderRefundEntity> orderRefundList = orderRefundService.queryList(params);
+		return R.ok().put("orderRefundList", orderRefundList);
+	}
+	
+	@Login
+	@RequestMapping("apply")
+	public R apply(@RequestBody OrderRefundEntity orderRefund, @RequestAttribute("userId") Long userId){
+		orderRefund.setCreateTime(new Date());
+		orderRefund.setMemberId(userId);
+		orderRefund.setStatus(1);
+		orderRefundService.save(orderRefund);
+		return R.ok();
+	}
+
+	/**
+	 * 退款/退货详情
+	 * @param id
+	 * @return
+	 */
+	@Login
+	@RequestMapping("detail")
+	public R detail(Long id){
+		OrderRefundEntity orderRefund = orderRefundService.queryObject(id);
+		return R.ok().put("orderRefund", orderRefund);
+	}
+	
+	@Login
+	@RequestMapping("getByOrderNumber")
+	public R getByOrderNumber(String orderNumber){
+		OrderRefundEntity orderRefund = orderRefundService.queryByOrderNumber(orderNumber);
+		OrderEntity order = orderService.queryByOrderNumber(orderNumber);
+		return R.ok().put("orderRefund", orderRefund).put("order", order);
+	}
+
+	/**
+	 * 添加售后评价
+	 */
+	@Login
+	@RequestMapping("addServiceEvaluate")
+	public R addServiceEvaluate(@RequestBody ServiceEvaluateEntity serviceEvaluate){
+		/*serviceEvaluate.setMemberId(userId);*/
+		serviceEvaluate.setCreateTime(new Date());
+		serviceEvaluateService.save(serviceEvaluate);
+		return R.ok();
+	}
+}

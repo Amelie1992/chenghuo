@@ -1,0 +1,56 @@
+package com.wzlue.advert.service.impl;
+
+import com.wzlue.advert.dao.ExtensionPosterDao;
+import com.wzlue.advert.entity.ExtensionPosterEntity;
+import com.wzlue.advert.service.ExtensionPosterService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+
+
+@Service("extensionPosterService")
+public class ExtensionPosterServiceImpl implements ExtensionPosterService {
+	@Autowired
+	private ExtensionPosterDao extensionPosterDao;
+	
+	@Override
+	public ExtensionPosterEntity queryObject(Long id){
+		return extensionPosterDao.queryObject(id);
+	}
+	
+	@Override
+	public List<ExtensionPosterEntity> queryList(Map<String, Object> map){
+		return extensionPosterDao.queryList(map);
+	}
+	
+	@Override
+	public int queryTotal(Map<String, Object> map){
+		return extensionPosterDao.queryTotal(map);
+	}
+	
+	@Override
+	public void save(ExtensionPosterEntity extensionPoster){
+		extensionPosterDao.save(extensionPoster);
+	}
+	
+	@Override
+	public void update(ExtensionPosterEntity extensionPoster){
+		extensionPoster.setUpdateTime(new Date());
+		extensionPosterDao.update(extensionPoster);
+	}
+	
+	@Override
+	public void delete(Long id){
+		extensionPosterDao.delete(id);
+	}
+	
+	@Override
+	public void deleteBatch(Long[] ids){
+		extensionPosterDao.deleteBatch(ids);
+	}
+	
+}

@@ -1,0 +1,84 @@
+package com.wzlue.goods.entity;
+
+import java.io.Serializable;
+import java.util.Date;
+
+
+/**
+ * 商品规格
+ * 
+ * @author wzlue
+ * @email wzlue.com
+ * @date 2018-07-25 20:42:51
+ */
+public class SpecEntity implements Serializable {
+	private static final long serialVersionUID = 1L;
+	
+	//主键
+	private Long id;
+	//规格名称
+	private String specName;
+	//父id
+	private Long parentId;
+	//排序
+	private Long sort;
+	//规格价格
+	private double specPrice;
+
+	public double getSpecPrice() {
+		return specPrice;
+	}
+
+	public void setSpecPrice(double specPrice) {
+		this.specPrice = specPrice;
+	}
+
+	/**
+	 * 设置：主键
+	 */
+	public void setId(Long id) {
+		this.id = id;
+	}
+	/**
+	 * 获取：主键
+	 */
+	public Long getId() {
+		return id;
+	}
+	/**
+	 * 设置：规格名称
+	 */
+	public void setSpecName(String specName) {
+		this.specName = specName;
+	}
+	/**
+	 * 获取：规格名称
+	 */
+	public String getSpecName() {
+		return specName;
+	}
+	/**
+	 * 设置：父id
+	 */
+	public void setParentId(Long parentId) {
+		this.parentId = parentId;
+	}
+	/**
+	 * 获取：父id
+	 */
+	public Long getParentId() {
+		return parentId;
+	}
+	/**
+	 * 设置：排序
+	 */
+	public void setSort(Long sort) {
+		this.sort = sort;
+	}
+	/**
+	 * 获取：排序
+	 */
+	public Long getSort() {
+		return sort;
+	}
+}

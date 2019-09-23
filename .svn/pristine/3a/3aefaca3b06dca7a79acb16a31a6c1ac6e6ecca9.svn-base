@@ -1,0 +1,49 @@
+package com.wzlue.web.controller.timer;
+
+import com.wzlue.order.entity.OrderEntity;
+import com.wzlue.order.service.OrderService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@Component
+@EnableScheduling
+public class OrderTimer {
+	@Autowired
+	private OrderService orderService;
+
+	//订单--系统自动确认收货(每五秒执行)
+	@Scheduled(cron="*/5 * * * * ?")
+	public void startLearnJob(){
+		System.out.println("================系统自动确认收货定时器======================");
+
+		//所有待收货的订单status==3
+		Map<String, Object> params = new HashMap<>();
+		params.put("status",3);
+		List<OrderEntity> orderEntities = orderService.queryList(params);
+		Date date = new Date();
+		SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		try {
+			date = f.parse(f.format(new Date())); //这是获取当前时间
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		System.out.println("================系统当前时间："+date);
+		for (OrderEntity order:orderEntities) {
+			Date confirmTime = order.getConfirmTime();//系统确认收货时间
+			if (confirmTime.getTime()<=date.getTime()) {
+				//订单确认收货
+				order.setStatus(7);
+				orderService.update(order);
+			}
+		}
+	}
+}

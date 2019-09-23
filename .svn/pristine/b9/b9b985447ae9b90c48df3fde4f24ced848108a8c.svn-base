@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wzlue.order.dao.OrderRefundDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+	<resultMap type="com.wzlue.order.entity.OrderRefundEntity"
+		id="orderRefundMap">
+		<result property="id" column="id" />
+		<result property="orderNumber" column="order_number" />
+		<result property="refundNumber" column="refund_number" />
+		<result property="memberId" column="member_id" />
+		<result property="refundAmount" column="refund_amount" />
+		<result property="refundNum" column="refund_num" />
+		<result property="refundIntegral" column="refund_integral" />
+		<result property="createTime" column="create_time" />
+		<result property="processTime" column="process_time" />
+		<result property="goodsStatus" column="goods_status" />
+		<result property="reason" column="reason" />
+		<result property="status" column="status" />
+		<result property="type" column="type" />
+		<result property="explain" column="explain" />
+		<result property="remarks" column="remarks" />
+		<result property="nickName" column="nickName" />
+		<result property="expressFee" column="express_fee" />
+		<result property="orderGoodId" column="order_good_id" />
+		<association property="memberInfo" javaType="com.wzlue.member.entity.MemberInfoEntity">
+			<result property="nickName" column="nick_name"/>
+		</association>
+
+
+		<!--订单物流-->
+		<association property="orderLogistics" javaType="com.wzlue.order.entity.OrderLogisticsEntity">
+			<result property="id" column="id" />
+			<result property="orderNumber" column="order_number" />
+			<result property="companyId" column="company_id" />
+			<result property="companyName" column="company_name" />
+			<result property="logisticsNumber" column="logistics_number" />
+			<result property="createTime" column="create_time" />
+		</association>
+
+		<!--退货物流-->
+		<association property="refundLogisticsEntity" javaType="com.wzlue.contact.entity.RefundLogisticsEntity">
+			<result property="id" column="logisticId"/>
+			<result property="orderRefund" column="order_refund"/>
+			<result property="logisticsId" column="logistics_id"/>
+			<result property="logisticsName" column="logistics_name"/>
+			<result property="logisticsNumber" column="logistics_number"/>
+			<result property="logisticsPrice" column="logistics_price"/>
+		</association>
+
+		<!--订单凭证-->
+		<association property="refundPicEntity" javaType="com.wzlue.order.entity.OrderRefundPicEntity">
+			<result property="id" column="id"/>
+			<result property="refundNumber" column="refund_number"/>
+			<result property="picUrl" column="pic_url"/>
+		</association>
+		<!--订单商品表-->
+		<association property="orderGoodsEntity" javaType="com.wzlue.order.entity.OrderGoodsEntity">
+			<result property="id" column="id" />
+			<result property="orderNumber" column="order_number" />
+			<result property="goodsId" column="goods_id" />
+			<result property="goodsName" column="goods_name" />
+			<result property="picUrl" column="pic_url" />
+			<result property="buyNum" column="buy_num" />
+			<result property="price" column="price" />
+			<result property="costPrice" column="cost_price" />
+			<result property="vipPrice" column="vip_price" />
+		</association>
+
+
+		<collection property="picUrls" select="queryPicUrls" column="refund_number"></collection>
+	</resultMap>
+
+	<resultMap type="com.wzlue.order.entity.OrderRefundEntity" id="orderRefundMapTwo">
+		<result property="id" column="id" />
+		<result property="orderNumber" column="order_number" />
+		<result property="refundNumber" column="refund_number" />
+		<result property="memberId" column="member_id" />
+		<result property="refundAmount" column="refund_amount" />
+		<result property="refundNum" column="refund_num" />
+		<result property="refundIntegral" column="refund_integral" />
+		<result property="createTime" column="create_time" />
+		<result property="processTime" column="process_time" />
+		<result property="goodsStatus" column="goods_status" />
+		<result property="reason" column="reason" />
+		<result property="status" column="status" />
+		<result property="type" column="type" />
+		<result property="explain" column="explain" />
+		<result property="remarks" column="remarks" />
+		<result property="nickName" column="nickName" />
+		<result property="expressFee" column="express_fee" />
+		<result property="orderGoodId" column="order_good_id" />
+     <!--订单商品表-->
+		<association property="orderGoodsEntity" javaType="com.wzlue.order.entity.OrderGoodsEntity">
+			<result property="id" column="id" />
+			<result property="orderNumber" column="order_number" />
+			<result property="goodsId" column="goods_id" />
+			<result property="goodsName" column="goods_name" />
+			<result property="picUrl" column="pic_url" />
+			<result property="buyNum" column="buy_num" />
+			<result property="price" column="price" />
+			<result property="costPrice" column="cost_price" />
+			<result property="vipPrice" column="vip_price" />
+		</association>
+	</resultMap>
+
+	<select id="queryPicUrls" resultType="string">
+		select pic_url from o_order_refund_pic where refund_number = #{value}
+	</select>
+
+
+
+  <!--关联order_goods-->
+	<select id="queryOrderGoodList" resultMap="orderRefundMapTwo">
+		SELECT * FROM o_order_refund refund LEFT  JOIN o_order_goods info ON refund.order_good_id=info.id
+		<where>
+			<if test="refundNumber!=null and refundNumber!=''">
+				refund_number = #{refundNumber}
+			</if>
+			<if test="status!=null and status!=''">
+				refund.status = #{status}
+			</if>
+			<if test="type!=null and type!=''">
+				refund.type = #{type}
+			</if>
+			<if test="memberId!=null and memberId!=''">
+				refund.member_id = #{memberId}
+			</if>
+			<if test="orderNumber!=null and orderNumber!=''">
+				refund.order_number = #{orderNumber}
+			</if>
+		</where>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				ORDER BY ${sidx} ${order}
+			</when>
+			<otherwise>
+				ORDER BY refund.status,refund.create_time desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			LIMIT #{offset}, #{limit}
+		</if>
+	</select>
+
+
+	<select id="queryObject" resultMap="orderRefundMap">
+		SELECT r.*, mi.nick_name,good.*,logistic.id logisticId,logistic.*  FROM o_order_refund r left join m_member_info mi on r.member_id = mi.id  LEFT JOIN o_order_goods good ON r.order_good_id=good.id
+        LEFT JOIN refund_logistics logistic ON  r.refund_number=logistic.order_refund
+		WHERE r.id = #{value}
+	</select>
+	
+	<select id="queryByOrderNumber" resultMap="orderRefundMap">
+		SELECT r.*, mi.nick_name FROM o_order_refund r left join m_member_info mi on r.member_id = mi.id
+		WHERE r.order_number = #{value}
+	</select>
+
+	<select id="queryByRefundNumber" resultMap="orderRefundMap">
+		SELECT r.*, mi.nick_name FROM o_order_refund r left join m_member_info mi on r.member_id = mi.id
+		WHERE r.refund_number = #{value}
+	</select>
+
+	<select id="queryList" resultMap="orderRefundMap">
+		SELECT refund.*,info.nick_name AS nickName,good.* FROM o_order_refund refund LEFT  JOIN m_member_info info ON refund.member_id=info.id
+		LEFT JOIN o_order_goods good ON refund.order_good_id=good.id
+		<where>
+			<if test="refundNumber!=null and refundNumber!=''">
+				AND refund.refund_number = #{refundNumber}
+			</if>
+			<if test="status!=null and status!=''">
+				and refund.status = #{status}
+			</if>
+			<if test="type!=null and type!=''">
+				and refund.type = #{type}
+			</if>
+			<if test="memberId!=null and memberId!=''">
+				and refund.member_id = #{memberId}
+			</if>
+			<if test="orderNumber!=null and orderNumber!=''">
+				and refund.order_number = #{orderNumber}
+			</if>
+		</where>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				ORDER BY ${sidx} ${order}
+			</when>
+			<otherwise>
+				ORDER BY refund.status,refund.create_time desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			LIMIT #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryTotal" resultType="int">
+		SELECT count(*) FROM o_order_refund
+		<where>
+			<if test="refundNumber!=null and refundNumber!=''">
+				AND refund_number = #{refundNumber}
+			</if>
+			<if test="status!=null and status!=''">
+				AND status = #{status}
+			</if>
+			<if test="type!=null and type!=''">
+				AND type = #{type}
+			</if>
+			<if test="orderNumber!=null and orderNumber!=''">
+				AND order_number = #{orderNumber}
+			</if>
+			<if test="memberId!=null and memberId!=''">
+				AND member_id=#{memberId}
+			</if>
+		</where>
+
+	</select>
+
+	<select id="reNumOrder" resultType="int">
+		SELECT sum(refund_num) FROM o_order_refund
+		<where>
+			1=1
+			<if test="status!=null and status!=''">
+				and status = #{status}
+			</if>
+			<if test="orderNumber!=null and orderNumber!=''">
+				and order_number = #{orderNumber}
+			</if>
+		</where>
+	</select>
+
+	<select id="reIntegral" resultType="int">
+		SELECT sum(refund_integral) FROM o_order_refund
+		<where>
+			1=1
+			<if test="status!=null and status!=''">
+				and status = #{status}
+			</if>
+			<if test="orderNumber!=null and orderNumber!=''">
+				and order_number = #{orderNumber}
+			</if>
+			<if test="refundId!=null and refundId!=''">
+				and id!=#{refundId}
+			</if>
+		</where>
+	</select>
+
+	<insert id="save" parameterType="com.wzlue.order.entity.OrderRefundEntity"
+		useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO o_order_refund
+		(
+		`order_number`,
+		`refund_number`,
+		`member_id`,
+		`refund_amount`,
+		`refund_integral`,
+		`refund_num`,
+		`create_time`,
+		`status`,
+		`type`,
+		`explain`,
+		`process_time`,
+		`express_fee`,
+		`order_good_id`,
+		`reason`,
+		`goods_status`
+		)
+		VALUES
+		(
+		#{orderNumber},
+		#{refundNumber},
+		#{memberId},
+		#{refundAmount},
+		#{refundIntegral},
+		#{refundNum},
+		#{createTime},
+		#{status},
+		#{type},
+		#{explain},
+		#{processTime},
+		#{expressFee},
+		#{orderGoodId},
+		#{reason},
+		#{goodsStatus}
+		)
+	</insert>
+
+	<update id="update" parameterType="com.wzlue.order.entity.OrderRefundEntity">
+		UPDATE o_order_refund
+		<set>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="remarks != null">`remarks` = #{remarks}, </if>
+			<if test="processTime != null">`process_time` = #{processTime},</if>
+			<if test="expressFee != null">`express_fee` = #{expressFee},</if>
+			<if test="refundIntegral != null">`refund_integral` = #{refundIntegral},</if>
+			<if test="reason != null">`reason` = #{reason},</if>
+			<if test="goodsStatus != null">`goods_status` = #{goodsStatus},</if>
+			<if test="refundNum != null">`refund_num` = #{refundNum}</if>
+
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<delete id="delete">
+		DELETE FROM o_order_refund WHERE id = #{value}
+	</delete>
+
+	<delete id="deleteBatch">
+		DELETE FROM o_order_refund WHERE id IN
+		<foreach item="id" collection="array" open="(" separator=","
+			close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+	<!--售后中商品的剩余数量-->
+	<select id="goodNum"  resultType="int">
+		SELECT IFNULL(SUM(refund_num), 0) AS sum FROM o_order_refund
+
+		<where>
+		     status not in(6)
+			<if test="memberId!=null and memberId!=''">
+				AND member_id=#{memberId}
+			</if>
+			<if test="orderNumber!=null and orderNumber!=''">
+				and order_number=#{orderNumber}
+			</if>
+			<if test="orderGoodId!=null and orderGoodId!=''">
+				and order_good_id=#{orderGoodId}
+			</if>
+
+		</where>
+
+	</select>
+</mapper>

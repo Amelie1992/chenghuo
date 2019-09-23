@@ -1,0 +1,39 @@
+<!--pages/user/index.wxml-->
+
+<view class="page">
+
+  <view class="form-box">
+    <view class="row-wrap" style='height:140rpx'>
+      <view class="label label-switch">头像</view>
+      <view class="label-right right-switch">
+        <image wx:if="{{userInfo && userInfo.avatarUrl}}" class="userinfo-avatar" src="{{ userInfo.avatarUrl }}" background-size="cover"></image>
+      </view>
+    </view>
+    <view class="order-item">
+      <view>昵称</view>
+      <text>{{userInfo.nickName}}</text>
+    </view>
+    <view class="order-item right" bindtap="userName">
+      <view>姓名</view>
+      <text wx:if="{{realName == ''}}">请输入姓名</text>
+      <text wx:else>{{realName}}</text>
+    </view>
+    <view class="order-item right">
+      <view>手机</view>
+      <button class="getPhoneNumber" open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber" wx:if="{{!phoneNumber}}">绑定手机号码</button>
+      <text wx:else>{{phoneNumber}}</text>
+    </view>
+  </view>
+</view>
+<modal hidden="{{hiddenmodalput}}" title="请输入姓名" confirm-text="保存" cancel-text="取消" bindcancel="cancel" bindconfirm="confirm">
+  <view class="weui-cells weui-cells_after-title">
+    <view class="weui-cell weui-cell_input">
+      <view class="weui-cell__hd">
+        <view class="weui-label">姓名</view>
+      </view>
+      <view class="weui-cell__bd">
+        <input class="weui-input" maxlength="12" value="{{realName}}" bindinput="inputName" placeholder="请输入姓名" />
+      </view>
+    </view>
+  </view>
+</modal>

@@ -1,0 +1,93 @@
+
+.container {
+  min-height: 100%;
+  border-top: 1px solid #ccc;
+  background-color: #f4f5f9;
+}
+
+.touch-item {
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  overflow: hidden;
+  margin-bottom: 30rpx;
+  background: #fff;
+}
+
+.content {
+  width: 100%;
+  padding: 10px;
+  line-height: 22px;
+  margin-right: 0;
+  -webkit-transition: all 0.4s;
+  transition: all 0.4s;
+  -webkit-transform: translateX(90px);
+  transform: translateX(90px);
+  margin-left: -90px;
+}
+
+.del {
+  background-color: #f40;
+  width: 90px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  -webkit-transform: translateX(90px);
+  transform: translateX(90px);
+  -webkit-transition: all 0.4s;
+  transition: all 0.4s;
+}
+
+.touch-move-active .content, .touch-move-active .del {
+  -webkit-transform: translateX(0);
+  transform: translateX(0);
+}
+
+.content {
+  display: flex;
+}
+
+.content .icon {
+  margin-right: 30rpx;
+  text-align: center;
+}
+
+.content .icon .iconfont {
+  display: inline-flex;
+  line-height: 90rpx;
+  color: #fff;
+}
+
+.icon-box {
+  width: 90rpx;
+  height: 90rpx;
+  border-radius: 4px;
+  background: #f40;
+}
+
+.message {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.title-box {
+width:100%;
+padding-top:230rpx;
+text-align:center;
+font-size:28rpx;
+color:#999;
+}
+.message-icon{
+  text-align: center;
+}
+.icon-meiyouhongbao{
+  font-size: 130rpx;
+  display: inline-flex;
+  overflow: hidden;
+  height: 150rpx;
+}

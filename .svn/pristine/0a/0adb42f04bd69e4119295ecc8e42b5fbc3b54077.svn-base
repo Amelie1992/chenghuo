@@ -1,0 +1,7 @@
+{
+ "navigationBarTitleText": "积分中心",
+ "backgroundTextStyle": "light",
+"navigationBarBackgroundColor": "#21C5B4",
+"navigationBarTextStyle": "white",
+"enablePullDownRefresh": true
+}

@@ -1,0 +1,71 @@
+<!--pages/index/search/index.wxml-->
+<view class="weui-search-bar">
+  <view class="weui-search-bar__form">
+    <view class="weui-search-bar__box">
+      <icon class="weui-icon-search_in-box" type="search" size="14"></icon>
+      <input type="search" class="weui-search-bar__input" maxlength="16" placeholder="请输入搜索内容" value="{{inputVal}}" bindinput="inputTyping" bindconfirm="wxSearchConfirm" />
+      <view class="weui-icon-clear" wx:if="{{inputVal.length > 0}}" bindtap="searchClear">
+        <icon type="clear" size="14"></icon>
+      </view>
+    </view>
+  </view>
+  <view class="weui-search-bar__cancel-btn" bindtap="wxSearchConfirm">
+    <text wx:if="{{inputVal.length>0}}" data-key='search'>搜索</text>
+    <text wx:else data-key='back'>返回</text>
+  </view>
+</view>
+
+<view class="wxSearch">
+
+  <view class="wxSearchInner">
+    <!-- 搜索提示部分 -->
+    <view class="wxSearchMindKey">
+      <view class="wxSearchMindKeyList">
+        <block wx:for="{{tipKeys}}" wx:key="{{index}}">
+          <view class="wxSearchMindKeyItem" bindtap="wxSearchKeyTap" data-key="{{item}}">{{item}}</view>
+        </block>
+      </view>
+    </view>
+
+    <!-- <view class="wxSearchKey" style="display:{{inputVal.length>0 ? 'none':'block'}}">
+      <text wx:if="{{hotKeys}}" class="wxSearchTitle" wx:key="{{index}}">搜索热点</text>
+      <view class="wxSearchKeyList">
+        <block wx:for="{{hotKeys}}" wx:key="{{index}}">
+          <view class="wxSearchKeyItem" bindtap="wxSearchKeyTap" data-key="{{item}}">{{item}}</view>
+        </block>
+      </view>
+    </view> -->
+
+    <view wx:if="{{history}}" class="wxSearchHistory" style="display:{{inputVal.length>0 ? 'none':'block'}}">
+      <view class="wxSearchHistoryItem">
+        <text class="wxSearchHistoryItemTitle">搜索记录</text>
+        <!--text class="wxSearchHistoryItemDel" bindtap="wxSearchDeleteAll">删除</text-->
+        <icon type="clear" bindtap="wxSearchDeleteAll" size="18" />
+      </view>
+      <view class="wxSearchKeyList">
+        <block wx:for="{{history}}" wx:key="{{index}}">
+          <view class="wxSearchKeyItem-history" bindtap="wxSearchKeyTap" data-key="{{item}}">{{item}}</view>
+        </block>
+      </view>
+    </view>
+    <!-- 搜索结果 -->
+    <view class="searchInner hot-goods" style="display:{{inputVal.length<=0 ? 'none':'block'}}">
+      <view class='hot-con clear' wx:if="{{goodsList.length>0}}">
+        <block wx:for="{{goodsList}}" wx:key="{{index}}">
+          <navigator hover-class="none" class='box' url="/pages/goods/goods-detail/index?id={{item.id}}">
+            <image class='good-img' mode='aspectFill' src='{{item.picUrl}}'></image>
+            <view class='title'>
+              <text class='brand ellipsis'>{{item.brand.brandName}} {{item.goodsName}}</text>
+              <text class='series ellipsis'>{{item.synopsis}}</text>
+              <text class='price'>￥{{item.price}}</text>
+            </view>
+          </navigator>
+        </block>
+      </view>
+      <view wx:if="{{showNoGoods && goodsList.length <= 0}}" class="no-goods">
+        <view class="iconfont icon-meiyou-biaoqing"></view>
+        <view>没有符合条件的商品~</view>
+      </view>
+    </view>
+  </view>
+</view>

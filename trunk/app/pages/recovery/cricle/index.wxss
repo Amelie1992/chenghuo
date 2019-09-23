@@ -1,0 +1,129 @@
+/* pages/cricle/index.wxss */
+
+.recovery-image {
+  width: 100%;
+  height: 300rpx;
+  position: relative;
+}
+
+.recovery-image image {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  vertical-align: top;
+}
+
+.btn-con {
+  font-size: 28rpx;
+  display: flex;
+  justify-content: flex-end;
+  position: absolute;
+  width: 100%;
+  bottom: 0rpx;
+}
+
+.btn-item {
+  margin-right: 40rpx;
+  flex: 0 0 auto;
+  overflow: hidden;
+}
+
+.kefu, .guzhi {
+  margin-top: 30rpx;
+  width: 100%;
+  height: 150rpx;
+  text-align: center;
+  color: #fff;
+  position: relative;
+}
+
+.kefu button {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 0 none;
+  opacity: 0;
+  background: transparent;
+}
+
+.circle-btn {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.iconfont {
+  font-size: 65rpx;
+}
+
+.recovery-image .phone{
+  position: absolute;
+  color: white;
+  right: 15rpx;
+  bottom: 5rpx;
+  text-align: right;
+}
+
+.apply-list {
+  margin-bottom: 300rpx;
+}
+
+.apply-item {
+  padding: 15rpx 30rpx;
+  background: #fff;
+  margin-bottom: 20rpx;
+}
+
+.apply-item.active .detail {
+  background: #319fd1;
+}
+
+.apply-con {
+  display: flex;
+  /* border: 1px solid #eee; */
+  border-radius: 4px;
+}
+
+.apply-info {
+  width: 540rpx;
+  font-size: 28rpx;
+  padding: 10rpx 30rpx;
+  color: #333;
+}
+
+.icon-box {
+  width: 150rpx;
+  height: 80rpx;
+  padding-top: 30rpx;
+}
+
+.detail {
+  width: 120rpx;
+  height: 50rpx;
+  margin: 15rpx;
+  text-align: center;
+  border-radius: 4px;
+  line-height: 50rpx;
+  font-size: 30rpx;
+  color: #306ba8;
+  border: 1px solid #306ba8;
+  overflow: hidden;
+}
+
+.line {
+  height: 10rpx;
+  width: 100%;
+  background: #fff;
+}
+
+.image-box {
+  text-align: center;
+}
+
+.image-box image {
+  margin-top: 240rpx;
+  width: 220rpx;
+  height: 220rpx;
+  vertical-align: top;
+}

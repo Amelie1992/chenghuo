@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wzlue.member.dao.MemberAddressDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+	<resultMap type="com.wzlue.member.entity.MemberAddressEntity"
+		id="memberAddressMap">
+		<result property="id" column="id" />
+		<result property="memberId" column="member_id" />
+		<result property="userName" column="user_name" />
+		<result property="province" column="province" />
+		<result property="city" column="city" />
+		<result property="county" column="county" />
+		<result property="street" column="street" />
+		<result property="zipCode" column="zip_code" />
+		<result property="telNumber" column="tel_number" />
+		<result property="defaultAddress" column="default_address" />
+		<result property="delFlag" column="del_flag" />
+	</resultMap>
+
+	<select id="queryObject" resultType="com.wzlue.member.entity.MemberAddressEntity">
+		SELECT * FROM m_member_address WHERE id = #{value}
+	</select>
+	
+	<select id="queryDefault" resultType="com.wzlue.member.entity.MemberAddressEntity">
+		SELECT * FROM m_member_address WHERE member_id = #{value} and default_address = 1
+	</select>
+
+	<select id="queryList" resultType="com.wzlue.member.entity.MemberAddressEntity">
+		SELECT * FROM m_member_address
+		<where>
+			<if test="memberId != null">
+			  member_id = #{memberId}
+			</if>
+			<if test="userName != null and userName!=''">
+			AND	user_name like concat('%', #{userName}, '%')
+			</if>
+			<if test="telNumber != null and telNumber!=''">
+			AND	tel_number like concat('%', #{telNumber}, '%')
+			</if>
+
+		</where>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				ORDER BY ${sidx} ${order}
+			</when>
+			<otherwise>
+				ORDER BY id desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			LIMIT #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryTotal" resultType="int">
+		SELECT count(*) FROM m_member_address
+		<where>
+		<if test="memberId != null">
+			member_id = #{memberId}
+		</if>
+			<if test="userName != null and userName!=''">
+				AND	user_name like concat('%', #{userName}, '%')
+			</if>
+			<if test="telNumber != null and telNumber!=''">
+				AND	tel_number like concat('%', #{telNumber}, '%')
+			</if>
+		</where>
+	</select>
+
+	<insert id="save" parameterType="com.wzlue.member.entity.MemberAddressEntity"
+		useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO m_member_address
+		(
+		`member_id`,
+		`user_name`,
+		`province`,
+		`city`,
+		`county`,
+		`street`,
+		`zip_code`,
+		`tel_number`,
+		`default_address`,
+		`del_flag`
+		)
+		VALUES
+		(
+		#{memberId},
+		#{userName},
+		#{province},
+		#{city},
+		#{county},
+		#{street},
+		#{zipCode},
+		#{telNumber},
+		#{defaultAddress},
+		#{delFlag}
+		)
+	</insert>
+	
+	<update id="updateDefault" parameterType="com.wzlue.member.entity.MemberAddressEntity">
+		update m_member_address set default_address = 0 where member_id = #{memberId}
+	</update>
+
+	<update id="update" parameterType="com.wzlue.member.entity.MemberAddressEntity">
+		UPDATE m_member_address
+		<set>
+			<if test="userName != null">`user_name` = #{userName}, </if>
+			<if test="province != null">`province` = #{province}, </if>
+			<if test="city != null">`city` = #{city}, </if>
+			<if test="county != null">`county` = #{county}, </if>
+			<if test="street != null">`street` = #{street}, </if>
+			<if test="zipCode != null">`zip_code` = #{zipCode}, </if>
+			<if test="telNumber != null">`tel_number` = #{telNumber}, </if>
+			<if test="defaultAddress != null">`default_address` = #{defaultAddress}, </if>
+			<if test="delFlag != null">`del_flag` = #{delFlag}</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<delete id="delete">
+		DELETE FROM m_member_address WHERE id = #{value}
+	</delete>
+
+	<delete id="deleteBatch">
+		DELETE FROM m_member_address WHERE id IN
+		<foreach item="id" collection="array" open="(" separator=","
+			close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

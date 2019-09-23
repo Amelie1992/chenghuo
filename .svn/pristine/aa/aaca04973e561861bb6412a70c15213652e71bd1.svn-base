@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wzlue.integral.dao.IntegralCardDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.wzlue.integral.entity.IntegralCardEntity" id="integralCardMap">
+        <result property="id" column="id"/>
+        <result property="cardNumber" column="card_number"/>
+        <result property="type" column="type"/>
+        <result property="batchNumber" column="batch_number"/>
+        <result property="integral" column="integral"/>
+        <result property="activationState" column="activation_state"/>
+        <result property="activationTime" column="activation_time"/>
+        <result property="writeOffStatus" column="write_off_status"/>
+        <result property="rechargeBy" column="recharge_by"/>
+        <result property="rechargeTime" column="recharge_time"/>
+        <result property="createTime" column="create_time"/>
+        <result property="remarks" column="remarks"/>
+    </resultMap>
+
+    <select id="queryObject" resultType="com.wzlue.integral.entity.IntegralCardEntity">
+		SELECT * FROM integral_card WHERE id = #{value}
+	</select>
+
+    <select id="queryList" resultType="com.wzlue.integral.entity.IntegralCardEntity">
+        SELECT a.* ,
+        (SELECT b.nick_name FROM m_member_info b WHERE b.id = a.recharge_by) rechargeByName
+        FROM integral_card a
+        <where>
+            1=1
+            <if test="cardNumber != null and cardNumber.trim() != ''">
+                and card_number like concat('%', #{cardNumber}, '%')
+            </if>
+            <if test="batchNumber != null and batchNumber.trim() != ''">
+                and batch_number like concat('%', #{batchNumber}, '%')
+            </if>
+            <if test="activationState != null and activationState.trim() != ''">
+                and activation_state = #{activationState}
+            </if>
+        </where>
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                ORDER BY ${sidx} ${order}
+            </when>
+            <otherwise>
+                ORDER BY id desc
+            </otherwise>
+        </choose>
+        <if test="offset != null and limit != null">
+            LIMIT #{offset}, #{limit}
+        </if>
+    </select>
+
+    <select id="queryTotal" resultType="int">
+		SELECT count(*) FROM integral_card
+        <where>
+            1=1
+            <if test="cardNumber != null and cardNumber.trim() != ''">
+                and card_number like concat('%', #{cardNumber}, '%')
+            </if>
+            <if test="batchNumber != null and batchNumber.trim() != ''">
+                and batch_number like concat('%', #{batchNumber}, '%')
+            </if>
+            <if test="activationState != null and activationState.trim() != ''">
+                and activation_state = #{activationState}
+            </if>
+        </where>
+	</select>
+
+    <insert id="save" parameterType="com.wzlue.integral.entity.IntegralCardEntity" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO integral_card
+		(
+			`card_number`,
+			`type`,
+			`batch_number`,
+			`integral`,
+			`activation_state`,
+			`write_off_status`,
+			`create_time`,
+			`remarks`
+					            )
+		VALUES
+		(
+			#{cardNumber},
+			#{type},
+			#{batchNumber},
+			#{integral},
+			2,
+			2,
+			now(),
+			#{remarks}
+							   )
+	</insert>
+
+    <update id="update" parameterType="com.wzlue.integral.entity.IntegralCardEntity">
+        UPDATE integral_card
+        <set>
+            <if test="cardNumber != null">`card_number` = #{cardNumber},</if>
+            <if test="type != null">`type` = #{type},</if>
+            <if test="batchNumber != null">`batch_number` = #{batchNumber},</if>
+            <if test="integral != null">`integral` = #{integral},</if>
+            <if test="activationState != null">`activation_state` = #{activationState},</if>
+            <if test="activationTime != null">`activation_time` = #{activationTime},</if>
+            <if test="writeOffStatus != null">`write_off_status` = #{writeOffStatus},</if>
+            <if test="rechargeBy != null">`recharge_by` = #{rechargeBy},</if>
+            <if test="rechargeTime != null">`recharge_time` = #{rechargeTime},</if>
+            <if test="createTime != null">`create_time` = #{createTime},</if>
+            <if test="remarks != null">`remarks` = #{remarks}</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+		DELETE FROM integral_card WHERE id = #{value}
+	</delete>
+
+    <delete id="deleteBatch">
+        DELETE FROM integral_card WHERE id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <update id="activateBatch">
+        UPDATE integral_card SET activation_state = 1, activation_time = now()
+        WHERE id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+</mapper>

@@ -1,0 +1,193 @@
+/* pages/jifen/index.wxss */
+
+.pages {
+  color: #333;
+  font-size: 28rpx;
+}
+
+.iconfont {
+  display: inline-flex;
+}
+
+.icon-ask {
+  /* color: #ccc; */
+  font-size: 35rpx;
+  padding-right: 10rpx;
+}
+
+.jifen {
+  /* width: 750rpx; */
+  background: #fff;
+  height: 300rpx;
+  padding: 30rpx;
+  font-size: 28rpx;
+}
+
+.jifen .title {
+  border: 1px solid #eee;
+  height: 100%;
+  border-radius: 4px;
+}
+
+.ruler {
+  margin-top: 15rpx;
+  text-align: right;
+  padding-right: 30rpx;
+}
+
+.info {
+  font-size: 50rpx;
+  text-align: center;
+  margin-bottom: 15rpx;
+}
+
+.info .iconfont {
+  font-size: 50rpx;
+  padding-right: 15rpx;
+}
+
+.sign {
+  text-align: center;
+}
+
+.sign .button {
+  padding: 8rpx 30rpx;
+  border: 1rpx solid rgb(33,197,180);
+  background: rgb(33,197,180);
+  border-radius: 15px;
+}
+
+.sign .button.red-btn {
+  color: #fff;
+  background:#ccc;
+  border: 1rpx solid #ccc;
+}
+
+.sign .button .iconfont {
+  padding-right: 10rpx;
+}
+
+.sign .button text {
+  vertical-align: baseline;
+}
+
+.sign .bottom {
+  font-size: 24rpx;
+  margin-top: 15rpx;
+}
+
+.bg-white {
+  background: #fff;
+}
+
+.pop-title-top {
+  height: 60rpx;
+  line-height: 60rpx;
+}
+
+.weui-cell-group .cell {
+  background: #fff;
+  padding: 20rpx 30rpx;
+  display: flex;
+  font-size: 26rpx;
+  justify-content: space-between;
+  border-bottom: 1px solid #eee;
+}
+
+.cell-right {
+  line-height: 86rpx;
+  font-size: 35rpx;
+}
+
+/* 弹出框popup */
+
+.show-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 101;
+}
+
+.popup-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 5;
+}
+
+.popup-contents {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: #fff;
+  z-index: 6;
+}
+
+.pop-goods-info {
+  align-items: center;
+  border-bottom: 1px solid #eee;
+}
+
+.popup-join-btn {
+  height: 89rpx;
+  line-height: 89rpx;
+  color: #fff;
+  font-size: 32rpx;
+  text-align: center;
+  background-color: rgb(33,197,180);
+}
+
+.pop-title {
+  text-align: center;
+  height: 89rpx;
+  line-height: 89rpx;
+  font-size: 30rpx;
+}
+
+.pop-goods-des {
+  font-size: 26rpx;
+  display: flex;
+  border: 1px solid #eee;
+  margin: -1rpx 30rpx;
+}
+
+.pop-goods-title {
+  flex: 3;
+  text-align: center;
+  border-left: 1px solid #eee;
+  margin-left: -1px;
+}
+
+.left {
+  flex: 2;
+  line-height: 80rpx;
+}
+
+.pop-title-top .left {
+  line-height: 60rpx;
+}
+
+.font-size {
+  font-size: 26rpx;
+}
+
+.info-bot {
+  padding: 30rpx;
+  line-height: 42rpx;
+}
+
+.loading-view {
+  height: 100rpx;
+  line-height: 100rpx;
+  text-align: center;
+  background: #fff;
+}
+.no-data{
+  font-size: 12px;
+}

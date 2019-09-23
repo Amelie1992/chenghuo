@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wzlue.goods.dao.TagDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.wzlue.goods.entity.TagEntity" id="tagMap">
+        <result property="id" column="id"/>
+        <result property="tagName" column="tag_name"/>
+        <result property="sort" column="sort"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.wzlue.goods.entity.TagEntity">
+		SELECT * FROM g_tag WHERE id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.wzlue.goods.entity.TagEntity">
+		SELECT * FROM g_tag
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                ORDER BY ${sidx} ${order}
+            </when>
+			<otherwise>
+                ORDER BY id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			LIMIT #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		SELECT count(*) FROM g_tag
+	</select>
+	 
+	<insert id="save" parameterType="com.wzlue.goods.entity.TagEntity" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO g_tag
+		(
+																				`tag_name`, 
+																	`sort`, 
+																	`create_time`
+									)
+		VALUES
+		(
+																				#{tagName}, 
+																	#{sort}, 
+																	#{createTime}
+									)
+	</insert>
+	 
+	<update id="update" parameterType="com.wzlue.goods.entity.TagEntity">
+		UPDATE g_tag
+		<set>
+																				<if test="tagName != null">`tag_name` = #{tagName}, </if>
+																	<if test="sort != null">`sort` = #{sort}, </if>
+																	<if test="createTime != null">`create_time` = #{createTime}</if>
+									</set>
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="delete">
+		DELETE FROM g_tag WHERE id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		DELETE FROM g_tag WHERE id IN
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

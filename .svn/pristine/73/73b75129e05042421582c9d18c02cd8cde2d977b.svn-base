@@ -1,0 +1,175 @@
+package com.wzlue.app.controller.order;
+
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.wzlue.common.base.Query;
+import com.wzlue.goods.dao.GoodsDao;
+import com.wzlue.goods.entity.GoodsEntity;
+import com.wzlue.order.dao.OrderRefundDao;
+import com.wzlue.order.entity.LogisticsEntity;
+import com.wzlue.order.entity.ServiceEvaluateEntity;
+import com.wzlue.order.service.LogisticsService;
+import com.wzlue.order.service.ServiceEvaluateService;
+import com.wzlue.sys.util.ExpressHundred;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.wzlue.app.common.annotation.Login;
+import com.wzlue.common.base.R;
+import com.wzlue.order.entity.OrderEntity;
+import com.wzlue.order.entity.OrderRefundEntity;
+import com.wzlue.order.service.OrderRefundService;
+import com.wzlue.order.service.OrderService;
+
+@RestController
+@RequestMapping("/app/orderrefund")
+public class ApiRefundController {
+
+	@Autowired
+	private OrderRefundService orderRefundService;
+	@Autowired
+	private OrderRefundDao orderRefundDao;
+	
+	@Autowired
+	private OrderService orderService;
+
+	@Autowired
+	private ServiceEvaluateService serviceEvaluateService;
+
+	@Autowired
+	private LogisticsService logisticsService;
+	@Autowired
+	private GoodsDao goodsDao;
+
+
+	/**
+	 * 退款退货列表
+	 * @param params
+	 * @param userId
+	 * @return
+	 */
+	@Login
+	@RequestMapping("list")
+	public R list(@RequestParam Map<String, Object> params,Long userId){
+		
+		params.put("memberId", userId);
+		Query query = new Query(params);
+//		List<OrderRefundEntity> orderRefundList = orderRefundService.queryList(params);
+		List<OrderRefundEntity>orderRefundList=orderRefundDao.queryOrderGoodList(query);
+		return R.ok().put("orderRefundList", orderRefundList);
+	}
+
+	/*申请退款*/
+	@Login
+	@RequestMapping("apply")
+	public R apply(@RequestBody OrderRefundEntity orderRefund, @RequestAttribute("userId") Long userId){
+		for (int i=0;i<orderRefund.getGoodsInfo().length;i++){
+			orderRefund.setCreateTime(new Date());
+			Object id=((LinkedHashMap) orderRefund.getGoodsInfo()[i]).get("id");
+			orderRefund.setOrderGoodId((Integer) id);//订单商品表id
+			Object num=((LinkedHashMap) orderRefund.getGoodsInfo()[i]).get("nums");
+			orderRefund.setRefundNum((Integer) num);
+			Object refoundAmount=((LinkedHashMap) orderRefund.getGoodsInfo()[i]).get("refundAmount");
+			if(refoundAmount.toString().contains(".")){//判断小数还是整数
+				BigDecimal aa=new BigDecimal((double) refoundAmount);
+				orderRefund.setRefundAmount(aa);
+			}else{
+				BigDecimal aa=new BigDecimal((Integer) refoundAmount);
+				orderRefund.setRefundAmount(aa);
+			}
+			orderRefund.setMemberId(userId);
+			orderRefund.setStatus(1);
+			orderRefundService.save(orderRefund);
+		}
+
+		return R.ok();
+	}
+
+	/**
+	 * 退款/退货详情
+	 * @param id
+	 * @return
+	 */
+	@Login
+	@RequestMapping("detail")
+	public R detail(Long id){
+		OrderRefundEntity orderRefund = orderRefundService.queryObject(id);//退款的信息
+		long goodId=orderRefund.getOrderGoodsEntity().getGoodsId();
+		GoodsEntity goodsEntity=goodsDao.goodsAddress(goodId);
+		return R.ok().put("orderRefund", orderRefund).put("goodsEntity",goodsEntity);
+	}
+	
+	@Login
+	@RequestMapping("getByOrderNumber")
+	public R getByOrderNumber(String orderNumber){
+		OrderRefundEntity orderRefund = orderRefundService.queryByOrderNumber(orderNumber);
+		OrderEntity order = orderService.queryByOrderNumber(orderNumber);
+		return R.ok().put("orderRefund", orderRefund).put("order", order);
+	}
+
+	/**
+	 * 添加售后评价
+	 */
+	@Login
+	@RequestMapping("addServiceEvaluate")
+	public R addServiceEvaluate(@RequestBody ServiceEvaluateEntity serviceEvaluate){
+		/*serviceEvaluate.setMemberId(userId);*/
+		serviceEvaluate.setCreateTime(new Date());
+		serviceEvaluateService.save(serviceEvaluate);
+		return R.ok();
+	}
+
+	/**
+	 * 退货物流公司列表
+	 * @param params
+	 * STATUS==1可用
+	 * @return
+	 */
+	@Login
+	@RequestMapping("/logisticsList")
+	public R list2(@RequestParam Map<String, Object> params){
+		//查询列表数据
+		Query query = new Query(params);
+		List<LogisticsEntity> logisticsList = logisticsService.queryList(query);
+		return R.ok().put("logisticsList",logisticsList);
+	}
+
+
+	/**
+	 * 退货发货
+	 * @param refundNumber 退货订单号
+	 * @param companyId  物流公司Id
+	 * @param companyName  物流公司名称
+	 * @param logisticsNumber 物流单号
+	 *                        logisticsPrice 运费
+	 * @return
+	 */
+	@Login
+	@RequestMapping("/sendGoods")
+	public R sendGoods(String refundNumber, Long companyId, String companyName, String logisticsNumber,Long logisticsId,String logisticsPrice) {
+		orderRefundService.sendGoods(refundNumber, companyId,companyName, logisticsNumber,logisticsId,logisticsPrice);
+		return R.ok();
+	}
+
+	/**
+	 * 查询实时物流
+	 * @param com 快递公司代码
+	 * @param nu  物流单号
+	 * @return
+	 */
+	@Login
+	@RequestMapping("/queryLogistics")
+	public R queryLogistics(String com, String nu) {
+		String content = ExpressHundred.getSynquery(com, nu);
+		return R.ok().put("content", content);
+	}
+
+}

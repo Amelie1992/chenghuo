@@ -1,0 +1,77 @@
+<!--pages/pay/index.wxml-->
+<view class="container">
+  <form bindsubmit="createOrder" report-submit="true">
+    <view class="address-box" wx:if="{{isNeedLogistics > 0}}">
+      <view class="add-address" hidden="{{memberAddress}}">
+        <view class="title" bindtap="addAddress">新增收货地址</view>
+      </view>
+      <view class="show-address" hidden="{{!memberAddress}}" bindtap="selectAddress">
+        <view class="name-tel">{{memberAddress.userName}} {{memberAddress.telNumber}}</view>
+        <view class="addr-text">{{memberAddress.province}}{{memberAddress.city}}{{memberAddress.county}}{{memberAddress.street}}</view>
+      </view>
+    </view>
+    <view class="goods-list">
+      <view class="list-title">商品列表</view>
+      <view class="a-goods" wx:for-items="{{goodsList}}" wx:key="{{index}}">
+        <view class="img-box">
+          <image src="{{item.pic}}" class="img" />
+        </view>
+        <view class="text-box">
+          <view class="arow arow01">
+            <view class="goods-name">{{item.name}}</view>
+            <view class="goods-price" wx:if="{{item.specsprice==null}}" >¥ {{item.payPrice}}</view>
+             <view class="goods-price" wx:if="{{item.specsprice}}" >¥ {{item.specsprice}}</view>
+          </view>
+          <view class="arow">
+          <view class="goods-label">{{item.specName}}</view>
+            <view class="goods-label">{{item.label}}</view>
+            <view class="goods-num">x {{item.number}}</view>
+          </view>
+        </view>
+      </view>
+      <view class='list-footer'>
+        <view class='foot-con'>共{{allGoodsNumber}}小件商品 小计
+          <view class='box'>￥{{goodsPrice}}</view>
+        </view>
+      </view>
+    </view>
+    <view class="peisong-way">
+      <view class="row-box">
+        <view class="row-label">支付方式</view>
+        <view class="right-text">微信</view>
+      </view>
+      <view class="row-box" wx:if="{{isNeedLogistics > 0}}">
+        <view class="row-label">运费</view>
+        <view class="right-text" wx:if="{{yunPrice > 0}}">{{yunPrice}}</view>
+        <view class="right-text" wx:if="{{yunPrice == 0}}">包邮</view>
+      </view>
+      <view class="row-box right">
+        <view class="row-label">发票</view>
+        <view class="right-text" style='padding-right:50rpx;'>
+          <navigator url="/pages/member/invoice/index" hover-class="navigator-hover">
+          <text wx:if="{{invoiceType == 1}}">纸质发票-单位</text> 
+          <text wx:if="{{invoiceType == 0}}">纸质发票-个人</text> 
+          </navigator>
+        </view>
+      </view>
+      <view class="row-box">
+        <view class="row-label">使用{{scoreToPay}}积分抵用{{purposeMoney}}元</view>
+        <view class="right-text">
+          <switch class='weui_switch' color='rgb(33,197,180)' checked="{{isChecked}}" bindchange="changeSwitch"/>
+        </view>
+      </view>
+      <view class="row-box">
+        <view class="row-label">备注</view>
+        <view class="right-text">
+          <input name="remark" type="text" class="liuyan" placeholder="如需备注请输入" />
+        </view>
+      </view>
+    </view>
+    <view class="jiesuan-box">
+      <view class="left-price">
+        <view class="total"><text style='color:black'>合计：</text>¥ {{allGoodsPrice + yunPrice}}</view>
+      </view>
+      <button class="to-pay-btn" formType="submit">提交订单</button>
+    </view>
+  </form>
+</view>

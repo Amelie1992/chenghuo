@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wzlue.goods.dao.GoodsDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.wzlue.goods.entity.GoodsEntity" id="goodsMap">
+        <result property="id" column="id"/>
+        <result property="goodsName" column="goods_name"/>
+        <result property="keywords" column="keywords"/>
+        <result property="categoryId" column="category_id"/>
+        <result property="brandId" column="brand_id"/>
+        <result property="shopId" column="shop_id"/>
+        <result property="price" column="price"/>
+        <result property="vipPrice" column="vip_price"/>
+        <!--<result property="payPrice" column="pay_price"/>-->
+        <result property="picUrl" column="pic_url"/>
+        <result property="stock" column="stock"/>
+        <result property="warningStock" column="warning_stock"/>
+        <result property="status" column="status"/>
+        <result property="sort" column="sort"/>
+        <result property="description" column="description"/>
+        <result property="sign" column="sign"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="synopsis" column="synopsis"/>
+        <result property="addressId" column="address_id"/>
+        <result property="salesNum" column="sales_num"/>
+        <result property="priceSection" column="price_section"/>
+        <result property="freightTemplateId" column="freight_template_id"/>
+        <result property="isCard" column="is_card"/>
+        <result property="supplier" column="supplier"/>
+        <result property="supplierContact" column="supplier_contact"/>
+        <result property="unitCost" column="unit_cost"/>
+        <result property="itemNo" column="item_no"/>
+        <association property="brand" javaType="com.wzlue.goods.entity.BrandEntity">
+            <result property="brandName" column="brand_name"/>
+        </association>
+
+        <association property="category" javaType="com.wzlue.goods.entity.CategoryEntity">
+            <result property="categoryName" column="category_name"/>
+        </association>
+
+        <collection property="tagList" select="queryTagList" column="id">
+            <result column="tag_name" property="tagName"/>
+        </collection>
+
+        <collection property="goodsPropertyList" select="queryGoodsPropertyList" column="id">
+            <result column="property_id" property="propertyId"/>
+            <result column="property_name" property="propertyName"/>
+            <result column="property_value" property="propertyValue"/>
+        </collection>
+
+        <collection property="specEntity" select="goodSpecList" column="id">
+
+        <result property="goodsId" column="goods_id"/>
+        <result property="specId" column="spec_id"/>
+        <result property="specName" column="spec_name"/>
+        <result property="specPrice" column="spec_price"/>
+        <result property="specVipPrice" column="spec_vip_price"/>
+        <result property="stock" column="stock"/>
+        <result property="specNo" column="spec_no"/>
+        <result property="specUnit" column="spec_unit"/>
+
+        <result property="specNameTwo" column="spec_name_two"/>
+        <result property="specIdTwo" column="spec_id_two"/>
+        <result property="specPic" column="spec_pic"/>
+        <result property="goodsName" column="goods_name"/>
+        </collection>
+
+    </resultMap>
+
+    <resultMap type="com.wzlue.goods.entity.GoodsEntity" id="goodsMapTwo">
+        <result property="id" column="id"/>
+        <result property="goodsName" column="goods_name"/>
+        <result property="keywords" column="keywords"/>
+        <result property="categoryId" column="category_id"/>
+        <result property="brandId" column="brand_id"/>
+        <result property="shopId" column="shop_id"/>
+        <result property="price" column="price"/>
+        <result property="vipPrice" column="vip_price"/>
+        <!--<result property="payPrice" column="pay_price"/>-->
+        <result property="picUrl" column="pic_url"/>
+        <result property="stock" column="stock"/>
+        <result property="warningStock" column="warning_stock"/>
+        <result property="status" column="status"/>
+        <result property="sort" column="sort"/>
+        <result property="description" column="description"/>
+        <result property="sign" column="sign"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="synopsis" column="synopsis"/>
+        <result property="addressId" column="address_id"/>
+        <result property="salesNum" column="sales_num"/>
+        <result property="priceSection" column="price_section"/>
+        <result property="freightTemplateId" column="freight_template_id"/>
+        <result property="isCard" column="is_card"/>
+        <result property="supplier" column="supplier"/>
+        <result property="supplierContact" column="supplier_contact"/>
+        <result property="unitCost" column="unit_cost"/>
+        <result property="itemNo" column="item_no"/>
+        <association property="merchantAddressEntity" javaType="com.wzlue.goods.entity.MerchantAddressEntity">
+            <result property="id" column="id"/>
+            <result property="name" column="name"/>
+            <result property="phone" column="phone"/>
+            <result property="province" column="province"/>
+            <result property="city" column="city"/>
+            <result property="county" column="county"/>
+            <result property="street" column="street"/>
+            <result property="zipCode" column="zip_code"/>
+            <result property="status" column="status"/>
+            <!-- 城市表别名 -->
+            <result property="provinceName" column="provinceName"/>
+            <result property="cityName" column="cityName"/>
+            <result property="countyName" column="countyName"/>
+        </association>
+    </resultMap>
+
+    <!--退货退款的商品和地址信息-->
+    <select id="goodsAddress" resultMap="goodsMapTwo">
+        SELECT g.*,c.* ,pr.city_name AS provinceName,ci.city_name AS cityName,c3.city_name AS countyName FROM g_goods g
+		LEFT JOIN merchant_address c ON g.address_id = c.id
+        LEFT JOIN sys_city_info AS pr ON pr.city_code = c.province
+        LEFT JOIN sys_city_info AS ci ON ci.city_code = c.city
+        LEFT JOIN sys_city_info AS c3 ON c3.city_code = c.county
+		WHERE g.id = #{goodId}
+    </select>
+
+    <select id="queryGoodsPropertyList" resultType="com.wzlue.goods.entity.GoodsPropertyEntity">
+    	select gp.property_id, p.property_name, gp.property_value from g_goods_property gp left join g_property p on gp.property_id = p.id where gp.goods_id = #{value}
+    </select>
+<!--规格-->
+    <select id="goodSpecList" resultType="com.wzlue.goods.entity.GoodsSpecEntity">
+        select * from g_goods_spec g where g.goods_id = #{value}
+    </select>
+
+
+    <select id="queryTagList" resultType="com.wzlue.goods.entity.TagEntity">
+    	select t.* from g_goods_tag gt left join g_tag t on gt.tag_id = t.id where gt.goods_id = #{value}
+    </select>
+
+    <select id="queryObject" resultMap="goodsMap">
+		SELECT g.*,b.brand_name, c.category_name FROM g_goods g
+		LEFT JOIN g_category c ON g.category_id = c.id
+		LEFT JOIN g_brand b ON g.brand_id = b.id
+		WHERE g.id = #{id}
+	</select>
+
+    <!--接口用查商品详情-->
+    <select id="queryObject2" resultMap="goodsMap">
+		SELECT * from g_goods WHERE id = #{id}
+	</select>
+
+    <select id="queryList" resultMap="goodsMap">
+        SELECT DISTINCT g.*,c.*,
+        b.brand_name AS 'brand.brandName' FROM g_goods g
+        LEFT JOIN g_category c ON g.category_id = c.id
+        LEFT JOIN g_brand b ON g.brand_id = b.id
+        LEFT JOIN g_goods_tag gt ON gt.goods_id = g.id
+        <where>
+            <if test="goodsName != null and goodsName !=''">
+                g.goods_name like CONCAT('%',#{goodsName},'%')
+            </if>
+            <if test="sign != null">
+                and g.sign = #{sign}
+            </if>
+            <if test="status != null">
+                and g.status = #{status}
+            </if>
+            <if test="categoryId != null and categoryId!=''">
+                and g.category_id = #{categoryId}
+            </if>
+            <if test="brandId != null">
+                and g.brand_id = #{brandId}
+            </if>
+            <if test="keywords != null and keywords != ''">
+                and keywords like CONCAT('%',#{keywords},'%')
+            </if>
+
+            <if test="goodsName != null and goodsName != ''">
+                and g.goods_name like CONCAT('%',#{goodsName},'%')
+            </if>
+            <if test="tags != null and tags != ''">
+                and gt.tag_id in
+                <foreach item="tag" collection="tags" open="(" separator="," close=")">
+                    #{tag}
+                </foreach>
+            </if>
+        </where>
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                ORDER BY ${sidx} ${order}
+            </when>
+            <otherwise>
+                ORDER BY g.status,g.create_time desc
+            </otherwise>
+        </choose>
+        <if test="offset != null and limit != null">
+            LIMIT #{offset}, #{limit}
+        </if>
+    </select>
+    <select id="goodsId" resultType="com.wzlue.goods.entity.GoodsEntity">
+        select * from g_goods where `status`=1 and id in (${ids})
+    </select>
+
+    <select id="queryTotal" resultType="int">
+        SELECT count(DISTINCT id) FROM g_goods g
+        <where>
+            <if test="sign != null">
+                g.sign = #{sign}
+            </if>
+            <if test="status != null">
+                and g.status = #{status}
+            </if>
+            <if test="categoryId != null">
+                and g.category_id = #{categoryId}
+            </if>
+            <if test="brandId != null">
+                and g.brand_id = #{brandId}
+            </if>
+            <if test="keywords != null and keywords != ''">
+                and keywords like CONCAT('%',#{keywords},'%')
+            </if>
+            <if test="goodsName != null and goodsName != ''">
+                and g.goods_name like CONCAT('%',#{goodsName},'%')
+            </if>
+            <if test="tags != null and tags != ''">
+                and gt.tag_id in
+                <foreach item="tag" collection="array" open="(" separator="," close=")">
+                    #{tag}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <insert id="save" parameterType="com.wzlue.goods.entity.GoodsEntity" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO g_goods
+        (
+        `goods_name`,
+        <if test="keywords != null">`keywords`,</if>
+        <if test="categoryId != null">category_id,</if>
+        <if test="brandId != null">brand_id,</if>
+        <if test="price != null">price,</if>
+        <if test="vipPrice != null">vip_price,</if>
+        <!--<if test="payPrice != null">pay_price,</if>-->
+        <if test="picUrl != null">pic_url,</if>
+        <if test="stock != null">stock,</if>
+        <if test="status != null">status,</if>
+        <if test="description != null">description,</if>
+        <if test="sign != null">sign,</if>
+        <if test="synopsis != null">synopsis,</if>
+        <if test="priceSection != null">price_section,</if>
+        <if test="isCard != null">is_card,</if>
+        <if test="freightTemplateId != null">freight_template_id,</if>
+        <if test="supplier != null">supplier,</if>
+        <if test="supplierContact != null">supplier_contact,</if>
+        <if test="unitCost != null">unit_cost,</if>
+        <if test="itemNo != null">item_no,</if>
+        `create_by`,
+        `create_time`,
+        `update_by`,
+        `update_time`,
+        `address_id`
+        )
+        VALUES
+        (
+        #{goodsName},
+        <if test="keywords != null">#{keywords},</if>
+        <if test="categoryId != null">#{categoryId},</if>
+        <if test="brandId != null">#{brandId},</if>
+        <if test="price != null">#{price},</if>
+        <if test="vipPrice != null">#{vipPrice},</if>
+        <!--<if test="payPrice != null">#{payPrice},</if>-->
+        <if test="picUrl != null">#{picUrl},</if>
+        <if test="stock != null">#{stock},</if>
+        <if test="status != null">#{status},</if>
+        <if test="description != null">#{description},</if>
+        <if test="sign != null">#{sign},</if>
+        <if test="synopsis != null">#{synopsis},</if>
+        <if test="priceSection != null">#{priceSection},</if>
+        <if test="isCard != null">#{isCard},</if>
+        <if test="freightTemplateId != null">#{freightTemplateId},</if>
+        <if test="supplier != null">#{supplier},</if>
+        <if test="supplierContact != null">#{supplierContact},</if>
+        <if test="unitCost != null">#{unitCost},</if>
+        <if test="itemNo != null">#{itemNo},</if>
+        #{createBy},
+        now(),
+        #{updateBy},
+        now(),
+        #{addressId}
+        )
+    </insert>
+
+    <update id="addSaleNum">
+		update g_goods  set sales_num = sales_num+1 where id = #{value}
+	</update>
+
+    <update id="update" parameterType="com.wzlue.goods.entity.GoodsEntity">
+        UPDATE g_goods
+        <set>
+            <if test="goodsName != null">`goods_name` = #{goodsName},</if>
+            <if test="keywords != null">`keywords` = #{keywords},</if>
+            <if test="categoryId != null">`category_id` = #{categoryId},</if>
+            <if test="brandId != null">`brand_id` = #{brandId},</if>
+            <if test="shopId != null">`shop_id` = #{shopId},</if>
+            <if test="price != null">`price` = #{price},</if>
+            <if test="vipPrice != null">`vip_price` = #{vipPrice},</if>
+            <!--<if test="payPrice != null">`pay_price` = #{payPrice},</if>-->
+            <if test="picUrl != null">`pic_url` = #{picUrl},</if>
+            <if test="stock != null">`stock` = #{stock},</if>
+            <if test="warningStock != null">`warning_stock` = #{warningStock},</if>
+            <if test="status != null">`status` = #{status},</if>
+            <if test="sort != null">`sort` = #{sort},</if>
+            <if test="description != null">`description` = #{description},</if>
+            <if test="sign != null">`sign` = #{sign},</if>
+            <if test="synopsis != null">`synopsis` = #{synopsis},</if>
+            <if test="freightTemplateId != null">`freight_template_id` = #{freightTemplateId},</if>
+            <if test="salesNum != null">`sales_num` = #{salesNum},</if>
+            <if test="priceSection != null">`price_section` = #{priceSection},</if>
+            <if test="updateBy != null">`update_by` = #{updateBy},</if>
+            <if test="updateTime != null">`update_time` = #{updateTime},</if>
+            <if test="isCard != null">`is_card`=#{isCard},</if>
+            <if test="supplier != null">`supplier`=#{supplier},</if>
+            <if test="supplierContact != null">`supplier_contact`=#{supplierContact},</if>
+            <if test="unitCost != null">`unit_cost`=#{unitCost},</if>
+            <if test="itemNo != null">`item_no`=#{itemNo},</if>
+            <if test="addressId != null">`address_id` = #{addressId}</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+		DELETE FROM g_goods  WHERE id = #{value}
+	</delete>
+
+    <delete id="deleteBatch">
+        DELETE FROM g_goods WHERE id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <update id="updateStatus">
+        update g_goods set status = #{status} WHERE id IN
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!--充值卡商品-->
+    <select id="cardGood" resultType="com.wzlue.goods.entity.GoodsEntity">
+        SELECT id FROM g_goods WHERE is_card=1 AND status=1 ORDER BY create_time desc
+    </select>
+
+</mapper>

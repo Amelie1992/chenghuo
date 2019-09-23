@@ -1,0 +1,249 @@
+
+package com.wzlue.web.controller.goods;
+
+import com.wzlue.common.base.R;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.wzlue.goods.dao.GoodsSpecDao;
+import com.wzlue.goods.dao.SpecDao;
+import com.wzlue.goods.entity.GoodsSpecEntity;
+import com.wzlue.goods.entity.MerchantAddressEntity;
+import com.wzlue.goods.entity.SpecEntity;
+import com.wzlue.goods.service.MerchantAddressService;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import com.wzlue.web.controller.sys.AbstractController;
+
+import com.wzlue.goods.entity.GoodsEntity;
+import com.wzlue.goods.service.GoodsService;
+import com.wzlue.common.utils.PageUtils;
+import com.wzlue.common.base.Query;
+import com.wzlue.common.base.R;
+
+
+/**
+ * 商品
+ *
+ * @author wzlue
+ * @email wzlue.com
+ * @date 2018-07-25 19:59:39
+ */
+@RestController
+@RequestMapping("/goods")
+public class GoodsController extends AbstractController {
+    @Autowired
+    private GoodsService goodsService;
+    @Autowired
+    private GoodsSpecDao goodsSpecDao;
+    @Autowired
+    private MerchantAddressService merchantAddressService;
+    @Autowired
+    private SpecDao specDao;
+
+    /**
+     * 列表
+     */
+    @RequestMapping("/list")
+    public R list(@RequestParam Map<String, Object> params) {
+        //查询列表数据
+        Query query = new Query(params);
+
+        List<GoodsEntity> goodsList = goodsService.queryList(query);
+        int total = goodsService.queryTotal(query);
+
+        return R.page(goodsList, total);
+    }
+
+
+    /**
+     * 信息
+     */
+    @RequestMapping("/info/{id}")
+    @RequiresPermissions("goods:info")
+    public R info(@PathVariable("id") Long id) {
+        GoodsEntity goods = goodsService.queryObject(id);
+        List<GoodsSpecEntity> goodsSpecEntityList = goodsSpecDao.getSpecs(id);
+        List<SpecEntity> specEntityListOne=new ArrayList<SpecEntity>();
+        List<SpecEntity> specEntityListTwo=new ArrayList<SpecEntity>();;
+        if(goodsSpecEntityList.size()>0){
+            //规格1的全部
+            Long specId =goodsSpecEntityList.get(0).getSpecId();
+            if(specId!=null){
+                SpecEntity specEntityOne=specDao.queryObject(specId);
+                specEntityListOne=specDao.selectIdSon(specEntityOne.getParentId().intValue());
+            }
+            //规格2的全部
+            Long specTowId =goodsSpecEntityList.get(0).getSpecIdTwo();
+            if(specTowId!=null){
+                SpecEntity specEntityTwo=specDao.queryObject(specTowId);
+                specEntityListTwo=specDao.selectIdSon(specEntityTwo.getParentId().intValue());
+            }
+
+        }
+
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("id",goods.getAddressId());
+        List<MerchantAddressEntity> merchantAddressEntity = merchantAddressService.queryList(params);
+        goods.setMerchantAddress(merchantAddressEntity);
+        return R.ok().put("goods", goods).put("goodsSpecEntityList", goodsSpecEntityList).put("specEntityListOne",specEntityListOne).put("specEntityListTwo",specEntityListTwo);
+    }
+
+    /**
+     * 保存
+     */
+    @RequestMapping("/save")
+    @RequiresPermissions("goods:save")
+    public R save(@RequestBody GoodsEntity goods) {
+        goods.setCreateBy(getUserId());
+        goods.setUpdateBy(getUserId());
+        goodsService.save(goods);
+//       添加到规格详情中
+        if(goods.getSpecList().size()<1){//如果没有选择多个规格集合的话单独创建规格为空的详情信息
+            GoodsSpecEntity goodSpecEntityOne = new GoodsSpecEntity();
+            goodSpecEntityOne.setGoodsId(goods.getId());//商品id
+            goodSpecEntityOne.setSpecPrice(goods.getPrice());//商品原价
+            goodSpecEntityOne.setSpecVipPrice(goods.getVipPrice());//会员价格
+            goodSpecEntityOne.setStock(goods.getStock().intValue());//库存
+            goodSpecEntityOne.setSpecNo(goods.getItemNo());//货号
+            goodSpecEntityOne.setSpecUnit(goods.getUnitCost());//成本单价
+            goodsSpecDao.save(goodSpecEntityOne);
+        }else{
+            for (int i = 0; i < goods.getSpecList().size(); i++) {
+                GoodsSpecEntity goodSpecEntity = new GoodsSpecEntity();
+                goodSpecEntity.setGoodsId(goods.getId());//商品id
+                goodSpecEntity.setSpecId(goods.getSpecList().get(i).getSpecId());//规格1id
+                goodSpecEntity.setSpecIdTwo(goods.getSpecList().get(i).getSpecIdTwo());//规格2id
+                goodSpecEntity.setSpecName(goods.getSpecList().get(i).getSpecName());//规格名称
+                goodSpecEntity.setSpecNameTwo(goods.getSpecList().get(i).getSpecNameTwo());//规格2名称
+                if(goods.getSpecList().get(i).getSpecPic()!=null){
+                    goodSpecEntity.setSpecPic(goods.getSpecList().get(i).getSpecPic());//规格图片
+                }
+                goodSpecEntity.setSpecPrice(goods.getSpecList().get(i).getSpecPrice());//规格价格
+                goodSpecEntity.setSpecVipPrice(goods.getSpecList().get(i).getSpecVipPrice());//会员价格
+                goodSpecEntity.setStock(goods.getSpecList().get(i).getStock());//库存
+                goodSpecEntity.setSpecNo(goods.getSpecList().get(i).getSpecNo());//货号
+                goodSpecEntity.setSpecUnit(goods.getSpecList().get(i).getSpecUnit());//成本单价
+                goodSpecEntity.setGoodsName(goods.getGoodsName());//商品名称
+                goodsSpecDao.save(goodSpecEntity);
+            }
+
+        }
+
+
+        return R.ok();
+    }
+
+    /**
+     * 修改
+     */
+    @RequestMapping("/update")
+    @RequiresPermissions("goods:update")
+    public R update(@RequestBody GoodsEntity goods) {
+        goods.setUpdateBy(getUserId());
+        goodsService.update(goods);
+        //提交的产品规格l
+        List<SpecEntity> goodsSpecEntityListNew=new ArrayList<SpecEntity>();
+        goodsSpecEntityListNew = goods.getSpecList();
+        //循环修改前的规格是否存在，不存在删除
+        List<GoodsSpecEntity> goodsSpecEntityListOld = goodsSpecDao.getSpecs(goods.getId());//数据库里的
+        ArrayList<Long> oId = new ArrayList<>();
+        ArrayList<Long> nId = new ArrayList<>();
+        for (GoodsSpecEntity ps : goodsSpecEntityListOld) {
+            oId.add(ps.getId());//数据库
+        }
+        for (SpecEntity psNew : goodsSpecEntityListNew) {
+            nId.add(psNew.getId());//现有的
+        }
+
+        for (int i = 0; i < oId.size(); i++) {
+            if (!nId.contains(oId.get(i))) {
+                goodsSpecDao.delete(oId.get(i));
+            }
+        }
+
+        for (int i = 0; i < goods.getSpecList().size(); i++) {
+            GoodsSpecEntity goodSpecEntity = new GoodsSpecEntity();
+            goodSpecEntity.setSpecId(goods.getSpecList().get(i).getSpecId());//规格1id
+            goodSpecEntity.setSpecIdTwo(goods.getSpecList().get(i).getSpecIdTwo());//规格2id
+            goodSpecEntity.setSpecName(goods.getSpecList().get(i).getSpecName());//规格名称
+            goodSpecEntity.setSpecNameTwo(goods.getSpecList().get(i).getSpecNameTwo());//规格2名称
+            goodSpecEntity.setSpecPrice(goods.getSpecList().get(i).getSpecPrice());//规格价格
+            goodSpecEntity.setSpecVipPrice(goods.getSpecList().get(i).getSpecVipPrice());//会员价格
+            goodSpecEntity.setSpecPic(goods.getSpecList().get(i).getSpecPic());//图片
+            goodSpecEntity.setGoodsName(goods.getGoodsName());//商品名称
+
+            if(goodsSpecEntityListNew.get(i).getId()!=null && goodsSpecEntityListNew.get(i).getId().toString()!=""){//传过来的规格id
+                goodSpecEntity.setId(goods.getSpecList().get(i).getId());//根据id修改
+                goodSpecEntity.setStock(goods.getSpecList().get(i).getStock());//库存
+                goodSpecEntity.setSpecUnit(goods.getSpecList().get(i).getSpecUnit());//成本单价
+                goodSpecEntity.setSpecNo(goods.getSpecList().get(i).getSpecNo());//货号
+                goodsSpecDao.update(goodSpecEntity);
+            }else{
+                goodSpecEntity.setGoodsId(goods.getId());//商品id
+                goodSpecEntity.setStock(goods.getSpecList().get(i).getStock());//库存
+                goodSpecEntity.setSpecUnit(goods.getSpecList().get(i).getSpecUnit());//成本单价
+                goodSpecEntity.setSpecNo(goods.getSpecList().get(i).getSpecNo());//货号
+                goodsSpecDao.save(goodSpecEntity);
+            }
+
+
+
+        }
+
+        if(goods.getSpecList().size()<1){
+            GoodsSpecEntity goodSpecEntityOne = new GoodsSpecEntity();
+            goodSpecEntityOne.setGoodsId(goods.getId());//商品id
+            goodSpecEntityOne.setGoodsName(goods.getGoodsName());//商品名称
+            goodSpecEntityOne.setSpecPrice(goods.getPrice());//商品原价
+            goodSpecEntityOne.setSpecVipPrice(goods.getVipPrice());//会员价格
+            goodSpecEntityOne.setStock(goods.getStock().intValue());//库存
+            goodSpecEntityOne.setSpecNo(goods.getItemNo());//货号
+            goodSpecEntityOne.setSpecUnit(goods.getUnitCost());//成本单价
+            goodsSpecDao.save(goodSpecEntityOne);
+        }
+
+
+
+
+
+        return R.ok();
+    }
+
+    /**
+     * 删除
+     */
+    @RequestMapping("/delete")
+    @RequiresPermissions("goods:delete")
+    public R delete(@RequestBody Long[] ids) {
+        goodsService.deleteBatch(ids);
+
+        return R.ok();
+    }
+
+    @RequestMapping("/goodsOn")
+    @RequiresPermissions("goods:update")
+    public R goodsOn(@RequestBody Long[] ids) {
+        Integer status = 1;
+        goodsService.updateStatus(ids, status);
+        return R.ok();
+    }
+
+    @RequestMapping("/goodsOff")
+    @RequiresPermissions("goods:update")
+    public R goodsOff(@RequestBody Long[] ids) {
+        Integer status = 2;
+        goodsService.updateStatus(ids, status);
+        return R.ok();
+    }
+
+}

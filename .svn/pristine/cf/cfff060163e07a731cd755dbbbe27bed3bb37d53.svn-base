@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wzlue.goods.dao.GoodsCollectionDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+	<resultMap type="com.wzlue.goods.entity.GoodsCollectionEntity"
+		id="goodsCollectionMap">
+		<result property="id" column="id" />
+		<result property="memberId" column="member_id" />
+		<result property="goodsId" column="goods_id" />
+		<result property="createTime" column="create_time" />
+	</resultMap>
+
+	<select id="queryObject" resultType="com.wzlue.goods.entity.GoodsCollectionEntity">
+		SELECT * FROM
+		g_goods_collection WHERE id = #{value}
+	</select>
+	
+	<select id="getCollectionGoods" resultType="com.wzlue.goods.entity.GoodsCollectionEntity">
+		select g.* from g_goods_collection gc left join
+		g_goods g on gc.goods_id = g.id
+		<where>
+			1=1
+			<if test="memberId!=null and memberId!=''">
+				and gc.member_id = #{memberId}
+			</if>
+			and g.status=1
+		</where>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				ORDER BY ${sidx} ${order}
+			</when>
+			<otherwise>
+				order by gc.create_time desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			LIMIT #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryList" resultType="com.wzlue.goods.entity.GoodsCollectionEntity">
+		SELECT * FROM g_goods_collection
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				ORDER BY ${sidx} ${order}
+			</when>
+			<otherwise>
+				ORDER BY id desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			LIMIT #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryTotal" resultType="int">
+		SELECT count(*) from g_goods_collection gc left join
+		g_goods g on gc.goods_id = g.id
+		<where>
+			g.status=1
+			<if test="goodsId != null">
+				AND goods_id = #{goodsId}
+			</if>
+			<if test="memberId != null">
+				and gc.member_id = #{memberId}
+			</if>
+		</where>
+	</select>
+
+	<insert id="save" parameterType="com.wzlue.goods.entity.GoodsCollectionEntity"
+		useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO g_goods_collection
+		(
+		`member_id`,
+		`goods_id`,
+		`create_time`
+		)
+		VALUES
+		(
+		#{memberId},
+		#{goodsId},
+		#{createTime}
+		)
+	</insert>
+
+	<update id="update" parameterType="com.wzlue.goods.entity.GoodsCollectionEntity">
+		UPDATE g_goods_collection
+		<set>
+			<if test="memberId != null">`member_id` = #{memberId}, </if>
+			<if test="goodsId != null">`goods_id` = #{goodsId}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<delete id="delete">
+		DELETE FROM g_goods_collection WHERE id = #{value}
+	</delete>
+
+	<delete id="deleteBatch">
+		DELETE FROM g_goods_collection WHERE id IN
+		<foreach item="id" collection="array" open="(" separator=","
+			close=")">
+			#{id}
+		</foreach>
+	</delete>
+	
+	<delete id="deleteByGoodsAndMember">
+		delete from g_goods_collection where goods_id = #{goodsId} and member_id = #{memberId}
+	</delete>
+
+</mapper>
